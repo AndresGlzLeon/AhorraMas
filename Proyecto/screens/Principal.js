@@ -1,6 +1,8 @@
 import React from "react";
 import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from "react-native";
 import  PagosProgramados  from "./PagosProgramados";
+import Login from "./Login";
+import CrearCuenta from "./CrearCuenta";
 
 export default function Principal() {
   const [currentScreen, setCurrentScreen] = React.useState("principaL");
@@ -22,7 +24,6 @@ export default function Principal() {
     );
   };
 
-  // Pantalla Principal (tu código original sin cambios)
   const renderPrincipal = () => {
     return (
       <View style={styles.container}>
@@ -36,7 +37,9 @@ export default function Principal() {
           <Text style={styles.title}>Ahorra+ App</Text>
 
           <View style={styles.avatar}>
-            <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+            <TouchableOpacity onPress={() => navigateTo("login")}>
+              <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -121,13 +124,16 @@ export default function Principal() {
   switch (currentScreen) {
     case "pagosProgramados":
       return renderPagosProgramados();
+    case "login":
+      return <Login navigate={setCurrentScreen || setScreen} />;
+    case "crear":
+      return <CrearCuenta navigate={setCurrentScreen || setScreen} />;
     case "principal":
     default:
       return renderPrincipal();
   }
 }
 
-// TUS ESTILOS ORIGINALES SIN CAMBIOS
 const styles = StyleSheet.create({
   container: { 
     flex: 1,
