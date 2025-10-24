@@ -1,117 +1,139 @@
 import React from "react";
-import { View, Text, ScrollView, StyleSheet, Image } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from "react-native";
+import  PagosProgramados  from "./PagosProgramados";
 
 export default function Principal() {
-  return (
-    <View style={styles.container}>
-      {/* HEADER */}
-      <View style={styles.header}>
-        <View style={styles.leftIcons}>
-          {/* 🔧 Aquí pones tu ícono de configuración */}
-          <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+  const [currentScreen, setCurrentScreen] = React.useState("principaL");
 
-          {/* 🔔 Aquí pones tu ícono de notificación */}
-          <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+  // Función para navegar entre pantallas
+  const navigateTo = (screen) => {
+    setCurrentScreen(screen);
+  };
+
+  // Pantalla de Pagos Programados
+  const renderPagosProgramados = () => {
+    return (
+      <View style={styles.container}>
+        
+        {/* Header original de PagosProgramados */}
+        <PagosProgramados />
+        
+      </View>
+    );
+  };
+
+  // Pantalla Principal (tu código original sin cambios)
+  const renderPrincipal = () => {
+    return (
+      <View style={styles.container}>
+        {/* HEADER */}
+        <View style={styles.header}>
+          <View style={styles.leftIcons}>
+            <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+            <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+          </View>
+
+          <Text style={styles.title}>Ahorra+ App</Text>
+
+          <View style={styles.avatar}>
+            <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+          </View>
         </View>
 
-        <Text style={styles.title}>Ahorra+ App</Text>
+        {/* CONTENIDO SCROLLABLE */}
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {/* Bienvenida + puerquito */}
+          <View style={styles.headerSection}>
+            <View>
+              <Text style={styles.welcome}>Bienvenido,{"\n"}Consulta tus gastos</Text>
+            </View>
+            <Image source={require("../assets/logo.png")} style={styles.pigImage} />
+          </View>
 
-        {/* 👤 Aquí va tu imagen/avatar */}
-        <View style={styles.avatar}>
-          <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+          {/* Dinero disponible */}
+          <Text style={styles.text}>Tu dinero disponible es:</Text>
+          <View style={styles.balanceCard}>
+            <Text style={styles.amount}>$1,200</Text>
+          </View>
+
+          {/* Últimas transacciones */}
+          <Text style={styles.sectionTitle}>Últimas transacciones</Text>
+
+          {/* TRANSPORTE */}
+          <View style={styles.transaction}>
+            <Image source={require("../assets/transporte.png")} style={styles.iconTrans} />
+            <View style={styles.details}>
+              <Text style={styles.itemTitle}>Transporte</Text>
+              <Text style={styles.date}>26 sep, 3:18 PM</Text>
+            </View>
+            <Text style={[styles.amountText, { color: "#e63946" }]}>- $300.0</Text>
+          </View>
+
+          {/* SUELDO */}
+          <View style={styles.transaction}>
+            <Image source={require("../assets/sueldo.png")} style={styles.iconTrans} />
+            <View style={styles.details}>
+              <Text style={styles.itemTitle}>Sueldo</Text>
+              <Text style={styles.date}>20 sep, 9:38 PM</Text>
+            </View>
+            <Text style={[styles.amountText, { color: "#2a9d8f" }]}>+ $500.0</Text>
+          </View>
+
+          {/* DESPENSA */}
+          <View style={styles.transaction}>
+            <Image source={require("../assets/despensa.png")} style={styles.iconTrans} />
+            <View style={styles.details}>
+              <Text style={styles.itemTitle}>Despensa</Text>
+              <Text style={styles.date}>26 jul, 3:18 PM</Text>
+            </View>
+            <Text style={[styles.amountText, { color: "#e63946" }]}>- $700.0</Text>
+          </View>
+        </ScrollView>
+
+        {/* NAV INFERIOR */}
+        <View style={styles.bottomNav}>
+          <TouchableOpacity style={styles.iconCircle}>
+            <Image source={require("../assets/Transisiones.png")} style={styles.navIcon} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.iconCircle}>
+            <Image source={require("../assets/Pink.png")} style={styles.navIcon} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.centerButton}>
+            <Image source={require("../assets/inicio.png")} style={styles.centerIcon} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("pagosProgramados")}
+          >
+            <Image source={require("../assets/Programados.png")} style={styles.navIcon} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.iconCircle}>
+            <Image source={require("../assets/BolsaDinero.png")} style={styles.navIcon} />
+          </TouchableOpacity>
         </View>
       </View>
+    );
+  };
 
-      {/* CONTENIDO SCROLLABLE */}
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Bienvenida + puerquito */}
-        <View style={styles.headerSection}>
-          <View>
-            <Text style={styles.welcome}>Bienvenido,{"\n"}Consulta tus gastos</Text>
-          </View>
-          {/* 🐷 Imagen del puerquito */}
-          <Image source={require("../assets/logo.png")} style={styles.pigImage} />
-        </View>
-
-        {/* Dinero disponible */}
-        <Text style={styles.text}>Tu dinero disponible es:</Text>
-        <View style={styles.balanceCard}>
-          <Text style={styles.amount}>$1,200</Text>
-        </View>
-
-        {/* Últimas transacciones */}
-        <Text style={styles.sectionTitle}>Últimas transacciones</Text>
-
-        {/* TRANSPORTE */}
-        <View style={styles.transaction}>
-          <Image source={require("../assets/transporte.png")} style={styles.iconTrans} />
-          <View style={styles.details}>
-            <Text style={styles.itemTitle}>Transporte</Text>
-            <Text style={styles.date}>26 sep, 3:18 PM</Text>
-          </View>
-          <Text style={[styles.amountText, { color: "#e63946" }]}>- $300.0</Text>
-        </View>
-
-        {/* SUELDO */}
-        <View style={styles.transaction}>
-          <Image source={require("../assets/sueldo.png")} style={styles.iconTrans} />
-          <View style={styles.details}>
-            <Text style={styles.itemTitle}>Sueldo</Text>
-            <Text style={styles.date}>20 sep, 9:38 PM</Text>
-          </View>
-          <Text style={[styles.amountText, { color: "#2a9d8f" }]}>+ $500.0</Text>
-        </View>
-
-        {/* DESPENSA */}
-        <View style={styles.transaction}>
-          <Image source={require("../assets/despensa.png")} style={styles.iconTrans} />
-          <View style={styles.details}>
-            <Text style={styles.itemTitle}>Despensa</Text>
-            <Text style={styles.date}>26 jul, 3:18 PM</Text>
-          </View>
-          <Text style={[styles.amountText, { color: "#e63946" }]}>- $700.0</Text>
-        </View>
-      </ScrollView>
-
-      {/* NAV INFERIOR */}
-      {/* NAV INFERIOR */}
-        <View style={styles.bottomNav}>
-
-        <View style={styles.iconCircle}>
-        <Image source={require("../assets/Transisiones.png")} style={styles.navIcon} />
-        </View>
-
-        <View style={styles.iconCircle}>
-        <Image source={require("../assets/Pink.png")} style={styles.navIcon} />
-        </View>
-
-        <View style={styles.centerButton}>
-        <Image source={require("../assets/inicio.png")} style={styles.centerIcon} />
-        </View>
-
-        <View style={styles.iconCircle}>
-        <Image source={require("../assets/Programados.png")} style={styles.navIcon} />
-        </View>
-
-        <View style={styles.iconCircle}>
-        <Image source={require("../assets/BolsaDinero.png")} style={styles.navIcon} />
-        </View>
-
-    </View>
-
-</View>
-);
+  // Renderizar la pantalla actual
+  switch (currentScreen) {
+    case "pagosProgramados":
+      return renderPagosProgramados();
+    case "principal":
+    default:
+      return renderPrincipal();
+  }
 }
 
+// TUS ESTILOS ORIGINALES SIN CAMBIOS
 const styles = StyleSheet.create({
   container: { 
     flex: 1,
-   backgroundColor: "#fff",
-   alignItems:"center",
-
-},
-
-
+    backgroundColor: "#fff",
+    alignItems: "center",
+  },
   // HEADER
   header: {
     flexDirection: "row",
@@ -120,25 +142,28 @@ const styles = StyleSheet.create({
     padding: 15,
     backgroundColor: "#f4f1ff",
     borderRadius: 40,
-    width: " 95%",
+    width: "95%",
     marginTop: 50,
-    
-    
   },
   leftIcons: {
     flexDirection: "row", 
-    alignItems: "center" },
-
+    alignItems: "center" 
+  },
   iconHeader: { 
     width: 33,
     height: 22, 
-    resizeMode: "contain" },
-
+    resizeMode: "contain" 
+  },
   title: { 
     fontSize: 18, 
     fontWeight: "600", 
-    color: "#333" },
-
+    color: "#333" 
+  },
+  backButton: {
+    fontSize: 16,
+    color: "#7b6cff",
+    fontWeight: "500",
+  },
   avatar: {
     backgroundColor: "#b3a5ff",
     borderRadius: 50,
@@ -148,13 +173,12 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20, 
     tintColor: "#fff",
-    resizeMode: "contain" },
-
-  // CUERPO
+    resizeMode: "contain" 
+  },
   scrollContent: { 
     padding: 20, 
-    paddingBottom: 120 },
-    
+    paddingBottom: 120 
+  },
   headerSection: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -170,13 +194,14 @@ const styles = StyleSheet.create({
   pigImage: { 
     width: 70, 
     height: 70, 
-    resizeMode: "contain" },
-
+    resizeMode: "contain" 
+  },
   text: { 
     fontSize: 18, 
     fontWeight: "500", 
-    marginBottom: 10 },
-
+    marginBottom: 10 
+    
+  },
   balanceCard: {
     backgroundColor: "#c8b6ff",
     borderRadius: 20,
@@ -190,15 +215,14 @@ const styles = StyleSheet.create({
   amount: {
     fontSize: 40, 
     color: "#fff", 
-    fontWeight: "bold" },
-
+    fontWeight: "bold" 
+  },
   sectionTitle: { 
     fontSize: 18, 
     fontWeight: "600", 
     marginTop: 30, 
-    marginBottom: 10 },
-
-  // TRANSACCIONES
+    marginBottom: 10 
+  },
   transaction: {
     flexDirection: "row",
     alignItems: "center",
@@ -213,30 +237,28 @@ const styles = StyleSheet.create({
   iconTrans: { 
     width: 25, 
     height: 25, 
-    resizeMode: "contain" },
-
+    resizeMode: "contain" 
+  },
   details: { 
     flex: 1, 
-    marginLeft: 10 },
-
+    marginLeft: 10 
+  },
   itemTitle: { 
     fontSize: 16, 
     fontWeight: "600", 
-    color: "#222" },
-
+    color: "#222" 
+  },
   date: { 
     fontSize: 12, 
-    color: "#777" },
-
+    color: "#777" 
+  },
   amountText: { 
     fontSize: 16, 
-    fontWeight: "600" },
-
-  // NAV INFERIOR
+    fontWeight: "600" 
+  },
   bottomNav: {
     position: "absolute",
     bottom: 10,
-
     width: "95%",
     flexDirection: "row",
     justifyContent: "space-around",
@@ -244,7 +266,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#eae2ff",
     paddingVertical: 12,
     borderRadius: 30,
-    
   },
   iconCircle: {
     width: 50,       
@@ -255,22 +276,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginHorizontal: 5, 
   },
-  
   navIcon: { 
     width: 26, 
     height: 26, 
-    resizeMode: "contain" },
-
+    resizeMode: "contain" 
+  },
   centerButton: {
     backgroundColor: "#7f6aff",
     padding: 15,
     borderRadius: 40,
     marginBottom: 25,
-
   },
   centerIcon: {
     width: 30, 
     height: 30, 
     resizeMode: "contain", 
-    tintColor: "#fff" },
+    tintColor: "#fff" 
+  },
 });
