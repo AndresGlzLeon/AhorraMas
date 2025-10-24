@@ -16,10 +16,10 @@ export default function Login({ navigate }) {
 
   const handleLogin = () => {
     if (name.trim()=== '' || email.trim()=== '' || password.trim() === '') {
-      Alert.alert("Error", "Por favor completa todos los campos");
+      Alert.alert("Error", "Completa todos los campos");
       return;
     }
-    Alert.alert("Éxito", "Bienvenid@ " + name + "!");
+    Alert.alert("Éxito", `Bienvenido ${name}`);
     setName("");
     setEmail("");
     setPassword("");
@@ -66,7 +66,7 @@ export default function Login({ navigate }) {
         <Text style={styles.buttonText}>Iniciar Sesión</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => Alert.alert("Crear una cuenta", "Función no disponible aún")}>
+      <TouchableOpacity onPress={() => navigate && navigate("crear")}>
         <Text style={styles.footer}>¿No tienes una cuenta aún? Crea una cuenta</Text>
       </TouchableOpacity>
 
