@@ -1,6 +1,9 @@
 import React from "react";
 import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from "react-native";
 import Principal from "./Principal";
+import Login from "./Login";
+import CrearCuenta from "./CrearCuenta";
+
 
 export default function PagosProgramados() {
   const [currentScreen, setCurrentScreen] = React.useState("pagosProgramados");
@@ -32,9 +35,9 @@ export default function PagosProgramados() {
 
           <Text style={styles.title}>Ahorra+ App</Text>
 
-          <View style={styles.avatar}>
+          <TouchableOpacity onPress={() => navigateTo("login")} style={styles.avatar} >
             <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* CONTENIDO */}
@@ -128,14 +131,19 @@ export default function PagosProgramados() {
     );
   };
 
-  // Renderizar la pantalla actual
-  switch (currentScreen) {
-    case "principal":
-      return renderPrincipal();
-    case "pagosProgramados":
-    default:
-      return renderPagosProgramados();
-  }
+// Renderizar la pantalla actual
+switch (currentScreen) {
+  case "principal":
+    return renderPrincipal();
+
+  case "login":
+    return <Login navigateTo={setCurrentScreen} />;
+
+  case "pagosProgramados":
+  default:
+    return renderPagosProgramados();
+}
+
 }
 
 const styles = StyleSheet.create({
@@ -161,8 +169,8 @@ const styles = StyleSheet.create({
   // CONTENIDO
   scrollContent: { padding: 20, paddingBottom: 120 },
   headerSection: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 },
-  mainTitle: { fontSize: 30, fontWeight: "700", color: "#7b6cff" },
-  subtitle: { fontSize: 16, marginTop:40, color: "#rgb(0, 0, 0)"  },
+  mainTitle: { fontSize: 26, fontWeight: "700", lineHeight: 30,marginTop:15, color: "#7b6cff" },
+  subtitle: { fontSize: 16, marginTop:50, color: "#rgb(0, 0, 0)"  },
   pigImage: { width: 80, height: 80, resizeMode: "contain" },
 
   // TARJETAS
@@ -171,7 +179,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 30,
     marginBottom: 30,
-    marginTop: 30,
+    marginTop: -5,
   },
   card: {
     flexDirection: "row",

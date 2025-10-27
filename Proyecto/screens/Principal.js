@@ -3,6 +3,13 @@ import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from "rea
 import  PagosProgramados  from "./PagosProgramados";
 import Login from "./Login";
 import CrearCuenta from "./CrearCuenta";
+import IngresosEgresos from "./IngresosEgresos";
+import Ahorros from "./Ahorros";
+import Ajustes from "./Ajustes";
+import Notificaciones from "./Notificaciones";
+import Perfil from "./Perfil";
+import Presupuesto from "./Presupuesto";
+
 
 export default function Principal() {
   const [currentScreen, setCurrentScreen] = React.useState("principaL");
@@ -95,11 +102,11 @@ export default function Principal() {
 
         {/* NAV INFERIOR */}
         <View style={styles.bottomNav}>
-          <TouchableOpacity style={styles.iconCircle}>
+          <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("ingresosEgresos")}>
             <Image source={require("../assets/Transisiones.png")} style={styles.navIcon} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.iconCircle}>
+          <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("ahorros")}>
             <Image source={require("../assets/Pink.png")} style={styles.navIcon} />
           </TouchableOpacity>
 
@@ -107,12 +114,11 @@ export default function Principal() {
             <Image source={require("../assets/inicio.png")} style={styles.centerIcon} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("pagosProgramados")}
-          >
+          <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("pagosProgramados")}>
             <Image source={require("../assets/Programados.png")} style={styles.navIcon} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.iconCircle}>
+          <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("presupuesto")}>
             <Image source={require("../assets/BolsaDinero.png")} style={styles.navIcon} />
           </TouchableOpacity>
         </View>
@@ -128,6 +134,18 @@ export default function Principal() {
       return <Login navigate={setCurrentScreen || setScreen} />;
     case "crear":
       return <CrearCuenta navigate={setCurrentScreen || setScreen} />;
+    case "ingresosEgresos":
+      return <IngresosEgresos navigate={setCurrentScreen || setScreen} />;
+    case "ahorros":
+      return <Ahorros navigate={setCurrentScreen || setScreen} />;
+    case "ajustes":
+      return <Ajustes navigate={setCurrentScreen || setScreen} />;
+    case "notificaciones":
+      return <Notificaciones navigate={setCurrentScreen || setScreen} />;
+    case "perfil":
+      return <Perfil navigate={setCurrentScreen || setScreen} />;
+    case "presupuesto":
+      return <Presupuesto navigate={setCurrentScreen || setScreen} />;
     case "principal":
     default:
       return renderPrincipal();
@@ -198,8 +216,8 @@ const styles = StyleSheet.create({
     lineHeight: 30,
   },
   pigImage: { 
-    width: 70, 
-    height: 70, 
+    width: 80, 
+    height: 80, 
     resizeMode: "contain" 
   },
   text: { 

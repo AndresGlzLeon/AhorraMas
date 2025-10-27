@@ -15,7 +15,7 @@ export default function Login({ navigate }) {
   const [password, setPassword] = useState("");
 
   const handleLogin = () => {
-    if (name.trim()=== '' || email.trim()=== '' || password.trim() === '') {
+    if (name.trim() === '' || email.trim() === '' || password.trim() === '') {
       Alert.alert("Error", "Por favor completa todos los campos");
       return;
     }
@@ -70,7 +70,7 @@ export default function Login({ navigate }) {
         <Text style={styles.footer}>¿No tienes una cuenta aún? Crea una cuenta</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigate && navigate("principal")}>
+      <TouchableOpacity onPress={() => navigate && navigate("principal",) }>
         <Text style={styles.footer}>Volver</Text>
       </TouchableOpacity>
     </View>
