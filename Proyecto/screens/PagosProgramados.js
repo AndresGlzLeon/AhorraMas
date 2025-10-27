@@ -36,7 +36,6 @@ export default function PagosProgramados() {
 
           <Text style={styles.title}>Ahorra+ App</Text>
 
-
           <View style={styles.avatar}>
             <TouchableOpacity onPress={() => navigateTo("login")}>
               <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
@@ -143,26 +142,16 @@ switch (currentScreen) {
     return renderPrincipal();
 
   case "login":
-    return <Login navigateTo={setCurrentScreen} />;
+    return <Login navigate={navigateTo} />;
+
+  case "crear":
+    return <CrearCuenta navigate={navigateTo} />;
 
   case "pagosProgramados":
   default:
     return renderPagosProgramados();
 }
 
-
-  // Renderizar la pantalla actual
-  switch (currentScreen) {
-    case "principal":
-      return renderPrincipal();
-    case "login":
-      return <Login navigate={navigateTo} />;
-    case "crear":
-      return <CrearCuenta navigate={setCurrentScreen || setScreen} />;  
-    case "pagosProgramados":
-    default:
-      return renderPagosProgramados();
-  }
 
 }
 
