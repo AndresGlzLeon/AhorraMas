@@ -5,6 +5,7 @@ import Login from "./Login";
 import CrearCuenta from "./CrearCuenta";
 
 
+
 export default function PagosProgramados() {
   const [currentScreen, setCurrentScreen] = React.useState("pagosProgramados");
 
@@ -38,6 +39,13 @@ export default function PagosProgramados() {
           <TouchableOpacity onPress={() => navigateTo("login")} style={styles.avatar} >
             <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
           </TouchableOpacity>
+
+          <View style={styles.avatar}>
+            <TouchableOpacity onPress={() => navigateTo("login")}>
+              <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+            </TouchableOpacity>
+          </View>
+
         </View>
 
         {/* CONTENIDO */}
@@ -131,6 +139,7 @@ export default function PagosProgramados() {
     );
   };
 
+
 // Renderizar la pantalla actual
 switch (currentScreen) {
   case "principal":
@@ -143,6 +152,20 @@ switch (currentScreen) {
   default:
     return renderPagosProgramados();
 }
+
+
+  // Renderizar la pantalla actual
+  switch (currentScreen) {
+    case "principal":
+      return renderPrincipal();
+    case "login":
+      return <Login navigate={navigateTo} />;
+    case "crear":
+      return <CrearCuenta navigate={setCurrentScreen || setScreen} />;  
+    case "pagosProgramados":
+    default:
+      return renderPagosProgramados();
+  }
 
 }
 
