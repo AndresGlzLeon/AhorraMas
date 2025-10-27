@@ -12,7 +12,7 @@ import Presupuesto from "./Presupuesto";
 
 
 export default function Principal() {
-  const [currentScreen, setCurrentScreen] = React.useState("principaL");
+  const [currentScreen, setCurrentScreen] = React.useState("principal");
 
   // Función para navegar entre pantallas
   const navigateTo = (screen) => {

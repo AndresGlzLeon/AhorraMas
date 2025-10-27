@@ -15,13 +15,11 @@ export default function Login({ navigate }) {
   const [password, setPassword] = useState("");
 
   const handleLogin = () => {
-    if (name.trim() === '' || email.trim() === '' || password.trim() === '') {
+    if (name.trim() === "" || email.trim() === "" || password.trim() === "") {
       Alert.alert("Error", "Por favor completa todos los campos");
-    if (name.trim()=== '' || email.trim()=== '' || password.trim() === '') {
-      Alert.alert("Error", "Completa todos los campos");
-
       return;
     }
+
     Alert.alert("Éxito", `Bienvenido ${name}`);
     setName("");
     setEmail("");
@@ -61,7 +59,11 @@ export default function Login({ navigate }) {
         placeholderTextColor="#999"
       />
 
-      <TouchableOpacity onPress={() => Alert.alert("Recuperar contraseña", "Función no disponible aún")}>
+      <TouchableOpacity
+        onPress={() =>
+          Alert.alert("Recuperar contraseña", "Función no disponible aún")
+        }
+      >
         <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
       </TouchableOpacity>
 
@@ -70,16 +72,16 @@ export default function Login({ navigate }) {
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigate && navigate("crear")}>
-        <Text style={styles.footer}>¿No tienes una cuenta aún? Crea una cuenta</Text>
+        <Text style={styles.footer}>
+          ¿No tienes una cuenta aún? Crea una cuenta
+        </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigate && navigate("principal",) }>
+      <TouchableOpacity onPress={() => navigate && navigate("principal")}>
         <Text style={styles.footer}>Volver</Text>
       </TouchableOpacity>
     </View>
-  
-);
-}
+  );
 }
 
 const styles = StyleSheet.create({

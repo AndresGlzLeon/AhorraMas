@@ -36,9 +36,6 @@ export default function PagosProgramados() {
 
           <Text style={styles.title}>Ahorra+ App</Text>
 
-          <TouchableOpacity onPress={() => navigateTo("login")} style={styles.avatar} >
-            <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-          </TouchableOpacity>
 
           <View style={styles.avatar}>
             <TouchableOpacity onPress={() => navigateTo("login")}>
