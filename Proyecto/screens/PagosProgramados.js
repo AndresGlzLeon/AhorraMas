@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from "rea
 import Principal from "./Principal";
 import Login from "./Login";
 import CrearCuenta from "./CrearCuenta";
+import Ahorros from "./Ahorros";
 
 
 
@@ -115,7 +116,7 @@ export default function PagosProgramados() {
             <Image source={require("../assets/Transisiones.png")} style={styles.navIcon} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("principal")}>
+          <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("ahorros")}>
             <Image source={require("../assets/Pink.png")} style={styles.navIcon} />
           </TouchableOpacity>
 
@@ -136,20 +137,21 @@ export default function PagosProgramados() {
   };
 
 
-// Renderizar la pantalla actual
-switch (currentScreen) {
-  case "principal":
-    return renderPrincipal();
+  // Renderizar la pantalla actual
+  switch (currentScreen) {
+    case "principal":
+      return renderPrincipal();
 
-  case "login":
-    return <Login navigate={navigateTo} />;
+    case "login":
+      return <Login navigate={navigateTo} />;
 
-  case "crear":
-    return <CrearCuenta navigate={navigateTo} />;
+    case "crear":
+      return <CrearCuenta navigate={navigateTo} />;
 
-  case "pagosProgramados":
-  default:
-    return renderPagosProgramados();
+    case "ahorros":
+      return <Ahorros navigate={navigateTo} />;
+    default:
+      return renderPagosProgramados();
 }
 
 

@@ -1,73 +1,156 @@
 import React from "react";
-import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, Animated } from "react-native";
+import Principal from "./Principal";
+import Login from "./Login";
+import CrearCuenta from "./CrearCuenta";
+import PagosProgramados from "./PagosProgramados";
+
 
 export default function Ahorros() {
-  return (
-    <View style={styles.container}>
-      {/* HEADER */}
-      <View style={styles.header}>
-        <View style={styles.leftIcons}>
-          {/* 🔧 Aquí pones tu ícono de configuración */}
-          <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
 
-          {/* 🔔 Aquí pones tu ícono de notificación */}
-          <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-        </View>
+  const [currentScreen, setCurrentScreen] = React.useState("ahorros");
+  
+    // Función para navegar entre pantallas
+    const navigateTo = (screen) => {
+      setCurrentScreen(screen);
+    };
 
-        <Text style={styles.title}>Ahorra+ App</Text>
-
-        {/* 👤 Aquí va tu imagen/avatar */}
-        <View style={styles.avatar}>
-          <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-        </View>
-      </View>
-
-      {/* CONTENIDO SCROLLABLE */}
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Bienvenida + puerquito */}
-        <View style={styles.headerSection}>
-          <View>
-            <Text style={styles.welcome}>Gastos,{"\n"}Programados</Text>
+    const renderAhorros = () => {
+      return (
+        <View style={styles.container}>
+          {/* HEADER */}
+          <View style={styles.header}>
+            <View style={styles.leftIcons}>
+              <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+              <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+            </View>
+  
+            <Text style={styles.title}>Ahorra+ App</Text>
+  
+            <View style={styles.avatar}>
+              <TouchableOpacity>
+                <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+              </TouchableOpacity>
+            </View>
+  
           </View>
-          {/* 🐷 Imagen del puerquito */}
-          <Image source={require("../assets/logo.png")} style={styles.pigImage} />
+  
+          {/* CONTENIDO */}
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            <View style={styles.headerSection}>
+              <View>
+                <Text style={styles.welcome}>Ahorros</Text>
+                <Text style={styles.subtitle}>Tu progreso hacia tus{"\n"} metas financieras</Text>
+              </View>
+              <Image source={require("../assets/logo.png")} style={styles.pigImage} />
+            </View>
+            
+
+            <View>
+               
+                <Text style={styles.title}>{"\n"} </Text>
+              </View>
+
+            <View style={styles.cardContainer}>
+
+              <Text style={styles.cardTitle}>Fondo de Ahorros</Text> 
+            
+                <View style={styles.progressBar}>  
+                  <Animated.View style={[StyleSheet.absoluteFill, {width: '19.4%', backgroundColor: '#7b6cff', borderRadius: 15,}]} />
+                </View>
+
+                <View style={styles.cardLeft}>
+                  <Text style={styles.cardSub}>Meta de:  296,495</Text>
+                  <Text style={styles.cardAmount2 }>Ahorrado:  57,500</Text>
+                </View>
+
+             
+            </View>
+
+            {/* Tarjetas de gastos */}
+            <View style={styles.cardContainer}>
+              
+              {/* Alquiler */}
+              <View style={styles.card}>
+                <View style={styles.cardLeft}>
+                  <Image source={require("../assets/plane.png")} style={styles.cardIcon} />
+                  <View>
+                    <Text style={styles.cardTitle}>Viaje a los cabos</Text>
+                    <Text style={styles.cardSub}>Meta de: 10,896{"\n"}</Text>
+                  </View>
+                </View>
+                <View>
+                  <Text style={styles.cardAmount}>+$7500.00</Text>
+                </View>
+              </View>
+  
+              {/* Seguro Auto */}
+              <View style={styles.card}>
+                <View style={styles.cardLeft}>
+                  <Image source={require("../assets/auto.png")} style={styles.cardIcon} />
+                  <View>
+                    <Text style={styles.cardTitle}>Auto Nuevo</Text>
+                    <Text style={styles.cardSub}>Meta de: 285,599</Text>
+                  </View>
+                </View>
+                <View>
+                  <Text style={styles.cardAmount}>+ $50,000.00</Text>
+                  
+                </View>
+              </View>
+
+              
+            </View>
+  
+            <TouchableOpacity style={styles.addButton}>
+                <Image source={require("../assets/mas.png")} style={styles.addIcon} />
+                <Text style={styles.addText}>Crear nueva meta de ahorro</Text>
+            </TouchableOpacity>
+        </ScrollView>
+  
+          {/* NAV INFERIOR */}
+          <View style={styles.bottomNav}>
+            <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("principal")}>
+              <Image source={require("../assets/Transisiones.png")} style={styles.navIcon} />
+            </TouchableOpacity>
+  
+            <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("principal")}>
+              <Image source={require("../assets/Pink.png")} style={styles.navIcon} />
+            </TouchableOpacity>
+  
+            <TouchableOpacity style={styles.centerButton} onPress={() => navigateTo("")}>
+              <Image source={require("../assets/Programados.png")} style={styles.centerIcon} />
+            </TouchableOpacity>
+  
+            <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("principal")}>
+              <Image source={require("../assets/inicio.png")} style={styles.navIcon} />
+            </TouchableOpacity>
+  
+            <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("principal")}>
+              <Image source={require("../assets/BolsaDinero.png")} style={styles.navIcon} />
+            </TouchableOpacity>
+          </View>
         </View>
+      );
+    };
 
-        {/* Últimas transacciones */}
-        <Text style={styles.sectionTitle}>Administra tus pagos</Text>
-
-      </ScrollView>
-
-      {/* NAV INFERIOR */}
-      {/* NAV INFERIOR */}
-        <View style={styles.bottomNav}>
-
-        <View style={styles.iconCircle}>
-        <Image source={require("../assets/Transisiones.png")} style={styles.navIcon} />
-        </View>
-
-        <View style={styles.iconCircle}>
-        <Image source={require("../assets/Pink.png")} style={styles.navIcon} />
-        </View>
-
-        <View style={styles.centerButton}>
-        <Image source={require("../assets/Programados.png")} style={styles.centerIcon} />
-        </View>
-
-        <View style={styles.iconCircle}>
-        <Image source={require("../assets/inicio.png")} style={styles.navIcon} />
-        </View>
-
-        <View style={styles.iconCircle}>
-        <Image source={require("../assets/BolsaDinero.png")} style={styles.navIcon} />
-        </View>
-
-    </View>
-
-</View>
-);
-}
-
+   switch (currentScreen) {
+     case "principal":
+       return <Principal navigate={navigateTo} />;
+     case "login":
+       return <Login navigate={navigateTo} />;
+   
+     case "crear":
+       return <CrearCuenta navigate={navigateTo} />;
+   
+     case "pagosProgramados":
+        return <PagosProgramados navigate={navigateTo} />;
+     default:
+       return renderAhorros();
+   }
+   
+      
+};
 const styles = StyleSheet.create({
   container: { 
     flex: 1,
@@ -132,13 +215,46 @@ const styles = StyleSheet.create({
     color: "#7b6cff",
     lineHeight: 30,
   },
-    pigImage: {
-        width: 80,
-        height: 80,
-        resizeMode: "contain",
-    },
+  subtitle:{ 
+    fontSize: 16,
+    marginTop:50, 
+    color: "#rgb(0, 0, 0)"  
 
+  },
+  
+  pigImage: {
+    width: 80,
+    height: 80,
+    resizeMode: "contain",
+  },
 
+  cardContainer: {
+    backgroundColor: "#f4f1ff",
+    padding: 10,
+    borderRadius: 30,
+    marginBottom: 30,
+    marginTop: -5,
+    width: "100%",
+  },
+  card: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderBottomColor: "#ddd",
+    borderBottomWidth: 2,
+    paddingVertical: 30,
+    paddingHorizontal: 10,
+    marginTop: 0,
+    paddingBottom: 0,
+  },
+  cardLeft: { flexDirection: "row", alignItems: "center" },
+  cardIcon: { width: 50, height: 50, marginRight:30, marginBottom:15, tintColor: "#7b6cff" },
+  cardTitle: { fontSize: 18, fontWeight: "600", color: "#000",  },
+  cardSub: { fontSize: 13, color: "#777" },
+  cardAmount: { fontSize: 16, fontWeight: "700", color: "#000", paddingVertical: 5,
+    paddingHorizontal: 30, },
+  cardAmount2: { fontSize: 16, fontWeight: "700", color: "#000", paddingLeft: 100,
+     },
 
 
   // NAV INFERIOR
@@ -182,4 +298,26 @@ const styles = StyleSheet.create({
     height: 30, 
     resizeMode: "contain", 
     tintColor: "#fff" },
+progressBar:{
+    height: 25,
+    flexDirection: 'row',
+    width: '100%',
+    backgroundColor: '#d3d3d3',
+    borderRadius: 15,
+    marginVertical: 10,
+    
+    alignContent: 'center',
+    
+},
+addButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f4f1ff",
+    borderRadius: 25,
+    padding: 15,
+    justifyContent: "center",
+  },
+  addIcon: { width: 25, height: 25, marginRight: 10, tintColor: "#7b6cff" },
+  addText: { fontSize: 16, color: "#000", fontWeight: "500" },
+
 });
