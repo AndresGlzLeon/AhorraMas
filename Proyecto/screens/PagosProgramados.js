@@ -5,6 +5,7 @@ import Login from "./Login";
 import CrearCuenta from "./CrearCuenta";
 import Ahorros from "./Ahorros";
 import Notificaciones from "./Notificaciones";
+import Ajustes from "./Ajustes";
 
 export default function PagosProgramados() {
   const [currentScreen, setCurrentScreen] = React.useState("pagosProgramados");
@@ -23,15 +24,19 @@ export default function PagosProgramados() {
 
   const renderPagosProgramados = () => {
     return (
-      <View style={styles.container}>
-        {/* HEADER */}
-        <View style={styles.header}>
-          <View style={styles.leftIcons}>
-            <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-                  <TouchableOpacity onPress={() => navigateTo("notificaciones")}>
-                     <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-                  </TouchableOpacity>
-          </View>
+        <View style={styles.container}>
+          {/* HEADER */}
+          <View style={styles.header}>
+            <View style={styles.leftIcons}>
+              {/* BOTÓN AJUSTES - CORREGIDO */}
+              <TouchableOpacity onPress={() => navigateTo("ajustes")}>
+                <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+              </TouchableOpacity>
+              {/* BOTÓN NOTIFICACIONES */}
+              <TouchableOpacity onPress={() => navigateTo("notificaciones")}>
+                <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+              </TouchableOpacity>
+            </View>
 
           <Text style={styles.title}>Ahorra+ App</Text>
 
@@ -141,7 +146,9 @@ export default function PagosProgramados() {
     case "ahorros":
       return <Ahorros navigate={navigateTo} />;
     case "notificaciones":
-         return <Notificaciones navigate={setCurrentScreen || setScreen} />;
+      return <Notificaciones navigate={setCurrentScreen || setScreen} />;
+    case "ajustes":  // AGREGADO - CASE PARA AJUSTES
+      return <Ajustes navigate={navigateTo} />;
     default:
       return renderPagosProgramados();
   }

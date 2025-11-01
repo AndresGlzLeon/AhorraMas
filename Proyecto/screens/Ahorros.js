@@ -5,7 +5,7 @@ import Login from "./Login";
 import CrearCuenta from "./CrearCuenta";
 import PagosProgramados from "./PagosProgramados";
 import Notificaciones from "./Notificaciones";
-
+import Ajustes from "./Ajustes";
 
 export default function Ahorros() {
 
@@ -22,16 +22,20 @@ export default function Ahorros() {
           {/* HEADER */}
           <View style={styles.header}>
             <View style={styles.leftIcons}>
-              <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-               <TouchableOpacity onPress={() => navigateTo("notificaciones")}>
-                 <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-               </TouchableOpacity>
+              {/* BOTÓN AJUSTES - CORREGIDO */}
+              <TouchableOpacity onPress={() => navigateTo("ajustes")}>
+                <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+              </TouchableOpacity>
+              {/* BOTÓN NOTIFICACIONES */}
+              <TouchableOpacity onPress={() => navigateTo("notificaciones")}>
+                <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+              </TouchableOpacity>
             </View>
   
             <Text style={styles.title}>Ahorra+ App</Text>
   
             <View style={styles.avatar}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => navigateTo("login")}>
                 <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
               </TouchableOpacity>
             </View>
@@ -142,21 +146,21 @@ export default function Ahorros() {
        return <Principal navigate={navigateTo} />;
      case "login":
        return <Login navigate={navigateTo} />;
-   
      case "crear":
        return <CrearCuenta navigate={navigateTo} />;
-   
      case "pagosProgramados":
         return <PagosProgramados navigate={navigateTo} />;
-
      case "notificaciones":
-        return <Notificaciones navigate={setCurrentScreen || setScreen} />;
+        return <Notificaciones navigate={navigateTo} />;
+     case "ajustes":  // AGREGADO - CASE PARA AJUSTES
+        return <Ajustes navigate={navigateTo} />;
      default:
        return renderAhorros();
    }
    
       
 };
+
 const styles = StyleSheet.create({
   container: { 
     flex: 1,

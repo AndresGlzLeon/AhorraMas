@@ -43,8 +43,14 @@ export default function Notificaciones({ navigate }) {
       {/* HEADER igual que en PagosProgramados */}
       <View style={styles.header}>
         <View style={styles.leftIcons}>
-          <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-          <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+          {/* BOTÓN AJUSTES - CORREGIDO */}
+          <TouchableOpacity onPress={() => navigate("ajustes")}>
+            <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+          </TouchableOpacity>
+          {/* BOTÓN NOTIFICACIONES */}
+          <TouchableOpacity onPress={() => navigate("notificaciones")}>
+            <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+          </TouchableOpacity>
         </View>
 
         <Text style={styles.title}>Ahorra+ App</Text>

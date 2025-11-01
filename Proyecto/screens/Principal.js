@@ -37,10 +37,12 @@ export default function Principal() {
         {/* HEADER */}
         <View style={styles.header}>
           <View style={styles.leftIcons}>
-            <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-          <TouchableOpacity onPress={() => navigateTo("notificaciones")}>
-             <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-          </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigateTo("ajustes")}>
+               <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+            </TouchableOpacity>            
+            <TouchableOpacity onPress={() => navigateTo("notificaciones")}>
+              <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+             </TouchableOpacity>
 
           </View>
 
