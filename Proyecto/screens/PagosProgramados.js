@@ -4,18 +4,15 @@ import Principal from "./Principal";
 import Login from "./Login";
 import CrearCuenta from "./CrearCuenta";
 import Ahorros from "./Ahorros";
-
-
+import Notificaciones from "./Notificaciones";
 
 export default function PagosProgramados() {
   const [currentScreen, setCurrentScreen] = React.useState("pagosProgramados");
 
-  // Función para navegar entre pantallas
   const navigateTo = (screen) => {
     setCurrentScreen(screen);
   };
 
-  // Pantalla Principal
   const renderPrincipal = () => {
     return (
       <View style={styles.container}>
@@ -24,7 +21,6 @@ export default function PagosProgramados() {
     );
   };
 
-  // Pantalla de Pagos Programados
   const renderPagosProgramados = () => {
     return (
       <View style={styles.container}>
@@ -32,7 +28,9 @@ export default function PagosProgramados() {
         <View style={styles.header}>
           <View style={styles.leftIcons}>
             <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-            <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+                  <TouchableOpacity onPress={() => navigateTo("notificaciones")}>
+                     <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+                  </TouchableOpacity>
           </View>
 
           <Text style={styles.title}>Ahorra+ App</Text>
@@ -57,7 +55,7 @@ export default function PagosProgramados() {
 
           {/* Tarjetas de gastos */}
           <View style={styles.cardContainer}>
-            {/* Alquiler */}
+            
             <View style={styles.card}>
               <View style={styles.cardLeft}>
                 <Image source={require("../assets/alquiler.png")} style={styles.cardIcon} />
@@ -72,7 +70,6 @@ export default function PagosProgramados() {
               </View>
             </View>
 
-            {/* Seguro Auto */}
             <View style={styles.card}>
               <View style={styles.cardLeft}>
                 <Image source={require("../assets/auto.png")} style={styles.cardIcon} />
@@ -87,7 +84,6 @@ export default function PagosProgramados() {
               </View>
             </View>
 
-            {/* Pago de Servicios */}
             <View style={styles.card}>
               <View style={styles.cardLeft}>
                 <Image source={require("../assets/servicios.png")} style={styles.cardIcon} />
@@ -103,7 +99,6 @@ export default function PagosProgramados() {
             </View>
           </View>
 
-          {/* Botón crear gasto */}
           <TouchableOpacity style={styles.addButton}>
             <Image source={require("../assets/mas.png")} style={styles.addIcon} />
             <Text style={styles.addText}>Crear nuevo gasto programado</Text>
@@ -136,31 +131,25 @@ export default function PagosProgramados() {
     );
   };
 
-
-  // Renderizar la pantalla actual
   switch (currentScreen) {
     case "principal":
       return renderPrincipal();
-
     case "login":
       return <Login navigate={navigateTo} />;
-
     case "crear":
       return <CrearCuenta navigate={navigateTo} />;
-
     case "ahorros":
       return <Ahorros navigate={navigateTo} />;
+    case "notificaciones":
+         return <Notificaciones navigate={setCurrentScreen || setScreen} />;
     default:
       return renderPagosProgramados();
-}
-
-
+  }
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", alignItems: "center" },
 
-  // HEADER
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -177,14 +166,12 @@ const styles = StyleSheet.create({
   avatar: { backgroundColor: "#b3a5ff", borderRadius: 50, padding: 8 },
   avatarIcon: { width: 20, height: 20, tintColor: "#fff", resizeMode: "contain" },
 
-  // CONTENIDO
   scrollContent: { padding: 20, paddingBottom: 120 },
   headerSection: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 },
   mainTitle: { fontSize: 26, fontWeight: "700", lineHeight: 30,marginTop:15, color: "#7b6cff" },
   subtitle: { fontSize: 16, marginTop:50, color: "#rgb(0, 0, 0)"  },
   pigImage: { width: 80, height: 80, resizeMode: "contain" },
 
-  // TARJETAS
   cardContainer: {
     backgroundColor: "#f4f1ff",
     padding: 10,
@@ -210,7 +197,6 @@ const styles = StyleSheet.create({
   cardAmount: { fontSize: 16, fontWeight: "700", color: "#000" },
   cardDate: { fontSize: 12, color: "#777" },
 
-  // BOTÓN NUEVO GASTO
   addButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -222,7 +208,6 @@ const styles = StyleSheet.create({
   addIcon: { width: 25, height: 25, marginRight: 10, tintColor: "#7b6cff" },
   addText: { fontSize: 16, color: "#000", fontWeight: "500" },
 
-  // NAV INFERIOR
   bottomNav: {
     position: "absolute",
     bottom: 10,

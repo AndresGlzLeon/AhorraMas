@@ -38,7 +38,10 @@ export default function Principal() {
         <View style={styles.header}>
           <View style={styles.leftIcons}>
             <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-            <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+          <TouchableOpacity onPress={() => navigateTo("notificaciones")}>
+             <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+          </TouchableOpacity>
+
           </View>
 
           <Text style={styles.title}>Ahorra+ App</Text>

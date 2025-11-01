@@ -4,6 +4,7 @@ import Principal from "./Principal";
 import Login from "./Login";
 import CrearCuenta from "./CrearCuenta";
 import PagosProgramados from "./PagosProgramados";
+import Notificaciones from "./Notificaciones";
 
 
 export default function Ahorros() {
@@ -22,7 +23,9 @@ export default function Ahorros() {
           <View style={styles.header}>
             <View style={styles.leftIcons}>
               <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-              <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+               <TouchableOpacity onPress={() => navigateTo("notificaciones")}>
+                 <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+               </TouchableOpacity>
             </View>
   
             <Text style={styles.title}>Ahorra+ App</Text>
@@ -145,6 +148,9 @@ export default function Ahorros() {
    
      case "pagosProgramados":
         return <PagosProgramados navigate={navigateTo} />;
+
+     case "notificaciones":
+        return <Notificaciones navigate={setCurrentScreen || setScreen} />;
      default:
        return renderAhorros();
    }
