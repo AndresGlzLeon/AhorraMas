@@ -1,45 +1,35 @@
 import React from "react";
-import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Image } from "react-native";
 
 export default function Presupuesto() {
   return (
     <View style={styles.container}>
-      {/* HEADER */}
       <View style={styles.header}>
         <View style={styles.leftIcons}>
-          {/* 🔧 Aquí pones tu ícono de configuración */}
           <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
 
-          {/* 🔔 Aquí pones tu ícono de notificación */}
           <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
         </View>
 
         <Text style={styles.title}>Ahorra+ App</Text>
 
-        {/* 👤 Aquí va tu imagen/avatar */}
         <View style={styles.avatar}>
           <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
         </View>
       </View>
 
-      {/* CONTENIDO SCROLLABLE */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Bienvenida + puerquito */}
         <View style={styles.headerSection}>
           <View>
             <Text style={styles.welcome}>Gastos,{"\n"}Programados</Text>
           </View>
-          {/* 🐷 Imagen del puerquito */}
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
         </View>
 
-        {/* Últimas transacciones */}
         <Text style={styles.sectionTitle}>Administra tus pagos</Text>
 
       </ScrollView>
 
-      {/* NAV INFERIOR */}
-      {/* NAV INFERIOR */}
         <View style={styles.bottomNav}>
 
         <View style={styles.iconCircle}>
@@ -76,7 +66,6 @@ const styles = StyleSheet.create({
 
 },
 
-  // HEADER
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -114,7 +103,6 @@ const styles = StyleSheet.create({
     tintColor: "#fff",
     resizeMode: "contain" },
 
-  // CUERPO
   scrollContent: { 
     padding: 20,
     paddingBottom: 120 },
@@ -141,7 +129,6 @@ const styles = StyleSheet.create({
 
 
 
-  // NAV INFERIOR
   bottomNav: {
     position: "absolute",
     bottom: 10,

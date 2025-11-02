@@ -1,15 +1,7 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  Image,
-} from "react-native";
+import {View,Text,TextInput,StyleSheet,Alert,Image} from "react-native";
 
-export default function Login({ navigate }) {
+export default function Login() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,7 +16,6 @@ export default function Login({ navigate }) {
     setName("");
     setEmail("");
     setPassword("");
-    if (navigate) navigate("principal");
   };
 
   return (
@@ -59,27 +50,15 @@ export default function Login({ navigate }) {
         placeholderTextColor="#999"
       />
 
-      <TouchableOpacity
-        onPress={() =>
-          Alert.alert("Recuperar contraseña", "Función no disponible aún")
-        }
-      >
         <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
-      </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Iniciar Sesión</Text>
-      </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigate && navigate("crear")}>
         <Text style={styles.footer}>
           ¿No tienes una cuenta aún? Crea una cuenta
         </Text>
-      </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigate && navigate("principal")}>
         <Text style={styles.footer}>Volver</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -132,7 +111,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   buttonText: {
-    color: "#fff",
+    color: "#000000ff",
     fontWeight: "600",
   },
   footer: {

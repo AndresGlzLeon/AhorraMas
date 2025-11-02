@@ -1,48 +1,24 @@
 import React from "react";
-import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, Animated } from "react-native";
-import Principal from "./Principal";
-import Login from "./Login";
-import CrearCuenta from "./CrearCuenta";
-import PagosProgramados from "./PagosProgramados";
-import Notificaciones from "./Notificaciones";
-import Ajustes from "./Ajustes";
+import { View, Text, ScrollView, StyleSheet, Image, Animated } from "react-native";
 
-export default function Ahorros() {
+export default function Ahorros(){
 
-  const [currentScreen, setCurrentScreen] = React.useState("ahorros");
-  
-    // Función para navegar entre pantallas
-    const navigateTo = (screen) => {
-      setCurrentScreen(screen);
-    };
-
-    const renderAhorros = () => {
       return (
         <View style={styles.container}>
-          {/* HEADER */}
           <View style={styles.header}>
             <View style={styles.leftIcons}>
-              {/* BOTÓN AJUSTES - CORREGIDO */}
-              <TouchableOpacity onPress={() => navigateTo("ajustes")}>
                 <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-              </TouchableOpacity>
-              {/* BOTÓN NOTIFICACIONES */}
-              <TouchableOpacity onPress={() => navigateTo("notificaciones")}>
                 <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-              </TouchableOpacity>
             </View>
   
             <Text style={styles.title}>Ahorra+ App</Text>
   
             <View style={styles.avatar}>
-              <TouchableOpacity onPress={() => navigateTo("login")}>
                 <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-              </TouchableOpacity>
             </View>
   
           </View>
   
-          {/* CONTENIDO */}
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <View style={styles.headerSection}>
               <View>
@@ -74,10 +50,8 @@ export default function Ahorros() {
              
             </View>
 
-            {/* Tarjetas de gastos */}
             <View style={styles.cardContainer}>
               
-              {/* Alquiler */}
               <View style={styles.card}>
                 <View style={styles.cardLeft}>
                   <Image source={require("../assets/plane.png")} style={styles.cardIcon} />
@@ -91,7 +65,6 @@ export default function Ahorros() {
                 </View>
               </View>
   
-              {/* Seguro Auto */}
               <View style={styles.card}>
                 <View style={styles.cardLeft}>
                   <Image source={require("../assets/auto.png")} style={styles.cardIcon} />
@@ -109,57 +82,25 @@ export default function Ahorros() {
               
             </View>
   
-            <TouchableOpacity style={styles.addButton}>
                 <Image source={require("../assets/mas.png")} style={styles.addIcon} />
                 <Text style={styles.addText}>Crear nueva meta de ahorro</Text>
-            </TouchableOpacity>
         </ScrollView>
   
-          {/* NAV INFERIOR */}
           <View style={styles.bottomNav}>
-            <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("principal")}>
               <Image source={require("../assets/Transisiones.png")} style={styles.navIcon} />
-            </TouchableOpacity>
   
-            <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("principal")}>
               <Image source={require("../assets/Pink.png")} style={styles.navIcon} />
-            </TouchableOpacity>
   
-            <TouchableOpacity style={styles.centerButton} onPress={() => navigateTo("")}>
               <Image source={require("../assets/Programados.png")} style={styles.centerIcon} />
-            </TouchableOpacity>
   
-            <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("principal")}>
               <Image source={require("../assets/inicio.png")} style={styles.navIcon} />
-            </TouchableOpacity>
   
-            <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("principal")}>
               <Image source={require("../assets/BolsaDinero.png")} style={styles.navIcon} />
-            </TouchableOpacity>
           </View>
         </View>
       );
     };
 
-   switch (currentScreen) {
-     case "principal":
-       return <Principal navigate={navigateTo} />;
-     case "login":
-       return <Login navigate={navigateTo} />;
-     case "crear":
-       return <CrearCuenta navigate={navigateTo} />;
-     case "pagosProgramados":
-        return <PagosProgramados navigate={navigateTo} />;
-     case "notificaciones":
-        return <Notificaciones navigate={navigateTo} />;
-     case "ajustes":  // AGREGADO - CASE PARA AJUSTES
-        return <Ajustes navigate={navigateTo} />;
-     default:
-       return renderAhorros();
-   }
-   
-      
-};
 
 const styles = StyleSheet.create({
   container: { 
@@ -169,7 +110,6 @@ const styles = StyleSheet.create({
 
 },
 
-  // HEADER
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -207,7 +147,6 @@ const styles = StyleSheet.create({
     tintColor: "#fff",
     resizeMode: "contain" },
 
-  // CUERPO
   scrollContent: { 
     padding: 20,
     paddingBottom: 120 },
@@ -267,7 +206,6 @@ const styles = StyleSheet.create({
      },
 
 
-  // NAV INFERIOR
   bottomNav: {
     position: "absolute",
     bottom: 10,

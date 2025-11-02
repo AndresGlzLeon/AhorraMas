@@ -1,63 +1,27 @@
 import React from "react";
-import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Image, } from "react-native";
 import  PagosProgramados  from "./PagosProgramados";
-import Login from "./Login";
-import CrearCuenta from "./CrearCuenta";
-import IngresosEgresos from "./IngresosEgresos";
-import Ahorros from "./Ahorros";
-import Ajustes from "./Ajustes";
-import Notificaciones from "./Notificaciones";
-import Perfil from "./Perfil";
-import Presupuesto from "./Presupuesto";
 
 
 export default function Principal() {
-  const [currentScreen, setCurrentScreen] = React.useState("principal");
 
-  // Función para navegar entre pantallas
-  const navigateTo = (screen) => {
-    setCurrentScreen(screen);
-  };
-
-  // Pantalla de Pagos Programados
-  const renderPagosProgramados = () => {
     return (
       <View style={styles.container}>
-        
-        {/* Header original de PagosProgramados */}
-        <PagosProgramados />
-        
-      </View>
-    );
-  };
-
-  const renderPrincipal = () => {
-    return (
-      <View style={styles.container}>
-        {/* HEADER */}
         <View style={styles.header}>
           <View style={styles.leftIcons}>
-            <TouchableOpacity onPress={() => navigateTo("ajustes")}>
                <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-            </TouchableOpacity>            
-            <TouchableOpacity onPress={() => navigateTo("notificaciones")}>
               <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-             </TouchableOpacity>
 
           </View>
 
           <Text style={styles.title}>Ahorra+ App</Text>
 
           <View style={styles.avatar}>
-            <TouchableOpacity onPress={() => navigateTo("login")}>
               <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-            </TouchableOpacity>
           </View>
         </View>
 
-        {/* CONTENIDO SCROLLABLE */}
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* Bienvenida + puerquito */}
           <View style={styles.headerSection}>
             <View>
               <Text style={styles.welcome}>Bienvenido,{"\n"}Consulta tus gastos</Text>
@@ -65,16 +29,13 @@ export default function Principal() {
             <Image source={require("../assets/logo.png")} style={styles.pigImage} />
           </View>
 
-          {/* Dinero disponible */}
           <Text style={styles.text}>Tu dinero disponible es:</Text>
           <View style={styles.balanceCard}>
             <Text style={styles.amount}>$1,200</Text>
           </View>
 
-          {/* Últimas transacciones */}
           <Text style={styles.sectionTitle}>Últimas transacciones</Text>
 
-          {/* TRANSPORTE */}
           <View style={styles.transaction}>
             <Image source={require("../assets/transporte.png")} style={styles.iconTrans} />
             <View style={styles.details}>
@@ -84,7 +45,6 @@ export default function Principal() {
             <Text style={[styles.amountText, { color: "#e63946" }]}>- $300.0</Text>
           </View>
 
-          {/* SUELDO */}
           <View style={styles.transaction}>
             <Image source={require("../assets/sueldo.png")} style={styles.iconTrans} />
             <View style={styles.details}>
@@ -94,7 +54,6 @@ export default function Principal() {
             <Text style={[styles.amountText, { color: "#2a9d8f" }]}>+ $500.0</Text>
           </View>
 
-          {/* DESPENSA */}
           <View style={styles.transaction}>
             <Image source={require("../assets/despensa.png")} style={styles.iconTrans} />
             <View style={styles.details}>
@@ -105,57 +64,20 @@ export default function Principal() {
           </View>
         </ScrollView>
 
-        {/* NAV INFERIOR */}
         <View style={styles.bottomNav}>
-          <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("ingresosEgresos")}>
             <Image source={require("../assets/Transisiones.png")} style={styles.navIcon} />
-          </TouchableOpacity>
 
-          <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("ahorros")}>
             <Image source={require("../assets/Pink.png")} style={styles.navIcon} />
-          </TouchableOpacity>
 
-          <TouchableOpacity style={styles.centerButton}>
             <Image source={require("../assets/inicio.png")} style={styles.centerIcon} />
-          </TouchableOpacity>
 
-          <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("pagosProgramados")}>
             <Image source={require("../assets/Programados.png")} style={styles.navIcon} />
-          </TouchableOpacity>
 
-          <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("presupuesto")}>
             <Image source={require("../assets/BolsaDinero.png")} style={styles.navIcon} />
-          </TouchableOpacity>
         </View>
       </View>
     );
   };
-
-  // Renderizar la pantalla actual
-  switch (currentScreen) {
-    case "pagosProgramados":
-      return renderPagosProgramados();
-    case "login":
-      return <Login navigate={setCurrentScreen || setScreen} />;
-    case "crear":
-      return <CrearCuenta navigate={setCurrentScreen || setScreen} />;
-    case "ingresosEgresos":
-      return <IngresosEgresos navigate={setCurrentScreen || setScreen} />;
-    case "ahorros":
-      return <Ahorros navigate={setCurrentScreen || setScreen} />;
-    case "ajustes":
-      return <Ajustes navigate={setCurrentScreen || setScreen} />;
-    case "notificaciones":
-      return <Notificaciones navigate={setCurrentScreen || setScreen} />;
-    case "perfil":
-      return <Perfil navigate={setCurrentScreen || setScreen} />;
-    case "presupuesto":
-      return <Presupuesto navigate={setCurrentScreen || setScreen} />;
-    case "principal":
-    default:
-      return renderPrincipal();
-  }
-}
 
 const styles = StyleSheet.create({
   container: { 
@@ -163,7 +85,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
   },
-  // HEADER
   header: {
     flexDirection: "row",
     alignItems: "center",

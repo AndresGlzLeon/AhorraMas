@@ -1,54 +1,24 @@
 import React from "react";
-import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from "react-native";
-import Principal from "./Principal";
-import Login from "./Login";
-import CrearCuenta from "./CrearCuenta";
-import Ahorros from "./Ahorros";
-import Notificaciones from "./Notificaciones";
-import Ajustes from "./Ajustes";
+import { View, Text, ScrollView, StyleSheet, Image } from "react-native";
 
 export default function PagosProgramados() {
-  const [currentScreen, setCurrentScreen] = React.useState("pagosProgramados");
 
-  const navigateTo = (screen) => {
-    setCurrentScreen(screen);
-  };
-
-  const renderPrincipal = () => {
-    return (
-      <View style={styles.container}>
-        <Principal />     
-      </View>
-    );
-  };
-
-  const renderPagosProgramados = () => {
     return (
         <View style={styles.container}>
-          {/* HEADER */}
           <View style={styles.header}>
             <View style={styles.leftIcons}>
-              {/* BOTÓN AJUSTES - CORREGIDO */}
-              <TouchableOpacity onPress={() => navigateTo("ajustes")}>
                 <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-              </TouchableOpacity>
-              {/* BOTÓN NOTIFICACIONES */}
-              <TouchableOpacity onPress={() => navigateTo("notificaciones")}>
                 <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-              </TouchableOpacity>
             </View>
 
           <Text style={styles.title}>Ahorra+ App</Text>
 
           <View style={styles.avatar}>
-            <TouchableOpacity onPress={() => navigateTo("login")}>
               <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-            </TouchableOpacity>
           </View>
 
         </View>
 
-        {/* CONTENIDO */}
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.headerSection}>
             <View>
@@ -58,7 +28,6 @@ export default function PagosProgramados() {
             <Image source={require("../assets/logo.png")} style={styles.pigImage} />
           </View>
 
-          {/* Tarjetas de gastos */}
           <View style={styles.cardContainer}>
             
             <View style={styles.card}>
@@ -104,55 +73,25 @@ export default function PagosProgramados() {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.addButton}>
             <Image source={require("../assets/mas.png")} style={styles.addIcon} />
             <Text style={styles.addText}>Crear nuevo gasto programado</Text>
-          </TouchableOpacity>
         </ScrollView>
 
-        {/* NAV INFERIOR */}
         <View style={styles.bottomNav}>
-          <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("principal")}>
             <Image source={require("../assets/Transisiones.png")} style={styles.navIcon} />
-          </TouchableOpacity>
 
-          <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("ahorros")}>
             <Image source={require("../assets/Pink.png")} style={styles.navIcon} />
-          </TouchableOpacity>
 
-          <TouchableOpacity style={styles.centerButton} onPress={() => navigateTo("")}>
             <Image source={require("../assets/Programados.png")} style={styles.centerIcon} />
-          </TouchableOpacity>
 
-          <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("principal")}>
             <Image source={require("../assets/inicio.png")} style={styles.navIcon} />
-          </TouchableOpacity>
 
-          <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("principal")}>
             <Image source={require("../assets/BolsaDinero.png")} style={styles.navIcon} />
-          </TouchableOpacity>
         </View>
       </View>
     );
   };
 
-  switch (currentScreen) {
-    case "principal":
-      return renderPrincipal();
-    case "login":
-      return <Login navigate={navigateTo} />;
-    case "crear":
-      return <CrearCuenta navigate={navigateTo} />;
-    case "ahorros":
-      return <Ahorros navigate={navigateTo} />;
-    case "notificaciones":
-      return <Notificaciones navigate={setCurrentScreen || setScreen} />;
-    case "ajustes":  // AGREGADO - CASE PARA AJUSTES
-      return <Ajustes navigate={navigateTo} />;
-    default:
-      return renderPagosProgramados();
-  }
-}
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", alignItems: "center" },

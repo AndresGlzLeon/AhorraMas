@@ -1,17 +1,8 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
-  Image,
+import {View,Text,TextInput,StyleSheet,KeyboardAvoidingView,Alert,Image,
 } from "react-native";
 
-export default function CrearCuenta({ navigate }) {
+export default function CrearCuenta() {
   const [nombre, setNombre] = useState("");
   const [correo, setCorreo] = useState("");
   const [contrasenia, setContrasenia] = useState("");
@@ -27,10 +18,11 @@ export default function CrearCuenta({ navigate }) {
     setCorreo("");
     setContrasenia("");
     setTelefono("");
-    if (onClose) onClose();
+ 
   };
 
   return (
+   <View>
     <KeyboardAvoidingView
       style={styles.container}
     >
@@ -72,14 +64,11 @@ export default function CrearCuenta({ navigate }) {
         placeholderTextColor="#999"
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>Crear cuenta</Text>
-      </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigate && navigate("login")}>
         <Text style={styles.footer}>¿Ya tienes una cuenta? Inicia sesión</Text>
-      </TouchableOpacity>
     </KeyboardAvoidingView>
+    </View>
   );
 }
 
@@ -126,7 +115,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   buttonText: {
-    color: "#fff",
+    color: "#000000ff",
     fontWeight: "600",
   },
   footer: {
