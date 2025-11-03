@@ -9,6 +9,7 @@ import Presupuesto from "./Presupuesto";
 import IngresosEgresos from "./IngresosEgresos";
 import Ajustes from "./Ajustes";
 import Perfil from "./Perfil";
+import Notificaciones from "./Notificaciones";
 
 export default function MenusScreens() {
   const [screen, setScreen] = useState("menu");
@@ -32,6 +33,8 @@ export default function MenusScreens() {
       return <Ajustes />;
     case "perfil":
       return <Perfil />;
+    case "notificaciones":
+      return <Notificaciones />;
     case "menu":
     default:
       return (
@@ -47,6 +50,7 @@ export default function MenusScreens() {
             <Button onPress={() => setScreen("ingresosEgresos")} title="Ingresos y Egresos" />
             <Button onPress={() => setScreen("ajustes")} title="Ajustes" />
             <Button onPress={() => setScreen("perfil")} title="Perfil" />
+            <Button onPress={() => setScreen("notificaciones")} title="Notificaciones" />
           </View>
         </View>
       );
