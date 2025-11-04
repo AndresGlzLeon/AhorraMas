@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, Animated } from "react-native";
+import React, { useState } from "react";
+import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, Animated, TextInput, FlatList } from "react-native";
 import Principal from "./Principal";
 import Login from "./Login";
 import CrearCuenta from "./CrearCuenta";
@@ -9,325 +9,181 @@ import Ajustes from "./Ajustes";
 
 export default function Ahorros() {
 
-  const [currentScreen, setCurrentScreen] = React.useState("ahorros");
-  
-    // Función para navegar entre pantallas
-    const navigateTo = (screen) => {
-      setCurrentScreen(screen);
-    };
+  const [currentScreen, setCurrentScreen] = useState("ahorros");
 
-    const renderAhorros = () => {
-      return (
-        <View style={styles.container}>
-          {/* HEADER */}
-          <View style={styles.header}>
-            <View style={styles.leftIcons}>
-              {/* BOTÓN AJUSTES - CORREGIDO */}
-              <TouchableOpacity onPress={() => navigateTo("ajustes")}>
-                <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+  // STATES CRUD
+  const [goal, setGoal] = useState("");
+  const [amount, setAmount] = useState("");
+  const [goals, setGoals] = useState([]);
+  const [editingIndex, setEditingIndex] = useState(null);
+
+  const navigateTo = (screen) => setCurrentScreen(screen);
+
+  // CRUD FUNCTIONS
+  const handleSave = () => {
+    if (!goal || !amount) return;
+
+    const newGoal = { goal, amount };
+
+    if (editingIndex !== null) {
+      const updated = [...goals];
+      updated[editingIndex] = newGoal;
+      setGoals(updated);
+      setEditingIndex(null);
+    } else {
+      setGoals([...goals, newGoal]);
+    }
+    setGoal("");
+    setAmount("");
+  };
+
+  const handleEdit = (i) => {
+    setGoal(goals[i].goal);
+    setAmount(goals[i].amount);
+    setEditingIndex(i);
+  };
+
+  const handleDelete = (i) => {
+    setGoals(goals.filter((_, index) => index !== i));
+  };
+
+  
+  const renderCRUD = () => (
+    <View style={styles.container}>
+      
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigateTo("ahorros")}>
+          <Image source={require("../assets/Pink.png")} style={styles.iconHeader} />
+        </TouchableOpacity>
+        <Text style={styles.title}>Gestión de Metas</Text>
+        <View style={{ width: 30 }} />
+      </View>
+
+      <Text style={styles.subtitle}>CRUD de Ahorros</Text>
+
+      <TextInput style={styles.input} placeholder="Nombre de la meta " value={goal} onChangeText={setGoal} />
+      <TextInput style={styles.input} placeholder="Cantidad " value={amount} onChangeText={setAmount} keyboardType="numeric" />
+
+      <TouchableOpacity style={styles.addButton} onPress={handleSave}>
+        <Text style={styles.addText}>{editingIndex !== null ? "Actualizar meta" : "Agregar meta"}</Text>
+      </TouchableOpacity>
+
+      <FlatList
+        data={goals}
+        keyExtractor={(_, i) => i.toString()}
+        renderItem={({ item, index }) => (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>{item.goal}</Text>
+            <Text style={styles.cardAmount}>${item.amount}</Text>
+
+            <View style={{ flexDirection: "row", gap: 15 }}>
+              <TouchableOpacity onPress={() => handleEdit(index)}>
+                <Image source={require("../assets/editar.png")} style={styles.actionIcon} />
               </TouchableOpacity>
-              {/* BOTÓN NOTIFICACIONES */}
-              <TouchableOpacity onPress={() => navigateTo("notificaciones")}>
-                <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+
+              <TouchableOpacity onPress={() => handleDelete(index)}>
+                <Image source={require("../assets/delete.png")} style={styles.actionIcon} />
               </TouchableOpacity>
             </View>
-  
-            <Text style={styles.title}>Ahorra+ App</Text>
-  
-            <View style={styles.avatar}>
-              <TouchableOpacity onPress={() => navigateTo("login")}>
-                <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-              </TouchableOpacity>
-            </View>
-  
           </View>
-  
-          {/* CONTENIDO */}
-          <ScrollView contentContainerStyle={styles.scrollContent}>
-            <View style={styles.headerSection}>
-              <View>
-                <Text style={styles.welcome}>Ahorros</Text>
-                <Text style={styles.subtitle}>Tu progreso hacia tus{"\n"} metas financieras</Text>
-              </View>
-              <Image source={require("../assets/logo.png")} style={styles.pigImage} />
-            </View>
-            
+        )}
+      />
+    </View>
+  );
 
-            <View>
-               
-                <Text style={styles.title}>{"\n"} </Text>
-              </View>
 
-            <View style={styles.cardContainer}>
+  const renderAhorros = () => (
+    <View style={styles.container}>
+      {/* HEADER */}
+      <View style={styles.header}>
+        <View style={styles.leftIcons}>
+          <TouchableOpacity onPress={() => navigateTo("ajustes")}>
+            <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigateTo("notificaciones")}>
+            <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+          </TouchableOpacity>
+        </View>
 
-              <Text style={styles.cardTitle}>Fondo de Ahorros</Text> 
-            
-                <View style={styles.progressBar}>  
-                  <Animated.View style={[StyleSheet.absoluteFill, {width: '19.4%', backgroundColor: '#7b6cff', borderRadius: 15,}]} />
-                </View>
+        <Text style={styles.title}>Ahorra+ App</Text>
 
-                <View style={styles.cardLeft}>
-                  <Text style={styles.cardSub}>Meta de:  296,495</Text>
-                  <Text style={styles.cardAmount2 }>Ahorrado:  57,500</Text>
-                </View>
+        <View style={styles.avatar}>
+          <TouchableOpacity onPress={() => navigateTo("login")}>
+            <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+          </TouchableOpacity>
+        </View>
+      </View>
 
-             
-            </View>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
 
-            {/* Tarjetas de gastos */}
-            <View style={styles.cardContainer}>
-              
-              {/* Alquiler */}
-              <View style={styles.card}>
-                <View style={styles.cardLeft}>
-                  <Image source={require("../assets/plane.png")} style={styles.cardIcon} />
-                  <View>
-                    <Text style={styles.cardTitle}>Viaje a los cabos</Text>
-                    <Text style={styles.cardSub}>Meta de: 10,896{"\n"}</Text>
-                  </View>
-                </View>
-                <View>
-                  <Text style={styles.cardAmount}>+$7500.00</Text>
-                </View>
-              </View>
-  
-              {/* Seguro Auto */}
-              <View style={styles.card}>
-                <View style={styles.cardLeft}>
-                  <Image source={require("../assets/auto.png")} style={styles.cardIcon} />
-                  <View>
-                    <Text style={styles.cardTitle}>Auto Nuevo</Text>
-                    <Text style={styles.cardSub}>Meta de: 285,599</Text>
-                  </View>
-                </View>
-                <View>
-                  <Text style={styles.cardAmount}>+ $50,000.00</Text>
-                  
-                </View>
-              </View>
+        <View style={styles.headerSection}>
+          <View>
+            <Text style={styles.welcome}>Ahorros</Text>
+            <Text style={styles.subtitle}>Tu progreso hacia tus{"\n"} metas financieras</Text>
+          </View>
+          <Image source={require("../assets/logo.png")} style={styles.pigImage} />
+        </View>
 
-              
-            </View>
-  
-            <TouchableOpacity style={styles.addButton}>
-                <Image source={require("../assets/mas.png")} style={styles.addIcon} />
-                <Text style={styles.addText}>Crear nueva meta de ahorro</Text>
-            </TouchableOpacity>
-        </ScrollView>
-  
-          {/* NAV INFERIOR */}
-          <View style={styles.bottomNav}>
-            <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("principal")}>
-              <Image source={require("../assets/Transisiones.png")} style={styles.navIcon} />
-            </TouchableOpacity>
-  
-            <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("principal")}>
-              <Image source={require("../assets/Pink.png")} style={styles.navIcon} />
-            </TouchableOpacity>
-  
-            <TouchableOpacity style={styles.centerButton} onPress={() => navigateTo("")}>
-              <Image source={require("../assets/Programados.png")} style={styles.centerIcon} />
-            </TouchableOpacity>
-  
-            <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("principal")}>
-              <Image source={require("../assets/inicio.png")} style={styles.navIcon} />
-            </TouchableOpacity>
-  
-            <TouchableOpacity style={styles.iconCircle} onPress={() => navigateTo("principal")}>
-              <Image source={require("../assets/BolsaDinero.png")} style={styles.navIcon} />
-            </TouchableOpacity>
+        {/*  BOTÓN PARA IR AL CRUD */}
+        <TouchableOpacity style={[styles.addButton, { marginBottom: 20 }]} onPress={() => navigateTo("crud")}>
+          <Text style={styles.addText}>Gestionar Metas (CRUD)</Text>
+        </TouchableOpacity>
+
+        <View style={styles.cardContainer}>
+          <Text style={styles.cardTitle}>Fondo de Ahorros</Text>
+
+          <View style={styles.progressBar}>
+            <Animated.View style={[StyleSheet.absoluteFill, { width: '19%', backgroundColor: '#7b6cff', borderRadius: 15 }]} />
+          </View>
+
+          <View style={styles.cardLeft}>
+            <Text style={styles.cardSub}>Meta de: 296,495</Text>
+            <Text style={styles.cardAmount2}>Ahorrado: 57,500</Text>
           </View>
         </View>
-      );
-    };
+      </ScrollView>
+    </View>
+  );
 
-   switch (currentScreen) {
-     case "principal":
-       return <Principal navigate={navigateTo} />;
-     case "login":
-       return <Login navigate={navigateTo} />;
-     case "crear":
-       return <CrearCuenta navigate={navigateTo} />;
-     case "pagosProgramados":
-        return <PagosProgramados navigate={navigateTo} />;
-     case "notificaciones":
-        return <Notificaciones navigate={navigateTo} />;
-     case "ajustes":  // AGREGADO - CASE PARA AJUSTES
-        return <Ajustes navigate={navigateTo} />;
-     default:
-       return renderAhorros();
-   }
-   
-      
-};
+
+  switch (currentScreen) {
+    case "principal": return <Principal navigate={navigateTo} />;
+    case "login": return <Login navigate={navigateTo} />;
+    case "crear": return <CrearCuenta navigate={navigateTo} />;
+    case "pagosProgramados": return <PagosProgramados navigate={navigateTo} />;
+    case "notificaciones": return <Notificaciones navigate={navigateTo} />;
+    case "ajustes": return <Ajustes navigate={navigateTo} />;
+    case "crud": return renderCRUD();
+    default: return renderAhorros();
+  }
+}
+
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1,
-   backgroundColor: "#fff",
-   alignItems:"center",
+  container: { flex: 1, backgroundColor: "#fff", alignItems: "center" },
+  header:{ flexDirection:"row", justifyContent:"space-between", alignItems:"center", padding:15, backgroundColor:"#7b6cff", borderRadius:40, width:"95%", marginTop:50 },
+  leftIcons:{ flexDirection:"row", alignItems:"center" },
+  iconHeader:{ width:33, height:22, resizeMode:"contain" },
+  title:{ fontSize:18, fontWeight:"600", color:"#333" },
+  avatar:{ backgroundColor:"#b3a5ff", borderRadius:50, padding:8 },
+  avatarIcon:{ width:20, height:20, tintColor:"#000000ff" },
+  scrollContent:{ padding:20, paddingBottom:120 },
+  headerSection:{ flexDirection:"row", justifyContent:"space-between", alignItems:"center", marginBottom:20 },
+  welcome:{ fontSize:26, paddingRight:100, fontWeight:"700", color:"#7b6cff", lineHeight:30 },
+  subtitle:{ fontSize:16, marginTop:50, color:"#000" },
+  pigImage:{ width:80, height:80 },
+  cardContainer:{ backgroundColor:"#f4f1ff", padding:10, borderRadius:30, marginBottom:30, width:"100%" },
+  progressBar:{ height:25, width:"100%", backgroundColor:"#ddd", borderRadius:15, marginVertical:10 },
+  cardLeft:{ flexDirection:"row", justifyContent:"space-between", width:"100%" },
+  cardSub:{ fontSize:14, color:"#777" },
+  cardAmount2:{ fontSize:14, fontWeight:"700", color:"#000" },
+  addButton:{ backgroundColor:"#7b6cff", padding:15, borderRadius:20, width:"100%", alignItems:"center" },
+  addText:{ color:"#fff", fontWeight:"bold" },
 
-},
-
-  // HEADER
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 15,
-    backgroundColor: "#f4f1ff",
-    borderRadius: 40,
-    width: " 95%",
-    marginTop: 50,
-    
-    
-  },
-  leftIcons: {
-    flexDirection: "row", 
-    alignItems: "center" },
-
-  iconHeader: { 
-    width: 33,
-    height: 22, 
-    resizeMode: "contain" },
-
-  title: { 
-    fontSize: 18, 
-    fontWeight: "600", 
-    color: "#333" },
-
-  avatar: {
-    backgroundColor: "#b3a5ff",
-    borderRadius: 50,
-    padding: 8,
-  },
-  avatarIcon: {
-    width: 20,
-    height: 20, 
-    tintColor: "#fff",
-    resizeMode: "contain" },
-
-  // CUERPO
-  scrollContent: { 
-    padding: 20,
-    paddingBottom: 120 },
-    
-  headerSection: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  welcome: {
-    fontSize: 26,
-    paddingRight: 100,
-    fontWeight: "700",
-    color: "#7b6cff",
-    lineHeight: 30,
-  },
-  subtitle:{ 
-    fontSize: 16,
-    marginTop:50, 
-    color: "#rgb(0, 0, 0)"  
-
-  },
-  
-  pigImage: {
-    width: 80,
-    height: 80,
-    resizeMode: "contain",
-  },
-
-  cardContainer: {
-    backgroundColor: "#f4f1ff",
-    padding: 10,
-    borderRadius: 30,
-    marginBottom: 30,
-    marginTop: -5,
-    width: "100%",
-  },
-  card: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderBottomColor: "#ddd",
-    borderBottomWidth: 2,
-    paddingVertical: 30,
-    paddingHorizontal: 10,
-    marginTop: 0,
-    paddingBottom: 0,
-  },
-  cardLeft: { flexDirection: "row", alignItems: "center" },
-  cardIcon: { width: 50, height: 50, marginRight:30, marginBottom:15, tintColor: "#7b6cff" },
-  cardTitle: { fontSize: 18, fontWeight: "600", color: "#000",  },
-  cardSub: { fontSize: 13, color: "#777" },
-  cardAmount: { fontSize: 16, fontWeight: "700", color: "#000", paddingVertical: 5,
-    paddingHorizontal: 30, },
-  cardAmount2: { fontSize: 16, fontWeight: "700", color: "#000", paddingLeft: 100,
-     },
-
-
-  // NAV INFERIOR
-  bottomNav: {
-    position: "absolute",
-    bottom: 10,
-
-    width: "95%",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    backgroundColor: "#eae2ff",
-    paddingVertical: 12,
-    borderRadius: 30,
-    
-  },
-  iconCircle: {
-    width: 50,       
-    height: 50,
-    borderRadius: 25, 
-    backgroundColor: "#A084E8", 
-    justifyContent: "center",
-    alignItems: "center",
-    marginHorizontal: 5, 
-  },
-  
-  navIcon: { 
-    width: 26, 
-    height: 26, 
-    resizeMode: "contain" },
-
-  centerButton: {
-    backgroundColor: "#7f6aff",
-    padding: 15,
-    borderRadius: 40,
-    marginBottom: 25,
-
-  },
-  centerIcon: {
-    width: 30, 
-    height: 30, 
-    resizeMode: "contain", 
-    tintColor: "#fff" },
-progressBar:{
-    height: 25,
-    flexDirection: 'row',
-    width: '100%',
-    backgroundColor: '#d3d3d3',
-    borderRadius: 15,
-    marginVertical: 10,
-    
-    alignContent: 'center',
-    
-},
-addButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f4f1ff",
-    borderRadius: 25,
-    padding: 15,
-    justifyContent: "center",
-  },
-  addIcon: { width: 25, height: 25, marginRight: 10, tintColor: "#7b6cff" },
-  addText: { fontSize: 16, color: "#000", fontWeight: "500" },
-
+  // CRUD
+  input:{ backgroundColor:"#f4f1ff", padding:15, borderRadius:15, width:"100%", marginBottom:10 },
+  card:{ backgroundColor:"#f4f1ff", padding:15, borderRadius:20, flexDirection:"row", justifyContent:"space-between", alignItems:"center", marginBottom:10, width:"100%" },
+  cardTitle:{ fontWeight:"bold", fontSize:16, color:"#000" },
+  cardAmount:{ fontSize:14, fontWeight:"600" },
+  actionIcon:{ width:25, height:25, tintColor:"#7b6cff" }
 });
