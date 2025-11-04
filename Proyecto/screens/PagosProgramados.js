@@ -1,6 +1,5 @@
 import React from "react";
-import { View, Text, ScrollView, StyleSheet, Image } from "react-native";
-
+import { View, Text, ScrollView, StyleSheet, Image, TextInput, Button } from "react-native";
 export default function PagosProgramados() {
 
     return (
@@ -73,8 +72,38 @@ export default function PagosProgramados() {
             </View>
           </View>
 
-            <Image source={require("../assets/mas.png")} style={styles.addIcon} />
-            <Text style={styles.addText}>Crear nuevo gasto programado</Text>
+          <View style={styles.crudContainer}>
+
+            <Text style={styles.crudTitle}>Sistema de Gastos</Text>
+            <Text style={styles.crudSubtitle}>Crear gasto:</Text>
+
+            <TextInput placeholder="Título" style={styles.input} />
+            <TextInput placeholder="Monto" style={styles.input} />
+            <TextInput placeholder="Fecha" style={styles.input} />
+
+            <View style={styles.buttonSpacing}>
+              <Button title="Guardar" onPress={() => {}} />
+            </View> 
+
+            <Text style={styles.crudSubtitle}>Actualizar gasto:</Text>
+
+            <TextInput placeholder="ID del gasto" style={styles.input} />
+            <TextInput placeholder="Nuevo monto" style={styles.input} />
+
+            <View style={styles.buttonSpacing}>
+              <Button title="Actualizar" onPress={() => {}} />
+            </View>
+
+            <Text style={styles.crudSubtitle}>Eliminar gasto:</Text>
+
+            <TextInput placeholder="ID del gasto a eliminar" style={styles.input} />
+
+            <View style={styles.buttonSpacing}>
+              <Button title="Eliminar" color="red" onPress={() => {}} />
+            </View>
+
+          </View>
+
         </ScrollView>
 
         <View style={styles.bottomNav}>
@@ -182,4 +211,48 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
   centerIcon: { width: 30, height: 30, resizeMode: "contain", tintColor: "#fff" },
+  crudContainer: {
+  backgroundColor: "#f4f1ff",
+  padding: 20,
+  borderRadius: 20,
+  marginTop: 20,
+  marginBottom: 50,
+},
+
+crudTitle: {
+  fontSize: 20,
+  fontWeight: "700",
+  marginBottom: 10,
+  color: "#000",
+},
+
+crudSubtitle: {
+  fontSize: 16,
+  fontWeight: "600",
+  marginTop: 20,
+  color: "#000",
+},
+
+input: {
+  backgroundColor: "#fff",
+  padding: 10,
+  borderRadius: 10,
+  marginTop: 8,
+  borderWidth: 1,
+  borderColor: "#ddd",
+},
+
+readBox: {
+  backgroundColor: "#fff",
+  padding: 10,
+  borderRadius: 10,
+  marginTop: 5,
+  borderWidth: 1,
+  borderColor: "#ddd",
+},
+
+buttonSpacing: {
+  marginTop: 10,
+}
+
 });
