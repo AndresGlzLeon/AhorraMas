@@ -268,4 +268,8 @@ addButton: {
   addIcon: { width: 25, height: 25, marginRight: 10, tintColor: "#7b6cff" },
   addText: { fontSize: 16, color: "#000", fontWeight: "500" },
 
+
+
+  
+
 });
