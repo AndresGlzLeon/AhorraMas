@@ -292,7 +292,7 @@ addButton: {
     justifyContent: "center",
   },
   addIcon: { width: 25, height: 25, marginRight: 10, tintColor: "#7b6cff" },
-  addText: { fontSize: 16, color: "#000", fontWeight: "500" },
+  addText: { marginTop:-22, marginLeft:50, fontSize: 16, color: "#000", fontWeight: "500" },
 
 
 
