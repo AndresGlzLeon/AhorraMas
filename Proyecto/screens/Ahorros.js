@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, ScrollView, StyleSheet, Image, Animated } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Image, Animated, TouchableOpacity } from "react-native";
 
 export default function Ahorros(){
 
@@ -82,8 +82,34 @@ export default function Ahorros(){
               
             </View>
   
+                <TouchableOpacity>
                 <Image source={require("../assets/mas.png")} style={styles.addIcon} />
+                </TouchableOpacity>
                 <Text style={styles.addText}>Crear nueva meta de ahorro</Text>
+              <View style={{ padding: 10 }}>
+                <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
+                    Metas personalizadas:
+                </Text>
+              <View style={{
+                backgroundColor: "#faf8ff",
+                padding: 12,
+                borderRadius: 15,
+                marginBottom: 10,
+              }}>
+                <Text style={{ fontWeight: "600", color: "#7b6cff" }}>Ejemplo de meta</Text>
+                <Text style={{ color: "#555" }}>Meta de: $10,000</Text>
+                <Text style={{ color: "#555" }}>Ahorrado: $2,500</Text>
+                <View style={{ flexDirection: "row", marginTop: 8, gap: 10 }}>
+                  <TouchableOpacity>
+                  <Text style={{ color: "#7b6cff", fontWeight: "600" }}>Editar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity>
+                  <Text style={{ color: "red", fontWeight: "600" }}>Eliminar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+
         </ScrollView>
   
           <View style={styles.bottomNav}>
