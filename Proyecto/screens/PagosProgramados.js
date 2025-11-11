@@ -285,53 +285,57 @@ const styles = StyleSheet.create({
   addIcon: { width: 25, height: 25, marginRight: 10, tintColor: "#7b6cff" },
   addText: { fontSize: 16, color: "#000", fontWeight: "500" },
 
-  navIcon: { width: 26, height: 26, resizeMode: "contain" },
+navIcon: { width: 26, height: 26, resizeMode: "contain" },
 
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalBox: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 20,
-    width: "85%",
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#7b6cff",
-    textAlign: "center",
-    marginBottom: 15,
-  },
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  cancelBtn: {
-    backgroundColor: "#ff6b6b",
-    padding: 12,
-    borderRadius: 12,
-    width: "45%",
-    alignItems: "center",
-  },
-  saveBtn: {
-    backgroundColor: "#7b6cff",
-    padding: 12,
-    borderRadius: 12,
-    width: "45%",
-    alignItems: "center",
-  },
-  btnText: { color: "#fff", fontWeight: "bold" },
+buttonSpacing: {
+  marginTop: 10,
+},
 
-  input: {
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 10,
-    marginTop: 8,
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
+modalContainer: {
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "center",
+  backgroundColor: "rgba(0,0,0,0.5)",
+},
+modalBox: {
+  backgroundColor: "#fff",
+  padding: 20,
+  borderRadius: 20,
+  width: "85%",
+},
+modalTitle: {
+  fontSize: 20,
+  fontWeight: "bold",
+  color: "#7b6cff",
+  textAlign: "center",
+  marginBottom: 15,
+},
+modalButtons: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+},
+cancelBtn: {
+  backgroundColor: "#ff6b6b",
+  padding: 12,
+  borderRadius: 12,
+  width: "45%",
+  alignItems: "center",
+},
+saveBtn: {
+  backgroundColor: "#7b6cff",
+  padding: 12,
+  borderRadius: 12,
+  width: "45%",
+  alignItems: "center",
+},
+btnText: { color: "#fff", fontWeight: "bold" },
+
+input: {
+  backgroundColor: "#fff",
+  padding: 10,
+  borderRadius: 10,
+  marginTop: 8,
+  borderWidth: 1,
+  borderColor: "#ddd",
+},
 });
