@@ -1,126 +1,228 @@
-import React from "react";
-import { View, Text, ScrollView, StyleSheet, Image, TextInput, Button } from "react-native";
+import React, { useState } from "react";
+import { View, Text, ScrollView, StyleSheet, Image, TextInput, TouchableOpacity, Modal, Alert } from "react-native";
+
 export default function PagosProgramados() {
 
-    return (
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <View style={styles.leftIcons}>
-                <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-                <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-            </View>
+  const [pagos, setPagos] = useState([
+    { titulo: "Alquiler", monto: 1500, fecha: "10 octubre 2025", tipo: "Mensual", icon: require("../assets/alquiler.png") },
+    { titulo: "Seguro Auto", monto: 750, fecha: "4 enero 2026", tipo: "Anual", icon: require("../assets/auto.png") },
+    { titulo: "Pago de Servicios", monto: 589, fecha: "26 octubre 2025", tipo: "Mensual", icon: require("../assets/servicios.png") },
+  ]);
 
-          <Text style={styles.title}>Ahorra+ App</Text>
+  const [modalAdd, setModalAdd] = useState(false);
+  const [modalEdit, setModalEdit] = useState(false);
 
-          <View style={styles.avatar}>
-              <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-          </View>
+  const [nuevoPago, setNuevoPago] = useState({ titulo: "", monto: "", fecha: "", tipo: "Mensual" });
+  const [editPagoIndex, setEditPagoIndex] = useState(null);
 
-        </View>
+  const agregarPago = () => {
+    if (!nuevoPago.titulo || !nuevoPago.monto || !nuevoPago.fecha) {
+      Alert.alert("Error", "Todos los campos son obligatorios");
+      return;
+    }
 
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          <View style={styles.headerSection}>
-            <View>
-              <Text style={styles.mainTitle}>Gastos{"\n"}Programados</Text>
-              <Text style={styles.subtitle}>Administra tus pagos</Text>
-            </View>
-            <Image source={require("../assets/logo.png")} style={styles.pigImage} />
-          </View>
+    setPagos(prev => [
+      ...prev,
+      {
+        ...nuevoPago,
+        monto: Number(nuevoPago.monto),
+        icon: require("../assets/servicios.png")
+      }
+    ]);
 
-          <View style={styles.cardContainer}>
-            
-            <View style={styles.card}>
-              <View style={styles.cardLeft}>
-                <Image source={require("../assets/alquiler.png")} style={styles.cardIcon} />
-                <View>
-                  <Text style={styles.cardTitle}>Alquiler</Text>
-                  <Text style={styles.cardSub}>Mensual</Text>
-                </View>
-              </View>
-              <View>
-                <Text style={styles.cardAmount}>-$1500.00</Text>
-                <Text style={styles.cardDate}>10 octubre 2025</Text>
-              </View>
-            </View>
+    setNuevoPago({ titulo: "", monto: "", fecha: "", tipo: "Mensual" });
+    setModalAdd(false);
+  };
 
-            <View style={styles.card}>
-              <View style={styles.cardLeft}>
-                <Image source={require("../assets/auto.png")} style={styles.cardIcon} />
-                <View>
-                  <Text style={styles.cardTitle}>Seguro Auto</Text>
-                  <Text style={styles.cardSub}>Anual</Text>
-                </View>
-              </View>
-              <View>
-                <Text style={styles.cardAmount}>-$750.00</Text>
-                <Text style={styles.cardDate}>4 enero 2026</Text>
-              </View>
-            </View>
+  const abrirEditar = (index) => {
+    const gasto = pagos[index];
+    setEditPagoIndex(index);
+    setNuevoPago({
+      titulo: gasto.titulo,
+      monto: gasto.monto.toString(),
+      fecha: gasto.fecha,
+      tipo: gasto.tipo
+    });
+    setModalEdit(true);
+  };
 
-            <View style={styles.card}>
-              <View style={styles.cardLeft}>
-                <Image source={require("../assets/servicios.png")} style={styles.cardIcon} />
-                <View>
-                  <Text style={styles.cardTitle}>Pago de Servicios   </Text>
-                  <Text style={styles.cardSub}>Mensual</Text>
-                </View>
-              </View>
-              <View>
-                <Text style={styles.cardAmount}>-$589.00</Text>
-                <Text style={styles.cardDate}>26 octubre 2025</Text>
-              </View>
-            </View>
-          </View>
+  const guardarEdicion = () => {
+    setPagos(prev => {
+      const copy = [...prev];
+      copy[editPagoIndex] = {
+        ...copy[editPagoIndex],
+        titulo: nuevoPago.titulo,
+        monto: Number(nuevoPago.monto),
+        fecha: nuevoPago.fecha,
+      };
+      return copy;
+    });
 
-          <View style={styles.crudContainer}>
+    setEditPagoIndex(null);
+    setModalEdit(false);
+  };
 
-            <Text style={styles.crudTitle}>Sistema de Gastos</Text>
-            <Text style={styles.crudSubtitle}>Crear gasto:</Text>
+  const eliminarPagoDirecto = (index) => {
+    console.log("Eliminar directo index:", index);
+    setPagos(prev => prev.filter((_, i) => i !== index));
+  };
 
-            <TextInput placeholder="Título" style={styles.input} />
-            <TextInput placeholder="Monto" style={styles.input} />
-            <TextInput placeholder="Fecha" style={styles.input} />
-
-            <View style={styles.buttonSpacing}>
-              <Button title="Guardar" onPress={() => {}} />
-            </View> 
-
-            <Text style={styles.crudSubtitle}>Actualizar gasto:</Text>
-
-            <TextInput placeholder="ID del gasto" style={styles.input} />
-            <TextInput placeholder="Nuevo monto" style={styles.input} />
-
-            <View style={styles.buttonSpacing}>
-              <Button title="Actualizar" onPress={() => {}} />
-            </View>
-
-            <Text style={styles.crudSubtitle}>Eliminar gasto:</Text>
-
-            <TextInput placeholder="ID del gasto a eliminar" style={styles.input} />
-
-            <View style={styles.buttonSpacing}>
-              <Button title="Eliminar" color="red" onPress={() => {}} />
-            </View>
-
-          </View>
-
-        </ScrollView>
-
-        <View style={styles.bottomNav}>
-            <Image source={require("../assets/Transisiones.png")} style={styles.navIcon} />
-
-            <Image source={require("../assets/Pink.png")} style={styles.navIcon} />
-
-            <Image source={require("../assets/Programados.png")} style={styles.centerIcon} />
-
-            <Image source={require("../assets/inicio.png")} style={styles.navIcon} />
-
-            <Image source={require("../assets/BolsaDinero.png")} style={styles.navIcon} />
-        </View>
-      </View>
+  const confirmarEliminar = (index) => {
+    Alert.alert(
+      "Eliminar",
+      "¿Seguro que deseas eliminar este pago?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Eliminar", style: "destructive", onPress: () => eliminarPagoDirecto(index) }
+      ]
     );
   };
 
+  return (
+    <View style={styles.container}>
+
+      <Modal visible={modalAdd} transparent animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalTitle}>Agregar Pago</Text>
+
+            <TextInput 
+              style={styles.input} 
+              placeholder="Título"
+              value={nuevoPago.titulo}
+              onChangeText={(t) => setNuevoPago({ ...nuevoPago, titulo: t })}
+            />
+            <TextInput 
+              style={styles.input} 
+              placeholder="Monto"
+              keyboardType="numeric"
+              value={nuevoPago.monto}
+              onChangeText={(t) => setNuevoPago({ ...nuevoPago, monto: t })}
+            />
+            <TextInput 
+              style={styles.input} 
+              placeholder="Fecha"
+              value={nuevoPago.fecha}
+              onChangeText={(t) => setNuevoPago({ ...nuevoPago, fecha: t })}
+            />
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalAdd(false)}>
+                <Text style={styles.btnText}>Cancelar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.saveBtn} onPress={agregarPago}>
+                <Text style={styles.btnText}>Guardar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={modalEdit} transparent animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalTitle}>Editar Pago</Text>
+
+            <TextInput 
+              style={styles.input} 
+              placeholder="Título"
+              value={nuevoPago.titulo}
+              onChangeText={(t) => setNuevoPago({ ...nuevoPago, titulo: t })}
+            />
+            <TextInput 
+              style={styles.input} 
+              placeholder="Monto"
+              keyboardType="numeric"
+              value={nuevoPago.monto}
+              onChangeText={(t) => setNuevoPago({ ...nuevoPago, monto: t })}
+            />
+            <TextInput 
+              style={styles.input} 
+              placeholder="Fecha"
+              value={nuevoPago.fecha}
+              onChangeText={(t) => setNuevoPago({ ...nuevoPago, fecha: t })}
+            />
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalEdit(false)}>
+                <Text style={styles.btnText}>Cancelar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.saveBtn} onPress={guardarEdicion}>
+                <Text style={styles.btnText}>Guardar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <View style={styles.header}>
+        <View style={styles.leftIcons}>
+          <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+          <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+        </View>
+        <Text style={styles.title}>Ahorra+ App</Text>
+        <View style={styles.avatar}>
+          <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+        </View>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.headerSection}>
+          <Text style={styles.mainTitle}>Gastos{"\n"}Programados</Text>
+          <Image source={require("../assets/logo.png")} style={styles.pigImage} />
+        </View>
+
+        <View style={styles.cardContainer}>
+          {pagos.map((pago, index) => (
+            <View key={index} style={styles.card}>
+              <View style={styles.cardLeft}>
+                <Image source={pago.icon} style={styles.cardIcon} />
+                <View>
+                  <Text style={styles.cardTitle}>{pago.titulo}</Text>
+                  <Text style={styles.cardSub}>{pago.tipo}</Text>
+                </View>
+              </View>
+
+              <View style={{ alignItems: "flex-end" }}>
+                <Text style={styles.cardAmount}>-${pago.monto}.00</Text>
+                <Text style={styles.cardDate}>{pago.fecha}</Text>
+
+                <View style={{ flexDirection: "row", marginTop: 5 }}>
+                  <TouchableOpacity
+                    onPress={() => abrirEditar(index)}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    activeOpacity={0.7}
+                    style={{ padding: 6 }}
+                  >
+                    <Image source={require("../assets/edit.png")} style={styles.navIcon} />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => confirmarEliminar(index)}
+                    hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                    activeOpacity={0.7}
+                    style={{ padding: 6, marginLeft: 8 }}
+                  >
+                    <Image source={require("../assets/elim.png")} style={styles.navIcon} />
+                  </TouchableOpacity>
+
+                </View>
+              </View>
+            </View>
+          ))}
+        </View>
+
+        <TouchableOpacity style={styles.addButton} onPress={() => setModalAdd(true)}>
+          <Image source={require("../assets/Programados.png")} style={styles.addIcon} />
+          <Text style={styles.addText}>Añadir Pago</Text>
+        </TouchableOpacity>
+
+      </ScrollView>
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", alignItems: "center" },
@@ -183,76 +285,53 @@ const styles = StyleSheet.create({
   addIcon: { width: 25, height: 25, marginRight: 10, tintColor: "#7b6cff" },
   addText: { fontSize: 16, color: "#000", fontWeight: "500" },
 
-  bottomNav: {
-    position: "absolute",
-    bottom: 10,
-    width: "95%",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    backgroundColor: "#eae2ff",
-    paddingVertical: 12,
-    borderRadius: 30,
-  },
-  iconCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: "#A084E8",
+  navIcon: { width: 26, height: 26, resizeMode: "contain" },
+
+  modalContainer: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginHorizontal: 5,
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
-  navIcon: { width: 26, height: 26, resizeMode: "contain" },
-  centerButton: {
-    backgroundColor: "#7f6aff",
-    padding: 15,
-    borderRadius: 40,
-    marginBottom: 25,
+  modalBox: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 20,
+    width: "85%",
   },
-  centerIcon: { width: 30, height: 30, resizeMode: "contain", tintColor: "#fff" },
-  crudContainer: {
-  backgroundColor: "#f4f1ff",
-  padding: 20,
-  borderRadius: 20,
-  marginTop: 20,
-  marginBottom: 50,
-},
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#7b6cff",
+    textAlign: "center",
+    marginBottom: 15,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  cancelBtn: {
+    backgroundColor: "#ff6b6b",
+    padding: 12,
+    borderRadius: 12,
+    width: "45%",
+    alignItems: "center",
+  },
+  saveBtn: {
+    backgroundColor: "#7b6cff",
+    padding: 12,
+    borderRadius: 12,
+    width: "45%",
+    alignItems: "center",
+  },
+  btnText: { color: "#fff", fontWeight: "bold" },
 
-crudTitle: {
-  fontSize: 20,
-  fontWeight: "700",
-  marginBottom: 10,
-  color: "#000",
-},
-
-crudSubtitle: {
-  fontSize: 16,
-  fontWeight: "600",
-  marginTop: 20,
-  color: "#000",
-},
-
-input: {
-  backgroundColor: "#fff",
-  padding: 10,
-  borderRadius: 10,
-  marginTop: 8,
-  borderWidth: 1,
-  borderColor: "#ddd",
-},
-
-readBox: {
-  backgroundColor: "#fff",
-  padding: 10,
-  borderRadius: 10,
-  marginTop: 5,
-  borderWidth: 1,
-  borderColor: "#ddd",
-},
-
-buttonSpacing: {
-  marginTop: 10,
-}
-
+  input: {
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 10,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
 });
