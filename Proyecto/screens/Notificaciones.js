@@ -1,9 +1,8 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
 
 export default function Notificaciones({ navigate }) {
 
-  // Notificaciones usando los mismos iconos que PagosProgramados
   const notificaciones = [
     {
       id: 1,
@@ -40,29 +39,19 @@ export default function Notificaciones({ navigate }) {
   return (
     <View style={styles.container}>
 
-      {/* HEADER igual que en PagosProgramados */}
       <View style={styles.header}>
         <View style={styles.leftIcons}>
-          {/* BOTÓN AJUSTES - CORREGIDO */}
-          <TouchableOpacity onPress={() => navigate("ajustes")}>
             <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-          </TouchableOpacity>
-          {/* BOTÓN NOTIFICACIONES */}
-          <TouchableOpacity onPress={() => navigate("notificaciones")}>
             <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-          </TouchableOpacity>
         </View>
 
         <Text style={styles.title}>Ahorra+ App</Text>
 
         <View style={styles.avatar}>
-          <TouchableOpacity onPress={() => navigate("login")}>
             <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-          </TouchableOpacity>
         </View>
       </View>
 
-      {/* TITULO + LOGO */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerSection}>
           <View>
@@ -72,7 +61,6 @@ export default function Notificaciones({ navigate }) {
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
         </View>
 
-        {/* Tarjetas */}
         {notificaciones.map((n) => (
           <View key={n.id} style={styles.card}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -85,10 +73,7 @@ export default function Notificaciones({ navigate }) {
         ))}
       </ScrollView>
 
-      {/* BOTÓN SALIR */}
-      <TouchableOpacity style={styles.exitButton} onPress={() => navigate("principal")}>
         <Text style={styles.exitText}>Salir</Text>
-      </TouchableOpacity>
     </View>
   );
 }

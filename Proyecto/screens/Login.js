@@ -1,18 +1,13 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  Image,
-} from "react-native";
+import {View,Text,TextInput,StyleSheet,Alert,Image, Modal, TouchableOpacity, Pressable} from "react-native";
 
-export default function Login({ navigate }) {
+export default function Login() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
 
   const handleLogin = () => {
     if (name.trim() === "" || email.trim() === "" || password.trim() === "") {
@@ -24,12 +19,27 @@ export default function Login({ navigate }) {
     setName("");
     setEmail("");
     setPassword("");
-    if (navigate) navigate("principal");
+  };
+
+  const handleSendReset = () => {
+    if (resetEmail.trim() === "") {
+      Alert.alert("Error", "Por favor ingresa un correo válido");
+      return;
+    }
+    setModalVisible(false);
+    Alert.alert("Enviado", `Se ha enviado un enlace de recuperación a ${resetEmail}`);
+    setResetEmail("");
+  };
+
+  const handleCancelReset = () => {
+    setModalVisible(false);
+    setResetEmail("");
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Bienvenid@ a Ahorra+ App</Text>
+      <Text style={styles.header}>Bienvenid@ a</Text> 
+      <Text style={styles.header}>Ahorra+ App</Text>
       <Text style={styles.subheader}>INICIA SESIÓN ...</Text>
 
       <Image source={require("../assets/logo.png")} style={styles.image} />
@@ -59,27 +69,50 @@ export default function Login({ navigate }) {
         placeholderTextColor="#999"
       />
 
-      <TouchableOpacity
-        onPress={() =>
-          Alert.alert("Recuperar contraseña", "Función no disponible aún")
-        }
-      >
-        <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={() => setModalVisible(true)}>
+          <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Iniciar Sesión</Text>
-      </TouchableOpacity>
+        <Pressable style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Iniciar Sesión</Text>
+        </Pressable>
 
-      <TouchableOpacity onPress={() => navigate && navigate("crear")}>
         <Text style={styles.footer}>
           ¿No tienes una cuenta aún? Crea una cuenta
         </Text>
-      </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigate && navigate("principal")}>
         <Text style={styles.footer}>Volver</Text>
-      </TouchableOpacity>
+
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={handleCancelReset}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Recuperar contraseña</Text>
+            <Text style={{color: "#555", marginBottom: 8}}>Ingresa tu correo para recibir el enlace</Text>
+            <TextInput
+              value={resetEmail}
+              onChangeText={setResetEmail}
+              placeholder="Correo"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              style={styles.modalInput}
+              placeholderTextColor="#999"
+            />
+            <View style={styles.modalButtons}>
+              <Pressable style={[styles.modalButton, {backgroundColor: "#7f6aff"}]} onPress={handleSendReset}>
+                <Text style={{color: "#fff", fontWeight: "600"}}>Enviar</Text>
+              </Pressable>
+              <Pressable style={[styles.modalButton, {backgroundColor: "#ddd"}]} onPress={handleCancelReset}>
+                <Text style={{color: "#333", fontWeight: "600"}}>Cancelar</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -132,12 +165,50 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   buttonText: {
-    color: "#fff",
+    color: "#000000ff",
     fontWeight: "600",
   },
   footer: {
     color: "#777",
     textAlign: "center",
     marginTop: 8,
+  },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    padding: 24,
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    elevation: 6,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#333",
+    marginBottom: 8,
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: "#e6e0ff",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 12,
+    backgroundColor: "#faf8ff",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  modalButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginHorizontal: 4,
   },
 });

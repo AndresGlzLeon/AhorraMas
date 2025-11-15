@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Switch, Image, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Switch, Image, ScrollView } from "react-native";
 
-export default function Ajustes({ navigate }) {
+export default function Ajustes() {
   const [notificacionesActivas, setNotificacionesActivas] = useState(true);
 
-  // Notificaciones usando los mismos iconos que PagosProgramados
   const notificaciones = [
     {
       id: 1,
@@ -40,29 +39,19 @@ export default function Ajustes({ navigate }) {
 
   return (
     <View style={styles.container}>
-      {/* HEADER igual que en Notificaciones */}
       <View style={styles.header}>
         <View style={styles.leftIcons}>
-          {/* BOTÓN AJUSTES - FUNCIONAL */}
-          <TouchableOpacity onPress={() => navigate("ajustes")}>
             <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-          </TouchableOpacity>
-          {/* BOTÓN NOTIFICACIONES - FUNCIONAL */}
-          <TouchableOpacity onPress={() => navigate("notificaciones")}>
             <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-          </TouchableOpacity>
         </View>
 
         <Text style={styles.title}>Ahorra+ App</Text>
 
         <View style={styles.avatar}>
-          <TouchableOpacity onPress={() => navigate("login")}>
             <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-          </TouchableOpacity>
         </View>
       </View>
 
-      {/* TITULO + LOGO */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerSection}>
           <View>
@@ -72,23 +61,18 @@ export default function Ajustes({ navigate }) {
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
         </View>
 
-        {/* CONTENIDO CON TARJETAS ANCHAS COMO NOTIFICACIONES */}
         <View style={styles.content}>
           
-          {/* Idioma - Tarjeta ancha */}
           <View style={styles.card}>
             <View style={styles.cardContent}>
               <View style={styles.textContainer}>
                 <Text style={styles.cardTitle}>Idioma</Text>
                 <Text style={styles.cardValue}>Español (México)</Text>
               </View>
-              <TouchableOpacity style={styles.editButton}>
                 <Text style={styles.editText}>Editar</Text>
-              </TouchableOpacity>
             </View>
           </View>
 
-          {/* Notificaciones - Tarjeta ancha */}
           <View style={styles.card}>
             <View style={styles.cardContent}>
               <View style={styles.textContainer}>
@@ -104,7 +88,6 @@ export default function Ajustes({ navigate }) {
             </View>
           </View>
 
-          {/* Fecha de unión - Tarjeta ancha */}
           <View style={styles.card}>
             <View style={styles.cardContent}>
               <View style={styles.textContainer}>
@@ -114,17 +97,11 @@ export default function Ajustes({ navigate }) {
             </View>
           </View>
 
-          {/* Botón Cerrar Sesión - Más ancho */}
-          <TouchableOpacity style={styles.logoutButton}>
             <Text style={styles.logoutText}>CERRAR SESIÓN</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
 
-      {/* BOTÓN SALIR - mismo estilo que Notificaciones */}
-      <TouchableOpacity style={styles.exitButton} onPress={() => navigate("principal")}>
         <Text style={styles.exitText}>Salir</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -136,7 +113,6 @@ const styles = StyleSheet.create({
     alignItems: "center" 
   },
 
-  // HEADER - mismo estilo que Notificaciones
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -173,7 +149,6 @@ const styles = StyleSheet.create({
     resizeMode: "contain" 
   },
 
-  // SCROLL CONTENT - mismo estilo que Notificaciones
   scrollContent: { 
     padding: 20, 
     paddingBottom: 120 
@@ -202,13 +177,11 @@ const styles = StyleSheet.create({
     resizeMode: "contain" 
   },
 
-  // CONTENIDO CON TARJETAS ANCHAS
   content: { 
     width: "100%",
     marginTop: 20
   },
 
-  // TARJETAS ANCHAS COMO EN NOTIFICACIONES
   card: {
     backgroundColor: "#fff",
     padding: 18,
@@ -241,7 +214,6 @@ const styles = StyleSheet.create({
     fontWeight: "500" 
   },
 
-  // SECCIÓN DE NOTIFICACIONES
   notificationsSection: {
     marginTop: 10,
     marginBottom: 20,
@@ -313,7 +285,6 @@ const styles = StyleSheet.create({
     fontWeight: "700" 
   },
 
-  // BOTÓN SALIR - mismo estilo que Notificaciones
   exitButton: {
     width: "60%",
     backgroundColor: "#7f6aff",
