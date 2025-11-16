@@ -1,6 +1,10 @@
 import React from "react";
 import { View, Text, ScrollView, StyleSheet, Image, } from "react-native";
 import  PagosProgramados  from "./PagosProgramados";
+import { Dimensions } from "react-native";
+const { width } = Dimensions.get("window");
+
+
 
 
 export default function Principal() {
@@ -69,7 +73,7 @@ export default function Principal() {
 
             <Image source={require("../assets/Pink.png")} style={styles.navIcon} />
 
-            <Image source={require("../assets/inicio.png")} style={styles.centerIcon} />
+            <Image source={require("../assets/inicio.png")} style={[styles.centerIcon, styles.iconCircle]}/>
 
             <Image source={require("../assets/Programados.png")} style={styles.navIcon} />
 
@@ -156,17 +160,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#c8b6ff",
     borderRadius: 20,
     alignItems: "center",
-    paddingVertical: 40,
-    paddingHorizontal: 120,
+    width: width * 0.85,           
+    paddingVertical: width * 0.08, 
+    alignSelf: "center",
     shadowColor: "#aaa",
     shadowOpacity: 0.3,
     shadowOffset: { width: 0, height: 4 },
   },
+  
   amount: {
-    fontSize: 40, 
-    color: "#fff", 
-    fontWeight: "bold" 
+    fontSize: width * 0.12, 
+    color: "#fff",
+    fontWeight: "bold",
   },
+  
   sectionTitle: { 
     fontSize: 18, 
     fontWeight: "600", 
@@ -220,7 +227,7 @@ const styles = StyleSheet.create({
   iconCircle: {
     width: 50,       
     height: 50,
-    borderRadius: 25, 
+    borderRadius: 15, 
     backgroundColor: "#A084E8", 
     justifyContent: "center",
     alignItems: "center",
@@ -231,16 +238,8 @@ const styles = StyleSheet.create({
     height: 26, 
     resizeMode: "contain" 
   },
-  centerButton: {
-    backgroundColor: "#7f6aff",
-    padding: 15,
-    borderRadius: 40,
-    marginBottom: 25,
-  },
   centerIcon: {
-    width: 30, 
-    height: 30, 
-    resizeMode: "contain", 
+    resizeMode: 'contain', 
     tintColor: "#fff" 
   },
 });

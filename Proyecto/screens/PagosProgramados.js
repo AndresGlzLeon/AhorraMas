@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Image, TextInput, TouchableOpacity, Modal, Alert } from "react-native";
+import { Dimensions } from "react-native";
+
+
+const { width } = Dimensions.get("window");
 
 export default function PagosProgramados() {
 
@@ -168,7 +172,7 @@ export default function PagosProgramados() {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView >
         <View style={styles.headerSection}>
           <Text style={styles.mainTitle}>Gastos{"\n"}Programados</Text>
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
@@ -220,12 +224,28 @@ export default function PagosProgramados() {
         </TouchableOpacity>
 
       </ScrollView>
+
+       <View  style={styles.bottomNav}>
+                  <Image source={require("../assets/Transisiones.png")} style={styles.navIcon} />
+      
+                  <Image source={require("../assets/Pink.png")} style={styles.navIcon} />
+
+                  <Image source={require("../assets/Programados.png")} style={ styles.iconCircle} />
+      
+                  <Image source={require("../assets/inicio.png")} style={styles.navIcon} />
+      
+                  <Image source={require("../assets/BolsaDinero.png")} style={styles.navIcon} />
+              </View>
+
+
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", alignItems: "center" },
+  container: { flex: 1,
+  backgroundColor: "#fff",
+  alignItems: "center" },
 
   header: {
     flexDirection: "row",
@@ -243,11 +263,11 @@ const styles = StyleSheet.create({
   avatar: { backgroundColor: "#b3a5ff", borderRadius: 50, padding: 8 },
   avatarIcon: { width: 20, height: 20, tintColor: "#fff", resizeMode: "contain" },
 
-  scrollContent: { padding: 20, paddingBottom: 120 },
-  headerSection: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 },
+
+  headerSection: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 30 },
   mainTitle: { fontSize: 26, fontWeight: "700", lineHeight: 30,marginTop:15, color: "#7b6cff" },
-  subtitle: { fontSize: 16, marginTop:50, color: "#rgb(0, 0, 0)"  },
-  pigImage: { width: 80, height: 80, resizeMode: "contain" },
+ subtitle: { fontSize: 16, marginTop:50, color: "#rgb(0, 0, 0)"  },
+  pigImage: { width: 80, height: 80, resizeMode: "contain" , marginTop:20 },
 
   cardContainer: {
     backgroundColor: "#f4f1ff",
@@ -282,10 +302,20 @@ const styles = StyleSheet.create({
     padding: 15,
     justifyContent: "center",
   },
-  addIcon: { width: 25, height: 25, marginRight: 10, tintColor: "#7b6cff" },
-  addText: { fontSize: 16, color: "#000", fontWeight: "500" },
+  addIcon: { 
+  width: 25, 
+  height: 25, 
+  marginRight: 10,
+  tintColor: "#7b6cff" },
 
-navIcon: { width: 26, height: 26, resizeMode: "contain" },
+  addText: { 
+  fontSize: 16, 
+  color: "#000",
+  fontWeight: "500" },
+
+navIcon: { width: 26, 
+height: 26, 
+resizeMode: "contain" },
 
 buttonSpacing: {
   marginTop: 10,
@@ -328,7 +358,8 @@ saveBtn: {
   width: "45%",
   alignItems: "center",
 },
-btnText: { color: "#fff", fontWeight: "bold" },
+btnText: { color: "#fff", 
+fontWeight: "bold" },
 
 input: {
   backgroundColor: "#fff",
@@ -338,4 +369,26 @@ input: {
   borderWidth: 1,
   borderColor: "#ddd",
 },
+
+bottomNav: {
+  position: "absolute",
+  bottom: 10,
+  width: "95%",
+  flexDirection: "row",
+  justifyContent: "space-around",
+  alignItems: "center",
+  backgroundColor: "#eae2ff",
+  paddingVertical: 12,
+  borderRadius: 30,
+},
+iconCircle: {
+  width: 50,       
+  height: 50,
+  borderRadius: 15, 
+  backgroundColor: "#A084E8", 
+  justifyContent: "center",
+  alignItems: "center",
+  marginHorizontal: 5, 
+},
+
 });

@@ -13,7 +13,7 @@ import {
 } from "react-native";
 
 export default function Ahorros() {
-  // Estados para las metas de ahorro
+
   const [metas, setMetas] = useState([
     { 
       id: 1, 
@@ -240,7 +240,7 @@ export default function Ahorros() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Sección de bienvenida */}
+
         <View style={styles.headerSection}>
           <View>
             <Text style={styles.welcome}>Ahorros</Text>
@@ -249,7 +249,7 @@ export default function Ahorros() {
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
         </View>
 
-        {/* Tarjeta de fondo de ahorros general */}
+
         <View style={styles.cardContainer}>
           <Text style={styles.cardTitle}>Fondo de Ahorros</Text> 
         
@@ -272,7 +272,7 @@ export default function Ahorros() {
           </View>
         </View>
 
-        {/* Lista de metas */}
+
         <View style={styles.cardContainer}>
           {metas.map((meta) => {
             const progreso = calcularProgreso(meta.ahorrado, meta.metaTotal);
@@ -334,25 +334,17 @@ export default function Ahorros() {
 
       {/* Bottom Navigation */}
       <View style={styles.bottomNav}>
-        <View style={styles.iconCircle}>
-          <Image source={require("../assets/Transisiones.png")} style={styles.navIcon} />
-        </View>
+ <View  style={styles.bottomNav}>
+                  <Image source={require("../assets/Transisiones.png")} style={styles.navIcon} />
 
-        <View style={styles.iconCircle}>
-          <Image source={require("../assets/Pink.png")} style={styles.navIcon} />
-        </View>
+                  <Image source={require("../assets/Programados.png")} style={ styles.navIcon} />
 
-        <View style={styles.centerButton}>
-          <Image source={require("../assets/Programados.png")} style={styles.centerIcon} />
-        </View>
-
-        <View style={styles.iconCircle}>
-          <Image source={require("../assets/inicio.png")} style={styles.navIcon} />
-        </View>
-
-        <View style={styles.iconCircle}>
-          <Image source={require("../assets/BolsaDinero.png")} style={styles.navIcon} />
-        </View>
+                  <Image source={require("../assets/Pink.png")} style={styles.iconCircle} />
+      
+                  <Image source={require("../assets/inicio.png")} style={styles.navIcon} />
+      
+                  <Image source={require("../assets/BolsaDinero.png")} style={styles.navIcon} />
+              </View>
       </View>
     </View>
   );
@@ -524,7 +516,7 @@ const styles = StyleSheet.create({
   iconCircle: {
     width: 50,       
     height: 50,
-    borderRadius: 25, 
+    borderRadius: 15, 
     backgroundColor: "#A084E8", 
     justifyContent: "center",
     alignItems: "center",
