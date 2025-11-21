@@ -283,29 +283,9 @@ export default function Presupuesto() {
       </ScrollView>
 
       
-      <View style={styles.bottomNav}>
 
-        <View style={styles.iconCircle}>
-        <Image source={require("../assets/Transisiones.png")} style={styles.navIcon} />
-        </View>
 
-        <View style={styles.iconCircle}>
-        <Image source={require("../assets/Pink.png")} style={styles.navIcon} />
-        </View>
-
-        <View style={styles.centerButton}>
-        <Image source={require("../assets/BolsaDinero.png")} style={styles.centerIcon} />
-        </View>
-
-        <View style={styles.iconCircle}>
-        <Image source={require("../assets/inicio.png")} style={styles.navIcon} />
-        </View>
-
-        <View style={styles.iconCircle}>
-        <Image source={require("../assets/Programados.png")} style={styles.navIcon} />
-        </View>
-
-    </View>
+ 
 
 </View>
 

@@ -68,17 +68,6 @@ export default function Principal() {
           </View>
         </ScrollView>
 
-        <View style={styles.bottomNav}>
-            <Image source={require("../assets/Transisiones.png")} style={styles.navIcon} />
-
-            <Image source={require("../assets/Pink.png")} style={styles.navIcon} />
-
-            <Image source={require("../assets/inicio.png")} style={[styles.centerIcon, styles.iconCircle]}/>
-
-            <Image source={require("../assets/Programados.png")} style={styles.navIcon} />
-
-            <Image source={require("../assets/BolsaDinero.png")} style={styles.navIcon} />
-        </View>
       </View>
     );
   };
