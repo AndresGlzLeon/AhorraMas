@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import 'react-native-get-random-values';
 import 'react-native-gesture-handler';
@@ -9,8 +10,15 @@ import Principal from './screens/Principal';
 import PagosProgramados from './screens/PagosProgramados';
 import Presupuesto from './screens/Presupuesto';
 import IngresosEgresos from './screens/IngresosEgresos';
+import Ahorros from './screens/Ahorros';
+import Ajustes from './screens/Ajustes';
+import CrearCuenta from './screens/CrearCuenta';
+import Login from './screens/Login';
+import Notificaciones from './screens/Notificaciones';
+import Perfil from './screens/Perfil';
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
