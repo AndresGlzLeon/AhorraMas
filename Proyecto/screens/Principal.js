@@ -1,19 +1,21 @@
 import React from "react";
-import { View, Text, ScrollView, StyleSheet, Image, } from "react-native";
-import  PagosProgramados  from "./PagosProgramados";
+import { View, Text, ScrollView, StyleSheet, Image,Pressable } from "react-native";
+
 import { Dimensions } from "react-native";
 const { width } = Dimensions.get("window");
 
 
 
 
-export default function Principal() {
+export default function Principal({navigation}) {
 
     return (
       <View style={styles.container}>
         <View style={styles.header}>
           <View style={styles.leftIcons}>
+            <Pressable onPress={() => navigation.navigate('Ajustes')}> 
                <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+            </Pressable>
               <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
 
           </View>

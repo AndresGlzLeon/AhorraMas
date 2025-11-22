@@ -20,6 +20,27 @@ import Perfil from './screens/Perfil';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+function PerfilStackNavigator(){
+  return (
+      <Stack.Navigator>
+        
+
+        <Stack.Screen name="Principal" component={Principal} />
+        <Stack.Screen name="PagosProgramados" component={PagosProgramados} />
+        <Stack.Screen name="Presupuesto" component={Presupuesto} />
+        <Stack.Screen name="IngresosEgresos" component={IngresosEgresos} />
+        <Stack.Screen name="Perfil" component={Perfil} />
+        <Stack.Screen name="Ahorros" component={Ahorros} />
+        <Stack.Screen name="Ajustes" component={Ajustes} />
+        <Stack.Screen name="Notificaciones" component={Notificaciones} /> 
+
+  
+
+
+        
+      </Stack.Navigator>
+  );
+}
 export default function App() {
   return (
     <NavigationContainer>
@@ -50,10 +71,11 @@ export default function App() {
           },
         })}
       >
-        <Tab.Screen name="Principal" component={Principal} />
+        <Tab.Screen name="Principal" component={PerfilStackNavigator} />
         <Tab.Screen name="PagosProgramados" component={PagosProgramados} />
         <Tab.Screen name="Presupuesto" component={Presupuesto} />
         <Tab.Screen name="IngresosEgresos" component={IngresosEgresos} />
+        <Tab.Screen name="Ahorros" component={Ahorros} />
       </Tab.Navigator>
     </NavigationContainer>
   );

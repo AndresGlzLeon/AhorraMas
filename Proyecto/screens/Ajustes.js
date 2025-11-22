@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Switch, Image, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Switch, Image, ScrollView, Button } from "react-native";
 
-export default function Ajustes() {
+export default function Ajustes({navigation}) {
   const [notificacionesActivas, setNotificacionesActivas] = useState(true);
 
   const notificaciones = [
@@ -100,8 +100,10 @@ export default function Ajustes() {
             <Text style={styles.logoutText}>CERRAR SESIÓN</Text>
         </View>
       </ScrollView>
-
-        <Text style={styles.exitText}>Salir</Text>
+      <View style={styles.exitButton}>
+        <Button title="Salir de Ajustes" onPress={() => navigation.goBack()} />
+      </View>
+        
     </View>
   );
 }
