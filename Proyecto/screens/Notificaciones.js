@@ -39,19 +39,7 @@ export default function Notificaciones({ navigate }) {
   return (
     <View style={styles.container}>
 
-      <View style={styles.header}>
-        <View style={styles.leftIcons}>
-            <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-            <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-        </View>
-
-        <Text style={styles.title}>Ahorra+ App</Text>
-
-        <View style={styles.avatar}>
-            <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-        </View>
-      </View>
-
+      
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerSection}>
           <View>

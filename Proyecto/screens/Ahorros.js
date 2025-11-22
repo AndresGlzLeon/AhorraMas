@@ -9,10 +9,10 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
-  Alert 
+  Alert,Pressable
 } from "react-native";
 
-export default function Ahorros() {
+export default function Ahorros({ navigation }) {
 
   const [metas, setMetas] = useState([
     { 
@@ -226,19 +226,25 @@ export default function Ahorros() {
       </Modal>
 
       {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.leftIcons}>
-          <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-          <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+        <View style={styles.header}>
+          <View style={styles.leftIcons}>
+            <Pressable onPress={() => navigation.navigate('Ajustes')}> 
+               <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate('Notificaciones')}> 
+               <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]}  />
+            </Pressable>
+             
+          </View>
+
+          <Text style={styles.title}>Ahorra+ App</Text>
+
+          <View style={styles.avatar}>
+            <Pressable onPress={() => navigation.navigate('Perfil')}> 
+               <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+            </Pressable>
+          </View>
         </View>
-
-        <Text style={styles.title}>Ahorra+ App</Text>
-
-        <View style={styles.avatar}>
-          <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-        </View>
-      </View>
-
       <ScrollView contentContainerStyle={styles.scrollContent}>
 
         <View style={styles.headerSection}>

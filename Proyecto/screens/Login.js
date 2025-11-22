@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {View,Text,TextInput,StyleSheet,Alert,Image, Modal, TouchableOpacity, Pressable} from "react-native";
 
-export default function Login() {
+export default function Login({ navigation }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,6 +19,7 @@ export default function Login() {
     setName("");
     setEmail("");
     setPassword("");
+    navigation.navigate('Principal');
   };
 
   const handleSendReset = () => {
@@ -73,15 +74,16 @@ export default function Login() {
           <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
         </TouchableOpacity>
 
-        <Pressable style={styles.button} onPress={handleLogin}>
+        <Pressable style={styles.button}  onPress={() => handleLogin()}>
           <Text style={styles.buttonText}>Iniciar Sesión</Text>
         </Pressable>
 
-        <Text style={styles.footer}>
-          ¿No tienes una cuenta aún? Crea una cuenta
-        </Text>
+       
+        <Pressable style={styles.footer} onPress={() => navigation.navigate('CrearCuenta')}>
+          <Text style={styles.footer}> ¿No tienes una cuenta aún?, Crear Cuenta</Text> 
+        </Pressable>
 
-        <Text style={styles.footer}>Volver</Text>
+        
 
       <Modal
         visible={modalVisible}

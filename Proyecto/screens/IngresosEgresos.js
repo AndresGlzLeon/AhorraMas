@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, ScrollView, StyleSheet, Image } from "react-native";
 
-export default function IngresosEgresos() {
+export default function IngresosEgresos({ navigate }) {
   return (
     <View style={styles.container}>
 

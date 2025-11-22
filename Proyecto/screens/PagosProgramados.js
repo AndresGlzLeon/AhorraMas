@@ -5,7 +5,7 @@ import { Dimensions } from "react-native";
 
 const { width } = Dimensions.get("window");
 
-export default function PagosProgramados() {
+export default function PagosProgramados({ navigate }) {
 
   const [pagos, setPagos] = useState([
     { titulo: "Alquiler", monto: 1500, fecha: "10 octubre 2025", tipo: "Mensual", icon: require("../assets/alquiler.png") },

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import {View,Text,TextInput,StyleSheet,KeyboardAvoidingView,Alert,Image,
+import {View,Text,TextInput,StyleSheet,KeyboardAvoidingView,Alert,Image,Pressable
 } from "react-native";
 
-export default function CrearCuenta() {
+export default function CrearCuenta({navigation}) {
   const [nombre, setNombre] = useState("");
   const [correo, setCorreo] = useState("");
   const [contrasenia, setContrasenia] = useState("");
@@ -18,14 +18,12 @@ export default function CrearCuenta() {
     setCorreo("");
     setContrasenia("");
     setTelefono("");
- 
+    navigation.navigate('Principal');
   };
 
   return (
-   <View>
-    <KeyboardAvoidingView
-      style={styles.container}
-    >
+   <View  style={styles.container}>
+    <KeyboardAvoidingView style={styles.container} behavior="padding">
       <Text style={styles.header}>Bienvenid@ a Ahorra+ App</Text>
       <Text style={styles.subheader}>CREA TU CUENTA</Text>
 
@@ -64,9 +62,14 @@ export default function CrearCuenta() {
         placeholderTextColor="#999"
       />
 
-        <Text style={styles.buttonText}>Crear cuenta</Text>
-
+        
+      <Pressable style={styles.button} onPress={  handleRegister }>
+        <Text style={styles.buttonText}>Registrarse</Text>
+      </Pressable>
+      <Pressable style={styles.footer} onPress={() => navigation.navigate('Login')}>
         <Text style={styles.footer}>¿Ya tienes una cuenta? Inicia sesión</Text>
+      </Pressable>
+        
     </KeyboardAvoidingView>
     </View>
   );

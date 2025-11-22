@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Image, TextInput, TouchableOpacity,Alert } from "react-native";
+import { Button } from "react-native-web";
 
-export default function Perfil() {
+export default function Perfil({}) {
 
   const [nombre, setNombre] = useState("Valeria Morales González");
   const [correo, setCorreo] = useState("vmoralesg@gmail.com");
@@ -19,20 +20,7 @@ export default function Perfil() {
   return (
     <View style={styles.container}>
 
-      <View style={styles.header}>
-        <View style={styles.leftIcons}>
-          <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-
-          <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-        </View>
-
-        <Text style={styles.title}>Ahorra+ App</Text>
-
-        <View style={styles.avatar}>
-          <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-        </View>
-      </View>
-
+      
       <ScrollView contentContainerStyle={styles.scrollContent}>
 
         <Text style={styles.perfilTitle}>TU PERFIL</Text>
@@ -110,6 +98,8 @@ export default function Perfil() {
         <TouchableOpacity style={styles.saveButton} onPress={guardarCambios}>
           <Text style={styles.saveText}>Guardar Cambios</Text>
         </TouchableOpacity>
+
+        
 
       </ScrollView>
 

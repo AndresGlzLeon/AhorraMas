@@ -23,14 +23,12 @@ const Stack = createNativeStackNavigator();
 function PerfilStackNavigator(){
   return (
       <Stack.Navigator>
-        
+        <Stack.Screen name="Login" component={Login} options={{headerShown:true, tabBarStyle:{display:'none'}}}/>
+        <Stack.Screen name="CrearCuenta" component={CrearCuenta} />
 
         <Stack.Screen name="Principal" component={Principal} />
-        <Stack.Screen name="PagosProgramados" component={PagosProgramados} />
-        <Stack.Screen name="Presupuesto" component={Presupuesto} />
-        <Stack.Screen name="IngresosEgresos" component={IngresosEgresos} />
+
         <Stack.Screen name="Perfil" component={Perfil} />
-        <Stack.Screen name="Ahorros" component={Ahorros} />
         <Stack.Screen name="Ajustes" component={Ajustes} />
         <Stack.Screen name="Notificaciones" component={Notificaciones} /> 
 

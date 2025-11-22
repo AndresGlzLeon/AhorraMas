@@ -12,7 +12,7 @@ import {
   Alert 
 } from "react-native";
 
-export default function Presupuesto() {
+export default function Presupuesto({ navigate }) {
   // Estados para el presupuesto y gastos
   const [presupuesto, setPresupuesto] = useState(10555);
   const [gastos, setGastos] = useState([

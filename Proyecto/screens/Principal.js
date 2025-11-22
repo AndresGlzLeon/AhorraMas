@@ -16,14 +16,18 @@ export default function Principal({navigation}) {
             <Pressable onPress={() => navigation.navigate('Ajustes')}> 
                <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
             </Pressable>
-              <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-
+            <Pressable onPress={() => navigation.navigate('Notificaciones')}> 
+               <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]}  />
+            </Pressable>
+             
           </View>
 
           <Text style={styles.title}>Ahorra+ App</Text>
 
           <View style={styles.avatar}>
-              <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+            <Pressable onPress={() => navigation.navigate('Perfil')}> 
+               <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+            </Pressable>
           </View>
         </View>
 

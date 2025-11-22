@@ -1,56 +1,13 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Switch, Image, ScrollView, Button } from "react-native";
+import { View, Text, StyleSheet, Switch, Image, ScrollView, Pressable } from "react-native";
 
 export default function Ajustes({navigation}) {
   const [notificacionesActivas, setNotificacionesActivas] = useState(true);
 
-  const notificaciones = [
-    {
-      id: 1,
-      icon: require("../assets/sueldo.png"),
-      categoria: "INGRESO",
-      mensaje: "Has recibido un ingreso reciente",
-      cantidad: "+$1000.00",
-      color: "#22b83a"
-    },
-    {
-      id: 2,
-      icon: require("../assets/alquiler.png"),
-      categoria: "PAGO PROGRAMADO",
-      mensaje: "Pago de alquiler próximo",
-      cantidad: "-$1500.00",
-      color: "#d62828"
-    },
-    {
-      id: 3,
-      icon: require("../assets/transporte.png"),
-      categoria: "GASTOS",
-      mensaje: "Has gastado más en transporte esta semana",
-      color: "#d62828"
-    },
-    {
-      id: 4,
-      icon: require("../assets/Pink.png"),
-      categoria: "AHORRO",
-      mensaje: "¡Vas bien! Sigue ahorrando para tu meta",
-      color: "#7b6cff"
-    }
-  ];
-
+  
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.leftIcons}>
-            <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-            <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-        </View>
-
-        <Text style={styles.title}>Ahorra+ App</Text>
-
-        <View style={styles.avatar}>
-            <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-        </View>
-      </View>
+      
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerSection}>
@@ -94,15 +51,27 @@ export default function Ajustes({navigation}) {
                 <Text style={styles.cardTitle}>Se unió</Text>
                 <Text style={styles.cardValue}>Febrero de 2023</Text>
               </View>
+
+               
+          
+
             </View>
           </View>
 
-            <Text style={styles.logoutText}>CERRAR SESIÓN</Text>
+           
+            <Pressable 
+            style={styles.logoutButton} 
+            onPress={() => navigation.navigate('Login')}
+          >
+            <Text style={styles.exitText}>Cerrar Sesión</Text>
+          </Pressable>
+
         </View>
+
+        
       </ScrollView>
-      <View style={styles.exitButton}>
-        <Button title="Salir de Ajustes" onPress={() => navigation.goBack()} />
-      </View>
+      
+      
         
     </View>
   );
