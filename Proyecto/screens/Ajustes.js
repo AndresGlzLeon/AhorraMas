@@ -1,14 +1,33 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Switch, Image, ScrollView, Pressable } from "react-native";
+import { View, Text, StyleSheet, Switch, Image, ScrollView, Pressable, Alert } from "react-native";
 
-export default function Ajustes({navigation}) {
+export default function Ajustes({navigation, onLogout}) {
   const [notificacionesActivas, setNotificacionesActivas] = useState(true);
 
-  
+  const handleLogout = () => {
+    Alert.alert(
+      "Cerrar Sesión",
+      "¿Estás seguro de que quieres cerrar sesión?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel"
+        },
+        {
+          text: "Cerrar Sesión",
+          style: "destructive",
+          onPress: () => {
+            if (onLogout) {
+              onLogout();
+            }
+          }
+        }
+      ]
+    );
+  };
+
   return (
     <View style={styles.container}>
-      
-
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerSection}>
           <View>
@@ -19,14 +38,13 @@ export default function Ajustes({navigation}) {
         </View>
 
         <View style={styles.content}>
-          
           <View style={styles.card}>
             <View style={styles.cardContent}>
               <View style={styles.textContainer}>
                 <Text style={styles.cardTitle}>Idioma</Text>
                 <Text style={styles.cardValue}>Español (México)</Text>
               </View>
-                <Text style={styles.editText}>Editar</Text>
+              <Text style={styles.editText}>Editar</Text>
             </View>
           </View>
 
@@ -36,8 +54,8 @@ export default function Ajustes({navigation}) {
                 <Text style={styles.cardTitle}>Notificaciones</Text>
                 <Text style={styles.cardValue}>Recibir alertas y recordatorios</Text>
               </View>
-              <Switch 
-                value={notificacionesActivas} 
+              <Switch
+                value={notificacionesActivas}
                 onValueChange={setNotificacionesActivas}
                 trackColor={{ false: "#ccc", true: "#7b6cff" }}
                 thumbColor={notificacionesActivas ? "#fff" : "#fff"}
@@ -51,108 +69,58 @@ export default function Ajustes({navigation}) {
                 <Text style={styles.cardTitle}>Se unió</Text>
                 <Text style={styles.cardValue}>Febrero de 2023</Text>
               </View>
-
-               
-          
-
             </View>
           </View>
 
-           
-            <Pressable 
-            style={styles.logoutButton} 
-            onPress={() => navigation.navigate('Login')}
+          <Pressable
+            style={styles.logoutButton}
+            onPress={handleLogout}
           >
             <Text style={styles.exitText}>Cerrar Sesión</Text>
           </Pressable>
-
         </View>
-
-        
       </ScrollView>
-      
-      
-        
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: "#fff", 
-    alignItems: "center" 
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center"
   },
-
-  header: {
+  scrollContent: {
+    padding: 20,
+    paddingBottom: 120
+  },
+  headerSection: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    padding: 15,
-    backgroundColor: "#f4f1ff",
-    borderRadius: 40,
-    width: "95%",
-    marginTop: 50,
+    alignItems: "center",
+    marginBottom: 20
   },
-  leftIcons: { 
-    flexDirection: "row", 
-    alignItems: "center" 
-  },
-  iconHeader: { 
-    width: 33, 
-    height: 22, 
-    resizeMode: "contain" 
-  },
-  title: { 
-    fontSize: 18, 
-    fontWeight: "600", 
-    color: "#333" 
-  },
-  avatar: { 
-    backgroundColor: "#b3a5ff", 
-    borderRadius: 50, 
-    padding: 8 
-  },
-  avatarIcon: { 
-    width: 20, 
-    height: 20, 
-    tintColor: "#fff", 
-    resizeMode: "contain" 
-  },
-
-  scrollContent: { 
-    padding: 20, 
-    paddingBottom: 120 
-  },
-  headerSection: { 
-    flexDirection: "row", 
-    justifyContent: "space-between", 
-    alignItems: "center", 
-    marginBottom: 20 
-  },
-  mainTitle: { 
-    fontSize: 26, 
-    fontWeight: "700", 
+  mainTitle: {
+    fontSize: 26,
+    fontWeight: "700",
     lineHeight: 30,
-    marginTop: 15, 
-    color: "#7b6cff" 
+    marginTop: 15,
+    color: "#7b6cff"
   },
-  subtitle: { 
-    fontSize: 16, 
-    marginTop: 50, 
-    color: "#000" 
+  subtitle: {
+    fontSize: 16,
+    marginTop: 50,
+    color: "#000"
   },
-  pigImage: { 
-    width: 80, 
-    height: 80, 
-    resizeMode: "contain" 
+  pigImage: {
+    width: 80,
+    height: 80,
+    resizeMode: "contain"
   },
-
-  content: { 
+  content: {
     width: "100%",
     marginTop: 20
   },
-
   card: {
     backgroundColor: "#fff",
     padding: 18,
@@ -173,75 +141,22 @@ const styles = StyleSheet.create({
   textContainer: {
     flex: 1,
   },
-  cardTitle: { 
-    fontSize: 16, 
-    fontWeight: "700", 
-    color: "#7b6cff",
-    marginBottom: 4 
-  },
-  cardValue: { 
-    fontSize: 15, 
-    color: "#555",
-    fontWeight: "500" 
-  },
-
-  notificationsSection: {
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 20,
+  cardTitle: {
+    fontSize: 16,
     fontWeight: "700",
     color: "#7b6cff",
-    marginBottom: 15,
-    marginLeft: 5,
+    marginBottom: 4
   },
-  notificationCard: {
-    backgroundColor: "#fff",
-    padding: 18,
-    borderRadius: 18,
-    marginBottom: 15,
-    width: "100%",
-    elevation: 6,
-    shadowColor: "#b6aaff",
-    shadowOpacity: 0.25,
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 5,
+  cardValue: {
+    fontSize: 15,
+    color: "#555",
+    fontWeight: "500"
   },
-  notificationIcon: { 
-    width: 30, 
-    height: 30, 
-    marginRight: 8 
+  editText: {
+    fontSize: 14,
+    color: "#7b6cff",
+    fontWeight: "600"
   },
-  notificationCategory: { 
-    fontSize: 14, 
-    fontWeight: "700", 
-    color: "#7b6cff" 
-  },
-  notificationMessage: { 
-    marginTop: 6, 
-    fontSize: 15, 
-    fontWeight: "600", 
-    color: "#333" 
-  },
-  notificationAmount: { 
-    marginTop: 5, 
-    fontSize: 16, 
-    fontWeight: "700" 
-  },
-
-  editButton: {
-    backgroundColor: "#eee",
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 12,
-  },
-  editText: { 
-    fontSize: 14, 
-    color: "#7b6cff", 
-    fontWeight: "600" 
-  },
-
   logoutButton: {
     backgroundColor: "#d62828",
     paddingVertical: 15,
@@ -250,23 +165,9 @@ const styles = StyleSheet.create({
     marginTop: 40,
     width: "100%",
   },
-  logoutText: { 
-    fontSize: 16, 
-    color: "#fff", 
-    fontWeight: "700" 
-  },
-
-  exitButton: {
-    width: "60%",
-    backgroundColor: "#7f6aff",
-    paddingVertical: 12,
-    borderRadius: 30,
-    alignItems: "center",
-    marginBottom: 15
-  },
-  exitText: { 
-    fontSize: 17, 
-    color: "#fff", 
-    fontWeight: "700" 
+  exitText: {
+    fontSize: 17,
+    color: "#fff",
+    fontWeight: "700"
   }
 });

@@ -9,10 +9,11 @@ import {
   Modal, 
   TextInput, 
   TouchableOpacity,
-  Alert 
+  Alert,
+  Pressable
 } from "react-native";
 
-export default function Presupuesto({ navigate }) {
+export default function Presupuesto({ navigation }) {
   // Estados para el presupuesto y gastos
   const [presupuesto, setPresupuesto] = useState(10555);
   const [gastos, setGastos] = useState([
@@ -178,14 +179,18 @@ export default function Presupuesto({ navigate }) {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.leftIcons}>
-          <Image source={require("../assets/ajustes.png")} style={styles.iconHeader}/>
-          <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+          <Pressable onPress={() => navigation.navigate('Ajustes')}>
+            <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+          </Pressable>
+          <Pressable onPress={() => navigation.navigate('Notificaciones')}>
+            <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+          </Pressable>
         </View>
-
         <Text style={styles.title}>Ahorra+ App</Text>
-
         <View style={styles.avatar}>
-          <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+          <Pressable onPress={() => navigation.navigate('Perfil')}>
+            <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+          </Pressable>
         </View>
       </View>
 

@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import {View,Text,TextInput,StyleSheet,Alert,Image, Modal, TouchableOpacity, Pressable} from "react-native";
 
-export default function Login({ navigation }) {
+export default function Login({ navigation, onLogin }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [modalVisible, setModalVisible] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
 
@@ -14,12 +13,19 @@ export default function Login({ navigation }) {
       Alert.alert("Error", "Por favor completa todos los campos");
       return;
     }
-
+    
+    // Aquí puedes agregar tu lógica de autenticación
+    // Por ejemplo, validar con un backend
+    
     Alert.alert("Éxito", `Bienvenido ${name}`);
     setName("");
     setEmail("");
     setPassword("");
-    navigation.navigate('Principal');
+    
+    // Llamar a la función onLogin para cambiar el estado de autenticación
+    if (onLogin) {
+      onLogin();
+    }
   };
 
   const handleSendReset = () => {
@@ -39,12 +45,12 @@ export default function Login({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Bienvenid@ a</Text> 
+      <Text style={styles.header}>Bienvenid@ a</Text>
       <Text style={styles.header}>Ahorra+ App</Text>
       <Text style={styles.subheader}>INICIA SESIÓN ...</Text>
-
+      
       <Image source={require("../assets/logo.png")} style={styles.image} />
-
+      
       <TextInput
         value={name}
         onChangeText={setName}
@@ -52,6 +58,7 @@ export default function Login({ navigation }) {
         style={styles.input}
         placeholderTextColor="#999"
       />
+      
       <TextInput
         value={email}
         onChangeText={setEmail}
@@ -61,6 +68,7 @@ export default function Login({ navigation }) {
         style={styles.input}
         placeholderTextColor="#999"
       />
+      
       <TextInput
         value={password}
         onChangeText={setPassword}
@@ -69,21 +77,18 @@ export default function Login({ navigation }) {
         style={styles.input}
         placeholderTextColor="#999"
       />
-
-        <TouchableOpacity onPress={() => setModalVisible(true)}>
-          <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
-        </TouchableOpacity>
-
-        <Pressable style={styles.button}  onPress={() => handleLogin()}>
-          <Text style={styles.buttonText}>Iniciar Sesión</Text>
-        </Pressable>
-
-       
-        <Pressable style={styles.footer} onPress={() => navigation.navigate('CrearCuenta')}>
-          <Text style={styles.footer}> ¿No tienes una cuenta aún?, Crear Cuenta</Text> 
-        </Pressable>
-
-        
+      
+      <TouchableOpacity onPress={() => setModalVisible(true)}>
+        <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
+      </TouchableOpacity>
+      
+      <Pressable style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Iniciar Sesión</Text>
+      </Pressable>
+      
+      <Pressable style={styles.footer} onPress={() => navigation.navigate('CrearCuenta')}>
+        <Text style={styles.footer}> ¿No tienes una cuenta aún?, Crear Cuenta</Text>
+      </Pressable>
 
       <Modal
         visible={modalVisible}
@@ -95,6 +100,7 @@ export default function Login({ navigation }) {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Recuperar contraseña</Text>
             <Text style={{color: "#555", marginBottom: 8}}>Ingresa tu correo para recibir el enlace</Text>
+            
             <TextInput
               value={resetEmail}
               onChangeText={setResetEmail}
@@ -104,6 +110,7 @@ export default function Login({ navigation }) {
               style={styles.modalInput}
               placeholderTextColor="#999"
             />
+            
             <View style={styles.modalButtons}>
               <Pressable style={[styles.modalButton, {backgroundColor: "#7f6aff"}]} onPress={handleSendReset}>
                 <Text style={{color: "#fff", fontWeight: "600"}}>Enviar</Text>
@@ -167,7 +174,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   buttonText: {
-    color: "#000000ff",
+    color: "#fff",
     fontWeight: "600",
   },
   footer: {
@@ -175,7 +182,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 8,
   },
-
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.4)",
