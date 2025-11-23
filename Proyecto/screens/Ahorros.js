@@ -154,14 +154,12 @@ export default function Ahorros() {
     return iconos[categoria] || iconos.otros;
   };
 
-  // Función para calcular el porcentaje de progreso
   const calcularProgreso = (ahorrado, metaTotal) => {
     return (ahorrado / metaTotal) * 100;
   };
 
   return (
     <View style={styles.container}>
-      {/* Modal para agregar/editar metas */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -244,7 +242,6 @@ export default function Ahorros() {
         <View style={styles.headerSection}>
           <View>
             <Text style={styles.welcome}>Ahorros</Text>
-            <Text style={styles.subtitle}>Tu progreso hacia tus{"\n"} metas financieras</Text>
           </View>
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
         </View>
@@ -268,7 +265,7 @@ export default function Ahorros() {
 
           <View style={styles.cardLeft}>
             <Text style={styles.cardSub}>Meta de: ${totalMetaGeneral.toLocaleString()}</Text>
-            <Text style={styles.cardAmount2}>Ahorrado: ${totalAhorradoGeneral.toLocaleString()}</Text>
+            <Text style={styles.cardAmount2}>                       Ahorrado: ${totalAhorradoGeneral.toLocaleString()}</Text>
           </View>
         </View>
 
@@ -314,13 +311,11 @@ export default function Ahorros() {
           })}
         </View>
 
-        {/* Botón para agregar nueva meta */}
         <TouchableOpacity style={styles.addButton} onPress={abrirModalAgregar}>
           <Image source={require("../assets/mas.png")} style={styles.addIcon} />
           <Text style={styles.addText}>Crear nueva meta de ahorro</Text>
         </TouchableOpacity>
 
-        {/* Ejemplo de meta (puedes eliminar esta sección si quieres) */}
         {metas.length === 0 && (
           <View style={styles.emptyState}>
             <Text style={styles.emptyTitle}>No tienes metas de ahorro</Text>
@@ -329,13 +324,7 @@ export default function Ahorros() {
             </Text>
           </View>
         )}
-
       </ScrollView>
-
-
-      
-
-
     </View>
   );
 }
@@ -383,30 +372,29 @@ const styles = StyleSheet.create({
   },
   scrollContent: { 
     padding: 20,
-    paddingBottom: 120 
+    paddingBottom: 120, 
+    alignItems: "center",
   },
   headerSection: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 25,
+    width: "100%",
   },
   welcome: {
     fontSize: 26,
-    paddingRight: 100,
     fontWeight: "700",
     color: "#7b6cff",
-    lineHeight: 30,
+    marginLeft: -10,
+    marginTop: -25
   },
-  subtitle: { 
-    fontSize: 16,
-    marginTop: 50, 
-    color: "#000"  
-  },
+
   pigImage: {
     width: 80,
     height: 80,
     resizeMode: "contain",
+    marginRight: 0,
   },
   cardContainer: {
     backgroundColor: "#f4f1ff",
@@ -477,7 +465,7 @@ const styles = StyleSheet.create({
   deleteText: {
     color: "red",
     fontWeight: "600",
-    fontSize: 12
+    fontSize: 12,
   },
   progressBar: {
     height: 25,
@@ -548,7 +536,6 @@ const styles = StyleSheet.create({
     color: "#000", 
     fontWeight: "500" 
   },
-  // Estilos para el modal
   modalContainer: {
     flex: 1,
     justifyContent: "center",

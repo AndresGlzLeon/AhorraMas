@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Image, TextInput, TouchableOpacity, Modal, Alert } from "react-native";
 import { Dimensions } from "react-native";
 
-
 const { width } = Dimensions.get("window");
 
 export default function PagosProgramados() {
@@ -85,6 +84,7 @@ export default function PagosProgramados() {
   return (
     <View style={styles.container}>
 
+      {/* MODAL AGREGAR */}
       <Modal visible={modalAdd} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalBox}>
@@ -123,6 +123,7 @@ export default function PagosProgramados() {
         </View>
       </Modal>
 
+      {/* MODAL EDITAR */}
       <Modal visible={modalEdit} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalBox}>
@@ -161,6 +162,7 @@ export default function PagosProgramados() {
         </View>
       </Modal>
 
+      {/* HEADER */}
       <View style={styles.header}>
         <View style={styles.leftIcons}>
           <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
@@ -172,7 +174,9 @@ export default function PagosProgramados() {
         </View>
       </View>
 
-      <ScrollView >
+      {/* SCROLLVIEW ADAPTATIVO */}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        
         <View style={styles.headerSection}>
           <Text style={styles.mainTitle}>Gastos{"\n"}Programados</Text>
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
@@ -225,15 +229,23 @@ export default function PagosProgramados() {
 
       </ScrollView>
 
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1,
-  backgroundColor: "#fff",
-  alignItems: "center" },
+
+  container: { 
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "stretch"
+  },
+
+  scrollContent: {
+    width: width * 0.95,
+    alignSelf: "center",
+    paddingBottom: 40,
+  },
 
   header: {
     flexDirection: "row",
@@ -243,19 +255,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#f4f1ff",
     borderRadius: 40,
     width: "95%",
+    alignSelf: "center",
     marginTop: 50,
   },
+
   leftIcons: { flexDirection: "row", alignItems: "center" },
   iconHeader: { width: 33, height: 22, resizeMode: "contain" },
   title: { fontSize: 18, fontWeight: "600", color: "#333" },
   avatar: { backgroundColor: "#b3a5ff", borderRadius: 50, padding: 8 },
   avatarIcon: { width: 20, height: 20, tintColor: "#fff", resizeMode: "contain" },
 
-
   headerSection: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 30 },
-  mainTitle: { fontSize: 26, fontWeight: "700", lineHeight: 30,marginTop:15, color: "#7b6cff" },
- subtitle: { fontSize: 16, marginTop:50, color: "#rgb(0, 0, 0)"  },
-  pigImage: { width: 80, height: 80, resizeMode: "contain" , marginTop:20 },
+  mainTitle: { fontSize: 26, fontWeight: "700", lineHeight: 30, marginTop:15, color: "#7b6cff" },
+  pigImage: { width: 80, height: 80, resizeMode: "contain", marginTop:20 },
 
   cardContainer: {
     backgroundColor: "#f4f1ff",
@@ -264,6 +276,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     marginTop: -5,
   },
+
   card: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -272,11 +285,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     paddingVertical: 30,
     paddingHorizontal: 15,
-    marginTop: 0,
-    paddingBottom: 0,
   },
+
   cardLeft: { flexDirection: "row", alignItems: "center" },
-  cardIcon: { width: 50, height: 50, marginRight:40, marginBottom:15, tintColor: "#7b6cff" },
+  cardIcon: { width: 50, height: 50, marginRight: 40, tintColor: "#7b6cff" },
   cardTitle: { fontSize: 18, fontWeight: "600", color: "#000" },
   cardSub: { fontSize: 13, color: "#777" },
   cardAmount: { fontSize: 16, fontWeight: "700", color: "#000" },
@@ -290,93 +302,64 @@ const styles = StyleSheet.create({
     padding: 15,
     justifyContent: "center",
   },
-  addIcon: { 
-  width: 25, 
-  height: 25, 
-  marginRight: 10,
-  tintColor: "#7b6cff" },
 
-  addText: { 
-  fontSize: 16, 
-  color: "#000",
-  fontWeight: "500" },
+  addIcon: { width: 25, height: 25, marginRight: 10, tintColor: "#7b6cff" },
+  addText: { fontSize: 16, color: "#000", fontWeight: "500" },
 
-navIcon: { width: 26, 
-height: 26, 
-resizeMode: "contain" },
+  navIcon: { width: 26, height: 26, resizeMode: "contain" },
 
-buttonSpacing: {
-  marginTop: 10,
-},
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
 
-modalContainer: {
-  flex: 1,
-  justifyContent: "center",
-  alignItems: "center",
-  backgroundColor: "rgba(0,0,0,0.5)",
-},
-modalBox: {
-  backgroundColor: "#fff",
-  padding: 20,
-  borderRadius: 20,
-  width: "85%",
-},
-modalTitle: {
-  fontSize: 20,
-  fontWeight: "bold",
-  color: "#7b6cff",
-  textAlign: "center",
-  marginBottom: 15,
-},
-modalButtons: {
-  flexDirection: "row",
-  justifyContent: "space-between",
-},
-cancelBtn: {
-  backgroundColor: "#ff6b6b",
-  padding: 12,
-  borderRadius: 12,
-  width: "45%",
-  alignItems: "center",
-},
-saveBtn: {
-  backgroundColor: "#7b6cff",
-  padding: 12,
-  borderRadius: 12,
-  width: "45%",
-  alignItems: "center",
-},
-btnText: { color: "#fff", 
-fontWeight: "bold" },
+  modalBox: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 20,
+    width: "85%",
+  },
 
-input: {
-  backgroundColor: "#fff",
-  padding: 10,
-  borderRadius: 10,
-  marginTop: 8,
-  borderWidth: 1,
-  borderColor: "#ddd",
-},
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#7b6cff",
+    textAlign: "center",
+    marginBottom: 15,
+  },
 
-bottomNav: {
-  position: "absolute",
-  bottom: 10,
-  width: "95%",
-  flexDirection: "row",
-  justifyContent: "space-around",
-  alignItems: "center",
-  backgroundColor: "#eae2ff",
-  paddingVertical: 12,
-  borderRadius: 30,
-},
-iconCircle: {
-  width: 50,       
-  height: 50,
-  borderRadius: 15, 
-  backgroundColor: "#A084E8", 
-  justifyContent: "center",
-  alignItems: "center",
-  marginHorizontal: 5, 
-},
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+
+  cancelBtn: {
+    backgroundColor: "#ff6b6b",
+    padding: 12,
+    borderRadius: 12,
+    width: "45%",
+    alignItems: "center",
+  },
+
+  saveBtn: {
+    backgroundColor: "#7b6cff",
+    padding: 12,
+    borderRadius: 12,
+    width: "45%",
+    alignItems: "center",
+  },
+
+  btnText: { color: "#fff", fontWeight: "bold" },
+
+  input: {
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 10,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
 
 });

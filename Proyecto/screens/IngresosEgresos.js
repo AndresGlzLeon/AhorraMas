@@ -1,5 +1,10 @@
 import React from "react";
 import { View, Text, ScrollView, StyleSheet, Image } from "react-native";
+import { LineChart } from "react-native-chart-kit";
+import { Dimensions } from "react-native";
+import { PieChart } from "react-native-chart-kit";
+
+const screenWidth = Dimensions.get("window").width;
 
 export default function IngresosEgresos() {
   return (
@@ -28,12 +33,63 @@ export default function IngresosEgresos() {
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
         </View>
 
-        <View style={styles.graphContainer}>
-          <Image 
-            source={require("../assets/grafica.png")} 
-            style={styles.graphImage} 
-          />
-        </View>
+
+        <View style={styles.carouselContainer}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            pagingEnabled
+          >
+
+    <View style={styles.graphSlide}>
+      <LineChart
+        data={{
+          labels: ["Ene", "Feb", "Mar", "Abr", "May"],
+          datasets: [
+            {
+              data: [300, 450, 280, 800, 990]
+            }
+          ]
+        }}
+        width={screenWidth * 0.8}
+        height={220}
+        chartConfig={{
+          backgroundColor: "#f4f1ff",
+          backgroundGradientFrom: "#e8e3ff",
+          backgroundGradientTo: "#cfc5ff",
+          decimalPlaces: 2,
+          color: (opacity = 1) => `rgba(100, 70, 255, ${opacity})`,
+          labelColor: () => "#6a5acd",
+        }}
+        bezier
+        style={{
+          borderRadius: 20,
+        }}
+      />
+    </View>
+
+    <View style={styles.graphSlide}>
+      <PieChart
+        data={[
+          { name: "Ingresos", amount: 1300, color: "#7f6aff", legendFontColor: "#333", legendFontSize: 14 },
+          { name: "Egresos", amount: 230, color: "#ff6b6b", legendFontColor: "#333", legendFontSize: 14 },
+        ]}
+        width={screenWidth * 0.8}
+        height={220}
+        chartConfig={{
+          backgroundColor: "#f4f1ff",
+          backgroundGradientFrom: "#e8e3ff",
+          backgroundGradientTo: "#cfc5ff",
+          color: () => "#6a5acd",
+        }}
+        accessor="amount"
+        backgroundColor="transparent"
+        paddingLeft="20"
+        style={{ borderRadius: 20 }}
+      />
+    </View>
+  </ScrollView>
+</View>
 
         <View style={styles.infoCard}>
           <Image 
@@ -75,11 +131,6 @@ export default function IngresosEgresos() {
 
 
       </ScrollView>
-
-
-
-    
-
     </View>
   );
 }
@@ -139,6 +190,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 20,
+    width: "100%",
   },
 
   welcome: {
@@ -146,13 +198,15 @@ const styles = StyleSheet.create({
     paddingRight: 100,
     fontWeight: "700",
     color: "#7b6cff",
-    lineHeight: 30,
+    marginLeft: -10,
+    marginTop: -25
   },
 
   pigImage: {
     width: 80,
     height: 80,
     resizeMode: "contain",
+    marginRight: -10,
   },
 
   graphContainer: {
@@ -178,6 +232,7 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row", 
     alignItems: "center",
+    marginTop: 10,
   },
 
   smallIcon: {

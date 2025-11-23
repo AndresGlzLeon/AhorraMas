@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -14,27 +14,25 @@ import Ahorros from './screens/Ahorros';
 import Perfil from './screens/Perfil';
 import Ajustes from './screens/Ajustes';
 import Notificaciones from './screens/Notificaciones';
+
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-function PerfilStackNavigator(){
+function PrincipalStack() {
   return (
-      <Stack.Navigator>
-        
-
-        <Stack.Screen name="StackPrincipal" component={Principal} />
-        <Stack.Screen name="PagosProgramados" component={PagosProgramados} />
-        <Stack.Screen name="Presupuesto" component={Presupuesto} />
-        <Stack.Screen name="IngresosEgresos" component={IngresosEgresos} />
-        <Stack.Screen name="Perfil" component={Perfil} />
-        <Stack.Screen name="Ahorros" component={Ahorros} />
-        <Stack.Screen name="Ajustes" component={Ajustes} />
-        <Stack.Screen name="Notificaciones" component={Notificaciones} /> 
-
-        
-      </Stack.Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="PrincipalHome" component={Principal} />
+      <Stack.Screen name="Perfil" component={Perfil} />
+      <Stack.Screen name="Ajustes" component={Ajustes} />
+      <Stack.Screen name="Notificaciones" component={Notificaciones} />
+      <Stack.Screen name="PagosProgramados" component={PagosProgramados} />
+      <Stack.Screen name="Presupuesto" component={Presupuesto} />
+      <Stack.Screen name="IngresosEgresos" component={IngresosEgresos} />
+      <Stack.Screen name="Ahorros" component={Ahorros} />
+    </Stack.Navigator>
   );
 }
+
 export default function App() {
   return (
     <NavigationContainer>
@@ -42,21 +40,20 @@ export default function App() {
         initialRouteName="Principal"
         screenOptions={({ route }) => ({
           headerShown: false,
-          tabBarIcon: ({ color}) => {
+          tabBarIcon: ({ color }) => {
             let iconName;
-        
+
             if (route.name === 'Principal') iconName = 'home';
             if (route.name === 'PagosProgramados') iconName = 'calendar';
             if (route.name === 'Presupuesto') iconName = 'cash';
             if (route.name === 'IngresosEgresos') iconName = 'swap-horizontal';
             if (route.name === 'Ahorros') iconName = 'bag-check';
-        
+
             return <Ionicons name={iconName} size={28} color={color} />;
           },
-        
+
           tabBarActiveTintColor: '#4c00ff',
           tabBarInactiveTintColor: '#eee',
-        
           tabBarStyle: {
             backgroundColor: '#b3a5ff',
             height: 70,
@@ -75,13 +72,13 @@ export default function App() {
             shadowRadius: 10,
           },
         })}
-        
       >
-        <Tab.Screen name="Principal" component={PerfilStackNavigator} />
+        <Tab.Screen name="Principal" component={PrincipalStack} />
         <Tab.Screen name="PagosProgramados" component={PagosProgramados} />
         <Tab.Screen name="Presupuesto" component={Presupuesto} />
         <Tab.Screen name="IngresosEgresos" component={IngresosEgresos} />
         <Tab.Screen name="Ahorros" component={Ahorros} />
+
       </Tab.Navigator>
     </NavigationContainer>
   );
