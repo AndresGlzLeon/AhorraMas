@@ -39,7 +39,7 @@ export default function Ajustes() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <View style={styles.leftIcons}>
             <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
             <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
@@ -50,7 +50,7 @@ export default function Ajustes() {
         <View style={styles.avatar}>
             <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
         </View>
-      </View>
+      </View> */}
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerSection}>
@@ -157,13 +157,13 @@ const styles = StyleSheet.create({
     flexDirection: "row", 
     justifyContent: "space-between", 
     alignItems: "center", 
-    marginBottom: 20 
+    width: "100%", 
   },
   mainTitle: { 
     fontSize: 26, 
     fontWeight: "700", 
     lineHeight: 30,
-    marginTop: 15, 
+    marginTop: 60, 
     color: "#7b6cff" 
   },
   subtitle: { 
@@ -174,7 +174,8 @@ const styles = StyleSheet.create({
   pigImage: { 
     width: 80, 
     height: 80, 
-    resizeMode: "contain" 
+    resizeMode: "contain", 
+   
   },
 
   content: { 

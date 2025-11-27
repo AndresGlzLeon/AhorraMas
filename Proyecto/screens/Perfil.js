@@ -19,7 +19,7 @@ export default function Perfil() {
   return (
     <View style={styles.container}>
 
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <View style={styles.leftIcons}>
           <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
 
@@ -31,7 +31,7 @@ export default function Perfil() {
         <View style={styles.avatar}>
           <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
         </View>
-      </View>
+      </View> */}
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
 
@@ -169,13 +169,15 @@ const styles = StyleSheet.create({
 
   scrollContent: {
     padding: 20,
-    paddingBottom: 140
+    paddingBottom: 140,
+    width: "100%",
+    alignItems: "center",
   },
 
   perfilTitle: {
     textAlign: "center",
     fontSize: 20,
-    marginTop: 20,
+    marginTop: 50,
     marginBottom: 15,
     color: "#a270ff",
     fontWeight: "700",

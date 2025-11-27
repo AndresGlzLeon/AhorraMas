@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Image, TextInput, TouchableOpacity, Modal, Alert } from "react-native";
 import { Dimensions } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
 export default function PagosProgramados() {
+  const navigation = useNavigation();
 
   const [pagos, setPagos] = useState([
     { titulo: "Alquiler", monto: 1500, fecha: "10 octubre 2025", tipo: "Mensual", icon: require("../assets/alquiler.png") },
@@ -162,17 +164,22 @@ export default function PagosProgramados() {
         </View>
       </Modal>
 
-      {/* HEADER */}
       <View style={styles.header}>
         <View style={styles.leftIcons}>
+          <TouchableOpacity onPress={() => navigation.navigate("Principal", { screen: "Ajustes" })}>
           <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("Principal", { screen: "Notificaciones" })}>
           <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+          </TouchableOpacity>
         </View>
+
         <Text style={styles.title}>Ahorra+ App</Text>
-        <View style={styles.avatar}>
-          <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-        </View>
+        <TouchableOpacity style={styles.avatar} onPress={() => navigation.navigate("Principal", { screen: "Perfil" })}>
+        <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+          </TouchableOpacity>
       </View>
+
 
       {/* SCROLLVIEW ADAPTATIVO */}
       <ScrollView contentContainerStyle={styles.scrollContent}>

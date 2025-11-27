@@ -1,23 +1,43 @@
 import React from "react";
-import { View, Text, ScrollView, StyleSheet, Image } from "react-native";
+import { View, Text, ScrollView,  StyleSheet, Image,TouchableOpacity} from "react-native";
 import { Dimensions } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+
 const { width } = Dimensions.get("window");
 
 export default function Principal() {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
       
       <View style={styles.header}>
         <View style={styles.leftIcons}>
-          <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-          <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+          <TouchableOpacity onPress={() => navigation.navigate("Ajustes")}>
+            <Image 
+              source={require("../assets/ajustes.png")} 
+              style={styles.iconHeader} 
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigation.navigate("Notificaciones")}>
+            <Image 
+              source={require("../assets/notificaciones.png")} 
+              style={[styles.iconHeader, { marginLeft: 10 }]} 
+            />
+          </TouchableOpacity>
         </View>
 
         <Text style={styles.title}>Ahorra+ App</Text>
-
-        <View style={styles.avatar}>
-          <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-        </View>
+        <TouchableOpacity 
+          style={styles.avatar}
+          onPress={() => navigation.navigate("Perfil")}
+        >
+          <Image 
+            source={require("../assets/usuarios.png")} 
+            style={styles.avatarIcon} 
+          />
+        </TouchableOpacity>
       </View>
 
 
