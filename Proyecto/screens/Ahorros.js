@@ -11,8 +11,14 @@ import {
   TextInput,
   Alert,Pressable
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
+<<<<<<< HEAD
 export default function Ahorros({ navigation }) {
+=======
+export default function Ahorros() {
+  const navigation = useNavigation();
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
 
   const [metas, setMetas] = useState([
     { 
@@ -154,14 +160,12 @@ export default function Ahorros({ navigation }) {
     return iconos[categoria] || iconos.otros;
   };
 
-  // Función para calcular el porcentaje de progreso
   const calcularProgreso = (ahorrado, metaTotal) => {
     return (ahorrado / metaTotal) * 100;
   };
 
   return (
     <View style={styles.container}>
-      {/* Modal para agregar/editar metas */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -226,6 +230,7 @@ export default function Ahorros({ navigation }) {
       </Modal>
 
       {/* Header */}
+<<<<<<< HEAD
         <View style={styles.header}>
           <View style={styles.leftIcons}>
             <Pressable onPress={() => navigation.navigate('Ajustes')}> 
@@ -245,12 +250,29 @@ export default function Ahorros({ navigation }) {
             </Pressable>
           </View>
         </View>
+=======
+      <View style={styles.header}>
+        <View style={styles.leftIcons}>
+          <TouchableOpacity onPress={() => navigation.navigate("Principal", { screen: "Ajustes" })}>
+          <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("Principal", { screen: "Notificaciones" })}>
+          <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.title}>Ahorra+ App</Text>
+        <TouchableOpacity style={styles.avatar} onPress={() => navigation.navigate("Principal", { screen: "Perfil" })}>
+        <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+          </TouchableOpacity>
+      </View>
+
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
       <ScrollView contentContainerStyle={styles.scrollContent}>
 
         <View style={styles.headerSection}>
           <View>
             <Text style={styles.welcome}>Ahorros</Text>
-            <Text style={styles.subtitle}>Tu progreso hacia tus{"\n"} metas financieras</Text>
           </View>
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
         </View>
@@ -274,7 +296,7 @@ export default function Ahorros({ navigation }) {
 
           <View style={styles.cardLeft}>
             <Text style={styles.cardSub}>Meta de: ${totalMetaGeneral.toLocaleString()}</Text>
-            <Text style={styles.cardAmount2}>Ahorrado: ${totalAhorradoGeneral.toLocaleString()}</Text>
+            <Text style={styles.cardAmount2}>                       Ahorrado: ${totalAhorradoGeneral.toLocaleString()}</Text>
           </View>
         </View>
 
@@ -320,13 +342,11 @@ export default function Ahorros({ navigation }) {
           })}
         </View>
 
-        {/* Botón para agregar nueva meta */}
         <TouchableOpacity style={styles.addButton} onPress={abrirModalAgregar}>
           <Image source={require("../assets/mas.png")} style={styles.addIcon} />
           <Text style={styles.addText}>Crear nueva meta de ahorro</Text>
         </TouchableOpacity>
 
-        {/* Ejemplo de meta (puedes eliminar esta sección si quieres) */}
         {metas.length === 0 && (
           <View style={styles.emptyState}>
             <Text style={styles.emptyTitle}>No tienes metas de ahorro</Text>
@@ -335,13 +355,7 @@ export default function Ahorros({ navigation }) {
             </Text>
           </View>
         )}
-
       </ScrollView>
-
-
-      
-
-
     </View>
   );
 }
@@ -389,30 +403,29 @@ const styles = StyleSheet.create({
   },
   scrollContent: { 
     padding: 20,
-    paddingBottom: 120 
+    paddingBottom: 120, 
+    alignItems: "center",
   },
   headerSection: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 25,
+    width: "100%",
   },
   welcome: {
     fontSize: 26,
-    paddingRight: 100,
     fontWeight: "700",
     color: "#7b6cff",
-    lineHeight: 30,
+    marginLeft: -10,
+    marginTop: -25
   },
-  subtitle: { 
-    fontSize: 16,
-    marginTop: 50, 
-    color: "#000"  
-  },
+
   pigImage: {
     width: 80,
     height: 80,
     resizeMode: "contain",
+    marginRight: 0,
   },
   cardContainer: {
     backgroundColor: "#f4f1ff",
@@ -483,7 +496,7 @@ const styles = StyleSheet.create({
   deleteText: {
     color: "red",
     fontWeight: "600",
-    fontSize: 12
+    fontSize: 12,
   },
   progressBar: {
     height: 25,
@@ -554,7 +567,6 @@ const styles = StyleSheet.create({
     color: "#000", 
     fontWeight: "500" 
   },
-  // Estilos para el modal
   modalContainer: {
     flex: 1,
     justifyContent: "center",

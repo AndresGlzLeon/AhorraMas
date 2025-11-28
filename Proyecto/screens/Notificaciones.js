@@ -39,7 +39,23 @@ export default function Notificaciones({ navigate }) {
   return (
     <View style={styles.container}>
 
+<<<<<<< HEAD
       
+=======
+      {/* <View style={styles.header}>
+        <View style={styles.leftIcons}>
+            <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+            <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+        </View>
+
+        <Text style={styles.title}>Ahorra+ App</Text>
+
+        <View style={styles.avatar}>
+            <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+        </View>
+      </View> */}
+
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerSection}>
           <View>
@@ -73,7 +89,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 15,
+    padding: 40,
     backgroundColor: "#f4f1ff",
     borderRadius: 40,
     width: "95%",
@@ -86,8 +102,8 @@ const styles = StyleSheet.create({
   avatarIcon: { width: 20, height: 20, tintColor: "#fff", resizeMode: "contain" },
 
   scrollContent: { padding: 20, paddingBottom: 120 },
-  headerSection: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 },
-  mainTitle: { fontSize: 26, fontWeight: "700", lineHeight: 30,marginTop:15, color: "#7b6cff" },
+  headerSection: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20, width: "100%" },
+  mainTitle: { fontSize: 26, fontWeight: "700", lineHeight: 30,marginTop:60, color: "#7b6cff" },
   subtitle: { fontSize: 16, marginTop:50, color: "#000" },
   pigImage: { width: 80, height: 80, resizeMode: "contain" },
 

@@ -1,10 +1,20 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Image, TextInput, TouchableOpacity, Modal, Alert, Pressable } from "react-native";
 import { Dimensions } from "react-native";
+<<<<<<< HEAD
 
 const { width } = Dimensions.get("window");
 
 export default function PagosProgramados({ navigation }) {
+=======
+import { useNavigation } from "@react-navigation/native";
+
+const { width } = Dimensions.get("window");
+
+export default function PagosProgramados() {
+  const navigation = useNavigation();
+
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   const [pagos, setPagos] = useState([
     { titulo: "Alquiler", monto: 1500, fecha: "10 octubre 2025", tipo: "Mensual", icon: require("../assets/alquiler.png") },
     { titulo: "Seguro Auto", monto: 750, fecha: "4 enero 2026", tipo: "Anual", icon: require("../assets/auto.png") },
@@ -77,7 +87,12 @@ export default function PagosProgramados({ navigation }) {
 
   return (
     <View style={styles.container}>
+<<<<<<< HEAD
       {/* Modal para agregar pago */}
+=======
+
+      {/* MODAL AGREGAR */}
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
       <Modal visible={modalAdd} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalBox}>
@@ -113,7 +128,11 @@ export default function PagosProgramados({ navigation }) {
         </View>
       </Modal>
 
+<<<<<<< HEAD
       {/* Modal para editar pago */}
+=======
+      {/* MODAL EDITAR */}
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
       <Modal visible={modalEdit} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalBox}>
@@ -152,14 +171,25 @@ export default function PagosProgramados({ navigation }) {
       {/* Header con navegación */}
       <View style={styles.header}>
         <View style={styles.leftIcons}>
+<<<<<<< HEAD
           <Pressable onPress={() => navigation.navigate('Ajustes')}>
             <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
           </Pressable>
           <Pressable onPress={() => navigation.navigate('Notificaciones')}>
             <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
           </Pressable>
+=======
+          <TouchableOpacity onPress={() => navigation.navigate("Principal", { screen: "Ajustes" })}>
+          <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("Principal", { screen: "Notificaciones" })}>
+          <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+          </TouchableOpacity>
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
         </View>
+
         <Text style={styles.title}>Ahorra+ App</Text>
+<<<<<<< HEAD
         <View style={styles.avatar}>
           <Pressable onPress={() => navigation.navigate('Perfil')}>
             <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
@@ -168,6 +198,17 @@ export default function PagosProgramados({ navigation }) {
       </View>
 
       <ScrollView>
+=======
+        <TouchableOpacity style={styles.avatar} onPress={() => navigation.navigate("Principal", { screen: "Perfil" })}>
+        <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+          </TouchableOpacity>
+      </View>
+
+
+      {/* SCROLLVIEW ADAPTATIVO */}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
         <View style={styles.headerSection}>
           <Text style={styles.mainTitle}>Gastos{"\n"}Programados</Text>
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
@@ -214,12 +255,32 @@ export default function PagosProgramados({ navigation }) {
           <Text style={styles.addText}>Añadir Pago</Text>
         </TouchableOpacity>
       </ScrollView>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+<<<<<<< HEAD
   container: { flex: 1, backgroundColor: "#fff", alignItems: "center" },
+=======
+
+  container: { 
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "stretch"
+  },
+
+  scrollContent: {
+    width: width * 0.95,
+    alignSelf: "center",
+    paddingBottom: 40,
+  },
+
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -228,16 +289,26 @@ const styles = StyleSheet.create({
     backgroundColor: "#f4f1ff",
     borderRadius: 40,
     width: "95%",
+    alignSelf: "center",
     marginTop: 50,
   },
+
   leftIcons: { flexDirection: "row", alignItems: "center" },
   iconHeader: { width: 33, height: 22, resizeMode: "contain" },
   title: { fontSize: 18, fontWeight: "600", color: "#333" },
   avatar: { backgroundColor: "#b3a5ff", borderRadius: 50, padding: 8 },
   avatarIcon: { width: 20, height: 20, tintColor: "#fff", resizeMode: "contain" },
+<<<<<<< HEAD
   headerSection: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 30, padding: 20 },
   mainTitle: { fontSize: 26, fontWeight: "700", lineHeight: 30, marginTop: 15, color: "#7b6cff" },
   pigImage: { width: 80, height: 80, resizeMode: "contain", marginTop: 20 },
+=======
+
+  headerSection: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 30 },
+  mainTitle: { fontSize: 26, fontWeight: "700", lineHeight: 30, marginTop:15, color: "#7b6cff" },
+  pigImage: { width: 80, height: 80, resizeMode: "contain", marginTop:20 },
+
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   cardContainer: {
     backgroundColor: "#f4f1ff",
     padding: 10,
@@ -245,6 +316,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     marginHorizontal: 20,
   },
+
   card: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -254,8 +326,13 @@ const styles = StyleSheet.create({
     paddingVertical: 30,
     paddingHorizontal: 15,
   },
+
   cardLeft: { flexDirection: "row", alignItems: "center" },
+<<<<<<< HEAD
   cardIcon: { width: 50, height: 50, marginRight: 40, marginBottom: 15, tintColor: "#7b6cff" },
+=======
+  cardIcon: { width: 50, height: 50, marginRight: 40, tintColor: "#7b6cff" },
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   cardTitle: { fontSize: 18, fontWeight: "600", color: "#000" },
   cardSub: { fontSize: 13, color: "#777" },
   cardAmount: { fontSize: 16, fontWeight: "700", color: "#000" },
@@ -270,21 +347,38 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 20,
   },
+<<<<<<< HEAD
   addIcon: { width: 25, height: 25, marginRight: 10, tintColor: "#7b6cff" },
   addText: { fontSize: 16, color: "#000", fontWeight: "500" },
   navIcon: { width: 26, height: 26, resizeMode: "contain" },
+=======
+
+  addIcon: { width: 25, height: 25, marginRight: 10, tintColor: "#7b6cff" },
+  addText: { fontSize: 16, color: "#000", fontWeight: "500" },
+
+  navIcon: { width: 26, height: 26, resizeMode: "contain" },
+
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
   },
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   modalBox: {
     backgroundColor: "#fff",
     padding: 20,
     borderRadius: 20,
     width: "85%",
   },
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
@@ -292,10 +386,18 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 15,
   },
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   modalButtons: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   cancelBtn: {
     backgroundColor: "#ff6b6b",
     padding: 12,
@@ -303,6 +405,10 @@ const styles = StyleSheet.create({
     width: "45%",
     alignItems: "center",
   },
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   saveBtn: {
     backgroundColor: "#7b6cff",
     padding: 12,
@@ -310,7 +416,13 @@ const styles = StyleSheet.create({
     width: "45%",
     alignItems: "center",
   },
+<<<<<<< HEAD
   btnText: { color: "#fff", fontWeight: "bold" },
+=======
+
+  btnText: { color: "#fff", fontWeight: "bold" },
+
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   input: {
     backgroundColor: "#fff",
     padding: 10,
@@ -319,4 +431,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ddd",
   },
+<<<<<<< HEAD
 });
+=======
+
+});
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf

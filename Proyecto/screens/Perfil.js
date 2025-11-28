@@ -20,7 +20,24 @@ export default function Perfil({}) {
   return (
     <View style={styles.container}>
 
+<<<<<<< HEAD
       
+=======
+      {/* <View style={styles.header}>
+        <View style={styles.leftIcons}>
+          <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+
+          <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+        </View>
+
+        <Text style={styles.title}>Ahorra+ App</Text>
+
+        <View style={styles.avatar}>
+          <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+        </View>
+      </View> */}
+
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
       <ScrollView contentContainerStyle={styles.scrollContent}>
 
         <Text style={styles.perfilTitle}>TU PERFIL</Text>
@@ -159,13 +176,15 @@ const styles = StyleSheet.create({
 
   scrollContent: {
     padding: 20,
-    paddingBottom: 140
+    paddingBottom: 140,
+    width: "100%",
+    alignItems: "center",
   },
 
   perfilTitle: {
     textAlign: "center",
     fontSize: 20,
-    marginTop: 20,
+    marginTop: 50,
     marginBottom: 15,
     color: "#a270ff",
     fontWeight: "700",

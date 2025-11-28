@@ -1,7 +1,13 @@
 import React, { useState } from "react";
+<<<<<<< HEAD
 import { View, Text, StyleSheet, Switch, Image, ScrollView, Pressable, Alert } from "react-native";
 
 export default function Ajustes({navigation, onLogout}) {
+=======
+import { View, Text, StyleSheet, Switch, Image, ScrollView } from "react-native";
+
+export default function Ajustes() {
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   const [notificacionesActivas, setNotificacionesActivas] = useState(true);
 
   const handleLogout = () => {
@@ -28,6 +34,22 @@ export default function Ajustes({navigation, onLogout}) {
 
   return (
     <View style={styles.container}>
+<<<<<<< HEAD
+=======
+      {/* <View style={styles.header}>
+        <View style={styles.leftIcons}>
+            <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+            <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+        </View>
+
+        <Text style={styles.title}>Ahorra+ App</Text>
+
+        <View style={styles.avatar}>
+            <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+        </View>
+      </View> */}
+
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerSection}>
           <View>
@@ -80,6 +102,11 @@ export default function Ajustes({navigation, onLogout}) {
           </Pressable>
         </View>
       </ScrollView>
+<<<<<<< HEAD
+=======
+
+        <Text style={styles.exitText}>Salir</Text>
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
     </View>
   );
 }
@@ -100,22 +127,75 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20
   },
+<<<<<<< HEAD
   mainTitle: {
     fontSize: 26,
     fontWeight: "700",
     lineHeight: 30,
     marginTop: 15,
     color: "#7b6cff"
+=======
+  leftIcons: { 
+    flexDirection: "row", 
+    alignItems: "center" 
+  },
+  iconHeader: { 
+    width: 33, 
+    height: 22, 
+    resizeMode: "contain" 
+  },
+  title: { 
+    fontSize: 18, 
+    fontWeight: "600", 
+    color: "#333" 
+  },
+  avatar: { 
+    backgroundColor: "#b3a5ff", 
+    borderRadius: 50, 
+    padding: 8 
+  },
+  avatarIcon: { 
+    width: 20, 
+    height: 20, 
+    tintColor: "#fff", 
+    resizeMode: "contain" 
+  },
+
+  scrollContent: { 
+    padding: 20, 
+    paddingBottom: 120 
+  },
+  headerSection: { 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    alignItems: "center", 
+    width: "100%", 
+  },
+  mainTitle: { 
+    fontSize: 26, 
+    fontWeight: "700", 
+    lineHeight: 30,
+    marginTop: 60, 
+    color: "#7b6cff" 
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   },
   subtitle: {
     fontSize: 16,
     marginTop: 50,
     color: "#000"
   },
+<<<<<<< HEAD
   pigImage: {
     width: 80,
     height: 80,
     resizeMode: "contain"
+=======
+  pigImage: { 
+    width: 80, 
+    height: 80, 
+    resizeMode: "contain", 
+   
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   },
   content: {
     width: "100%",

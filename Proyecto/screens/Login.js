@@ -1,7 +1,11 @@
 import React, { useState } from "react";
-import {View,Text,TextInput,StyleSheet,Alert,Image, Modal, TouchableOpacity, Pressable} from "react-native";
+import { View, Text, TextInput, StyleSheet, Alert, Image, Modal, TouchableOpacity, Pressable } from "react-native";
 
+<<<<<<< HEAD
 export default function Login({ navigation, onLogin }) {
+=======
+export default function Login({ navigation }) {
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,6 +17,7 @@ export default function Login({ navigation, onLogin }) {
       Alert.alert("Error", "Por favor completa todos los campos");
       return;
     }
+<<<<<<< HEAD
     
     // Aquí puedes agregar tu lógica de autenticación
     // Por ejemplo, validar con un backend
@@ -26,6 +31,14 @@ export default function Login({ navigation, onLogin }) {
     if (onLogin) {
       onLogin();
     }
+=======
+
+    setName("");
+    setEmail("");
+    setPassword("");
+
+    navigation.replace("HomeTabs");
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   };
 
   const handleSendReset = () => {
@@ -77,6 +90,7 @@ export default function Login({ navigation, onLogin }) {
         style={styles.input}
         placeholderTextColor="#999"
       />
+<<<<<<< HEAD
       
       <TouchableOpacity onPress={() => setModalVisible(true)}>
         <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
@@ -89,6 +103,19 @@ export default function Login({ navigation, onLogin }) {
       <Pressable style={styles.footer} onPress={() => navigation.navigate('CrearCuenta')}>
         <Text style={styles.footer}> ¿No tienes una cuenta aún?, Crear Cuenta</Text>
       </Pressable>
+=======
+
+      <TouchableOpacity onPress={() => setModalVisible(true)}>
+        <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
+      </TouchableOpacity>
+
+      <Pressable style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Iniciar Sesión</Text>
+      </Pressable>
+
+      <Text style={styles.footer}>¿No tienes una cuenta aún? Crea una cuenta</Text>
+      <Text style={styles.footer}>Volver</Text>
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
 
       <Modal
         visible={modalVisible}
@@ -99,8 +126,14 @@ export default function Login({ navigation, onLogin }) {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Recuperar contraseña</Text>
+<<<<<<< HEAD
             <Text style={{color: "#555", marginBottom: 8}}>Ingresa tu correo para recibir el enlace</Text>
             
+=======
+            <Text style={{ color: "#555", marginBottom: 8 }}>
+              Ingresa tu correo para recibir el enlace
+            </Text>
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
             <TextInput
               value={resetEmail}
               onChangeText={setResetEmail}
@@ -112,11 +145,17 @@ export default function Login({ navigation, onLogin }) {
             />
             
             <View style={styles.modalButtons}>
-              <Pressable style={[styles.modalButton, {backgroundColor: "#7f6aff"}]} onPress={handleSendReset}>
-                <Text style={{color: "#fff", fontWeight: "600"}}>Enviar</Text>
+              <Pressable
+                style={[styles.modalButton, { backgroundColor: "#7f6aff" }]}
+                onPress={handleSendReset}
+              >
+                <Text style={{ color: "#fff", fontWeight: "600" }}>Enviar</Text>
               </Pressable>
-              <Pressable style={[styles.modalButton, {backgroundColor: "#ddd"}]} onPress={handleCancelReset}>
-                <Text style={{color: "#333", fontWeight: "600"}}>Cancelar</Text>
+              <Pressable
+                style={[styles.modalButton, { backgroundColor: "#ddd" }]}
+                onPress={handleCancelReset}
+              >
+                <Text style={{ color: "#333", fontWeight: "600" }}>Cancelar</Text>
               </Pressable>
             </View>
           </View>

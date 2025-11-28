@@ -1,27 +1,33 @@
+<<<<<<< HEAD
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+=======
+import { NavigationContainer, getFocusedRouteNameFromRoute } from '@react-navigation/native';
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
-import 'react-native-get-random-values';
-import 'react-native-gesture-handler';
 
+<<<<<<< HEAD
 // Screens
+=======
+import Login from './screens/Login';
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
 import Principal from './screens/Principal';
 import PagosProgramados from './screens/PagosProgramados';
 import Presupuesto from './screens/Presupuesto';
 import IngresosEgresos from './screens/IngresosEgresos';
 import Ahorros from './screens/Ahorros';
-import Ajustes from './screens/Ajustes';
-import CrearCuenta from './screens/CrearCuenta';
-import Login from './screens/Login';
-import Notificaciones from './screens/Notificaciones';
 import Perfil from './screens/Perfil';
+import Ajustes from './screens/Ajustes';
+import Notificaciones from './screens/Notificaciones';
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+<<<<<<< HEAD
 // Stack de Login/Registro
 function LoginStackNavigator({ onLogin }) {
   return (
@@ -32,10 +38,28 @@ function LoginStackNavigator({ onLogin }) {
       <Stack.Screen name="CrearCuenta">
         {(props) => <CrearCuenta {...props} onLogin={onLogin} />}
       </Stack.Screen>
+=======
+
+function PrincipalStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: true }}>
+      <Stack.Screen name="Atras" component={Principal}
+      options={{
+        headerShown: false
+      }} />
+      <Stack.Screen name="Perfil" component={Perfil} />
+      <Stack.Screen name="Ajustes" component={Ajustes} />
+      <Stack.Screen name="Notificaciones" component={Notificaciones} />
+      <Stack.Screen name="PagosProgramados" component={PagosProgramados} />
+      <Stack.Screen name="Presupuesto" component={Presupuesto} />
+      <Stack.Screen name="IngresosEgresos" component={IngresosEgresos} />
+      <Stack.Screen name="Ahorros" component={Ahorros} />
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
     </Stack.Navigator>
   );
 }
 
+<<<<<<< HEAD
 // Stack de Principal con sus sub-pantallas
 function PrincipalStackNavigator({ onLogout, navigation }) {
   return (
@@ -391,15 +415,67 @@ function TabsNavigator({ onLogout }) {
       <Tab.Screen name="Ahorros">
         {(props) => <AhorrosStackNavigator {...props} onLogout={onLogout} />}
       </Tab.Screen>
+=======
+
+function AppTabs() {
+  return (
+    <Tab.Navigator
+      initialRouteName="Principal"
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarIcon: ({ color }) => {
+          let iconName;
+
+          if (route.name === 'Principal') iconName = 'home';
+          if (route.name === 'PagosProgramados') iconName = 'calendar';
+          if (route.name === 'Presupuesto') iconName = 'cash';
+          if (route.name === 'IngresosEgresos') iconName = 'swap-horizontal';
+          if (route.name === 'Ahorros') iconName = 'bag-check';
+
+          return <Ionicons name={iconName} size={28} color={color} />;
+        },
+        tabBarActiveTintColor: '#4c00ff',
+        tabBarInactiveTintColor: '#eee',
+        tabBarStyle: {
+          backgroundColor: '#b3a5ff',
+          height: 70,
+          width: '95%',
+          alignSelf: 'center',
+          borderRadius: 50,
+          left: 10,
+          right: 10,
+          bottom: 15
+        },
+      })}
+    >
+      <Tab.Screen name="Principal" component={PrincipalStack}
+      options={({route})=>{
+        const routeName = getFocusedRouteNameFromRoute(route) ?? 'Principal';
+        if(routeName === 'Perfil' || routeName === 'Ajustes' || routeName === 'Notificaciones'){
+          return {tabBarStyle: {display: 'none'}}
+        }
+        return 
+
+      }} />
+      <Tab.Screen name="PagosProgramados" component={PagosProgramados} />
+      <Tab.Screen name="Presupuesto" component={Presupuesto} />
+      <Tab.Screen name="IngresosEgresos" component={IngresosEgresos} />
+      <Tab.Screen name="Ahorros" component={Ahorros} />
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
     </Tab.Navigator>
   );
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   
   return (
     <NavigationContainer>
+<<<<<<< HEAD
       {isLoggedIn ? (
         <TabsNavigator onLogout={() => setIsLoggedIn(false)} />
       ) : (
@@ -417,3 +493,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+=======
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="HomeTabs" component={AppTabs} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+>>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
