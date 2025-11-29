@@ -1,3 +1,4 @@
+import React from "react";
 import { NavigationContainer, getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -12,19 +13,20 @@ import Ahorros from './screens/Ahorros';
 import Perfil from './screens/Perfil';
 import Ajustes from './screens/Ajustes';
 import Notificaciones from './screens/Notificaciones';
-import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+
+import { IngresosProvider } from "./screens/IngresosContext";   // <-- AQUI SE AGREGA
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-
 function PrincipalStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: true }}>
-      <Stack.Screen name="Atras" component={Principal}
-      options={{
-        headerShown: false
-      }} />
+      <Stack.Screen 
+        name="Atras" 
+        component={Principal}
+        options={{ headerShown: false }} 
+      />
       <Stack.Screen name="Perfil" component={Perfil} />
       <Stack.Screen name="Ajustes" component={Ajustes} />
       <Stack.Screen name="Notificaciones" component={Notificaciones} />
@@ -35,7 +37,6 @@ function PrincipalStack() {
     </Stack.Navigator>
   );
 }
-
 
 function AppTabs() {
   return (
@@ -68,15 +69,21 @@ function AppTabs() {
         },
       })}
     >
-      <Tab.Screen name="Principal" component={PrincipalStack}
-      options={({route})=>{
-        const routeName = getFocusedRouteNameFromRoute(route) ?? 'Principal';
-        if(routeName === 'Perfil' || routeName === 'Ajustes' || routeName === 'Notificaciones'){
-          return {tabBarStyle: {display: 'none'}}
-        }
-        return 
-
-      }} />
+      <Tab.Screen 
+        name="Principal" 
+        component={PrincipalStack}
+        options={({ route }) => {
+          const routeName = getFocusedRouteNameFromRoute(route) ?? 'Principal';
+          if (
+            routeName === 'Perfil' || 
+            routeName === 'Ajustes' || 
+            routeName === 'Notificaciones'
+          ) {
+            return { tabBarStyle: { display: 'none' } };
+          }
+          return {};
+        }} 
+      />
       <Tab.Screen name="PagosProgramados" component={PagosProgramados} />
       <Tab.Screen name="Presupuesto" component={Presupuesto} />
       <Tab.Screen name="IngresosEgresos" component={IngresosEgresos} />
@@ -85,14 +92,15 @@ function AppTabs() {
   );
 }
 
-
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="HomeTabs" component={AppTabs} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <IngresosProvider>   {/* ENVUELVE TODA LA APP */}
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="HomeTabs" component={AppTabs} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </IngresosProvider>
   );
 }

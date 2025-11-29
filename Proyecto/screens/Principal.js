@@ -6,8 +6,14 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { format, parse } from "date-fns";
 
+// 🎯 AGREGADO: import del contexto
+import { useIngresos } from "../screens/IngresosContext";
+
 export default function Principal() {
   const navigation = useNavigation();
+
+  // 🎯 AGREGADO: acceso a la BD temporal
+  const { addIngreso } = useIngresos();
 
   // 1. NUEVO ESTADO: Saldo disponible 
   const [currentBalance, setCurrentBalance] = useState(1200.00);
@@ -31,7 +37,6 @@ export default function Principal() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  //  Función para formatear dólares (Mantiene la lógica visual)
   const formatMoney = (value) => {
     let num = Number(value);
     if (isNaN(num)) return "$0.00";
@@ -42,77 +47,79 @@ export default function Principal() {
     });
   };
 
-  // 📌 Función auxiliar para limpiar y obtener el valor numérico
   const parseMoney = (formattedValue) => {
-    // Elimina el símbolo de dólar, comas y convierte a número.
     const cleanValue = formattedValue.toString().replace(/[$,]/g, "");
     return Number(cleanValue);
   };
 
-  // 📌 Guardar o actualizar transacción
+  // ----------------------------------------------------
+  //     🔥 GUARDAR INGRESO (AQUÍ VA LO IMPORTANTE)
+  // ----------------------------------------------------
   const saveTransaction = () => {
     if (!amount || !category || !dateInput || !description)
       return alert("Llena todos los campos");
 
     let parsedDate;
-
     try {
       parsedDate = parse(dateInput, "yyyy-MM-dd", new Date());
     } catch (e) {
       return alert("Formato de fecha incorrecto. Usa yyyy-mm-dd");
     }
 
-    const numericAmount = parseMoney(amount); // Obtener el valor numérico
+    const numericAmount = parseMoney(amount);
+
+    if (numericAmount <= 0)
+      return alert("Solo se permiten ingresos (monto positivo)");
 
     const newTrans = {
-      // Guardamos el monto formateado para la lista, pero usamos el numérico para el cálculo
+      id: Date.now(),
       amount: formatMoney(numericAmount),
-      numericAmount, //  Guardamos el valor numérico para cálculos futuros
+      numericAmount,
       category,
       date: format(parsedDate, "dd/MM/yyyy"),
-      description
+      description,
+      type: "ingreso"
     };
 
     let newTransactions;
     let newBalance = currentBalance;
 
     if (editingIndex !== null) {
-      // Caso de EDICIÓN
       const oldTrans = transactions[editingIndex];
-      const oldAmount = oldTrans.numericAmount; // Monto anterior
+      const oldAmount = oldTrans.numericAmount;
 
-      // 1. Revertir el impacto de la transacción antigua: Sumar el monto antiguo
-      newBalance = newBalance - oldAmount;
-      // 2. Aplicar el impacto de la nueva transacción
-      newBalance = newBalance + numericAmount;
+      newBalance = newBalance - oldAmount + numericAmount;
 
       newTransactions = [...transactions];
       newTransactions[editingIndex] = newTrans;
 
       setEditingIndex(null);
     } else {
-      // Caso de NUEVA TRANSACCIÓN
+      // 🎯 SE AGREGA AL ESTADO LOCAL
       newTransactions = [...transactions, newTrans];
- 
-      newBalance = currentBalance + numericAmount;
+      newBalance += numericAmount;
+
+      // 🎯 SE AGREGA AL CONTEXTO (IngresosEgresos)
+      addIngreso(newTrans);
     }
 
     setTransactions(newTransactions);
-    setCurrentBalance(newBalance); //  ACTUALIZAR EL SALDO
+    setCurrentBalance(newBalance);
 
-    // Limpiar
+    // LIMPIAR
     setAmount("");
     setCategory("");
     setDateInput("");
     setDescription("");
-
     setModalVisible(false);
   };
 
-  //  Editar transacción
+  // ----------------------------------------------------
+  //               EDITAR INGRESO  
+  // ----------------------------------------------------
   const editTransaction = (index) => {
     const t = transactions[index];
-    // Al editar, cargamos el valor numérico (sin $, ni comas)
+
     setAmount(t.numericAmount.toString());
     setCategory(t.category);
     setDescription(t.description);
@@ -124,34 +131,33 @@ export default function Principal() {
     setModalVisible(true);
   };
 
-  //  Eliminar transacción
+  // ----------------------------------------------------
+  //               ELIMINAR INGRESO  
+  // ----------------------------------------------------
   const deleteTransaction = (index) => {
     const transToDelete = transactions[index];
     const amountToRestore = transToDelete.numericAmount;
 
-    // Al eliminar, devolvemos el monto al balance actual (porque se había restado al guardar)
     setCurrentBalance(currentBalance - amountToRestore);
 
     const filtered = transactions.filter((_, i) => i !== index);
     setTransactions(filtered);
   };
 
-  //  FILTROS COMPLETOS (sin cambios)
+  // ----------------------------------------------------
+  //                  FILTROS  
+  // ----------------------------------------------------
   const filteredTransactions = transactions.filter((t) => {
-    // CATEGORÍA
     const matchCategory = filterCategory
       ? t.category.toLowerCase().includes(filterCategory.toLowerCase())
       : true;
 
-    // DESCRIPCIÓN
     const matchDescription = filterDescription
       ? t.description.toLowerCase().includes(filterDescription.toLowerCase())
       : true;
 
-    // FECHA EXACTA dd/mm/yyyy
     const matchExactDate = filterDate ? t.date === filterDate : true;
 
-    // RANGO FECHAS yyyy-mm-dd
     let matchRange = true;
 
     const trDate = parse(t.date, "dd/MM/yyyy", new Date());
@@ -171,7 +177,7 @@ export default function Principal() {
 
   return (
     <View style={styles.container}>
-
+      
       {/* HEADER */}
       <View style={styles.header}>
         <View style={styles.leftIcons}>
@@ -204,13 +210,11 @@ export default function Principal() {
         {/* DINERO DISPONIBLE */}
         <Text style={styles.text}>Tu dinero disponible es:</Text>
         <View style={styles.balanceCard}>
-          {/* USAMOS EL SALDO DEL ESTADO currentBalance, FORMATÁNDOLO */}
           <Text style={styles.amount}>{formatMoney(currentBalance)}</Text>
         </View>
 
         {/* BOTÓN AGREGAR */}
         <TouchableOpacity style={styles.addButtonTop} onPress={() => {
-          // Limpiar el formulario al abrir el modal para una nueva transacción
           setAmount("");
           setCategory("");
           setDateInput("");
@@ -253,15 +257,13 @@ export default function Principal() {
             </View>
 
             <Text style={{
-              // Usamos el `amount` ya formateado, que contendrá el "-" si es un gasto
-              color: t.amount.includes("-") ? "#e63946" : "#2a9d8f",
+              color: "#2a9d8f",
               fontWeight: "700",
               fontSize: 16
             }}>
               {t.amount}
             </Text>
 
-            {/* BOTONES EDITAR / ELIMINAR */}
             <TouchableOpacity onPress={() => editTransaction(i)}>
               <Image source={require("../assets/editar.png")} style={{ width: 22, height: 22, marginLeft: 10 }} />
             </TouchableOpacity>
@@ -284,7 +286,7 @@ export default function Principal() {
             </Text>
 
             <TextInput
-              placeholder="Monto en pesos (ej: 1500 o -50.50)"
+              placeholder="Monto en pesos (ej: 1500)"
               style={styles.modalInput}
               value={amount}
               onChangeText={setAmount}
@@ -312,14 +314,12 @@ export default function Principal() {
               onChangeText={setDescription}
             />
 
-            {/* Guardar */}
             <TouchableOpacity style={styles.saveButton} onPress={saveTransaction}>
               <Text style={styles.saveText}>
                 {editingIndex !== null ? "Actualizar" : "Guardar"}
               </Text>
             </TouchableOpacity>
 
-            {/* Cerrar */}
             <TouchableOpacity style={styles.closeModal} onPress={() => {
               setEditingIndex(null);
               setModalVisible(false);
@@ -335,6 +335,8 @@ export default function Principal() {
   );
 }
 
+
+// ---------------- ESTILOS (NO CAMBIADOS) ----------------
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
