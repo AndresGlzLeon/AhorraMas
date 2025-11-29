@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, Alert, Image, Modal, TouchableOpacity, Pressable } from "react-native";
+import {View,Text,TextInput,StyleSheet,Alert,Image, Modal, TouchableOpacity, Pressable} from "react-native";
 
-export default function Login({ navigation }) {
+export default function Login({ navigation, onLogin }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,11 +14,15 @@ export default function Login({ navigation }) {
       return;
     }
 
+    
+    Alert.alert("Éxito", `Bienvenido ${name}`);
     setName("");
     setEmail("");
     setPassword("");
-
-    navigation.replace("HomeTabs");
+    
+    if (onLogin) {
+      onLogin();
+    }
   };
 
   const handleSendReset = () => {
@@ -41,9 +45,9 @@ export default function Login({ navigation }) {
       <Text style={styles.header}>Bienvenid@ a</Text>
       <Text style={styles.header}>Ahorra+ App</Text>
       <Text style={styles.subheader}>INICIA SESIÓN ...</Text>
-
+      
       <Image source={require("../assets/logo.png")} style={styles.image} />
-
+      
       <TextInput
         value={name}
         onChangeText={setName}
@@ -51,6 +55,7 @@ export default function Login({ navigation }) {
         style={styles.input}
         placeholderTextColor="#999"
       />
+      
       <TextInput
         value={email}
         onChangeText={setEmail}
@@ -60,6 +65,7 @@ export default function Login({ navigation }) {
         style={styles.input}
         placeholderTextColor="#999"
       />
+      
       <TextInput
         value={password}
         onChangeText={setPassword}
@@ -68,17 +74,18 @@ export default function Login({ navigation }) {
         style={styles.input}
         placeholderTextColor="#999"
       />
-
+      
       <TouchableOpacity onPress={() => setModalVisible(true)}>
         <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
       </TouchableOpacity>
-
+      
       <Pressable style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Iniciar Sesión</Text>
       </Pressable>
-
-      <Text style={styles.footer}>¿No tienes una cuenta aún? Crea una cuenta</Text>
-      <Text style={styles.footer}>Volver</Text>
+      
+      <Pressable style={styles.footer} onPress={() => navigation.navigate('CrearCuenta')}>
+        <Text style={styles.footer}> ¿No tienes una cuenta aún?, Crear Cuenta</Text>
+      </Pressable>
 
       <Modal
         visible={modalVisible}
@@ -89,9 +96,8 @@ export default function Login({ navigation }) {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Recuperar contraseña</Text>
-            <Text style={{ color: "#555", marginBottom: 8 }}>
-              Ingresa tu correo para recibir el enlace
-            </Text>
+            <Text style={{color: "#555", marginBottom: 8}}>Ingresa tu correo para recibir el enlace</Text>
+            
             <TextInput
               value={resetEmail}
               onChangeText={setResetEmail}
@@ -101,18 +107,13 @@ export default function Login({ navigation }) {
               style={styles.modalInput}
               placeholderTextColor="#999"
             />
+            
             <View style={styles.modalButtons}>
-              <Pressable
-                style={[styles.modalButton, { backgroundColor: "#7f6aff" }]}
-                onPress={handleSendReset}
-              >
-                <Text style={{ color: "#fff", fontWeight: "600" }}>Enviar</Text>
+              <Pressable style={[styles.modalButton, {backgroundColor: "#7f6aff"}]} onPress={handleSendReset}>
+                <Text style={{color: "#fff", fontWeight: "600"}}>Enviar</Text>
               </Pressable>
-              <Pressable
-                style={[styles.modalButton, { backgroundColor: "#ddd" }]}
-                onPress={handleCancelReset}
-              >
-                <Text style={{ color: "#333", fontWeight: "600" }}>Cancelar</Text>
+              <Pressable style={[styles.modalButton, {backgroundColor: "#ddd"}]} onPress={handleCancelReset}>
+                <Text style={{color: "#333", fontWeight: "600"}}>Cancelar</Text>
               </Pressable>
             </View>
           </View>
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   buttonText: {
-    color: "#000000ff",
+    color: "#fff",
     fontWeight: "600",
   },
   footer: {
