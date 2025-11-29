@@ -10,24 +10,15 @@ import {
   TextInput, 
   TouchableOpacity,
   Alert,
-<<<<<<< HEAD
-  Pressable
-=======
   Dimensions
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
-<<<<<<< HEAD
-export default function Presupuesto({ navigation }) {
-  // Estados para el presupuesto y gastos
-=======
 export default function Presupuesto() {
   const navigation = useNavigation();
 
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   const [presupuesto, setPresupuesto] = useState(10555);
   const [gastos, setGastos] = useState([]);
 
@@ -168,34 +159,18 @@ export default function Presupuesto() {
 
       <View style={styles.header}>
         <View style={styles.leftIcons}>
-<<<<<<< HEAD
-          <Pressable onPress={() => navigation.navigate('Ajustes')}>
-            <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate('Notificaciones')}>
-            <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-          </Pressable>
-=======
           <TouchableOpacity onPress={() => navigation.navigate("Principal", { screen: "Ajustes" })}>
           <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate("Principal", { screen: "Notificaciones" })}>
           <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
           </TouchableOpacity>
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
         </View>
+
         <Text style={styles.title}>Ahorra+ App</Text>
-<<<<<<< HEAD
-        <View style={styles.avatar}>
-          <Pressable onPress={() => navigation.navigate('Perfil')}>
-            <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-          </Pressable>
-        </View>
-=======
         <TouchableOpacity style={styles.avatar} onPress={() => navigation.navigate("Principal", { screen: "Perfil" })}>
         <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
           </TouchableOpacity>
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
       </View>
 
       {/* SCROLL RESPONSIVO */}
@@ -486,4 +461,3 @@ const styles = StyleSheet.create({
   },
 
 });
-

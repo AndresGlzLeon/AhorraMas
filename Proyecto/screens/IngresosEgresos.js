@@ -1,9 +1,5 @@
-import React from "react";
-<<<<<<< HEAD
-import { View, Text, ScrollView, StyleSheet, Image, Pressable } from "react-native";
 
-export default function IngresosEgresos({ navigation }) {
-=======
+import React from "react";
 import { View, Text, ScrollView, StyleSheet, Image,TouchableOpacity } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
@@ -15,58 +11,35 @@ const screenWidth = Dimensions.get("window").width;
 
 export default function IngresosEgresos() {
   const navigation = useNavigation();
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   return (
     <View style={styles.container}>
-      {/* Header con navegación */}
+
       <View style={styles.header}>
         <View style={styles.leftIcons}>
-<<<<<<< HEAD
-          <Pressable onPress={() => navigation.navigate('Ajustes')}>
-            <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate('Notificaciones')}>
-            <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-          </Pressable>
-=======
           <TouchableOpacity onPress={() => navigation.navigate("Principal", { screen: "Ajustes" })}>
           <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate("Principal", { screen: "Notificaciones" })}>
           <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
           </TouchableOpacity>
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
         </View>
+
         <Text style={styles.title}>Ahorra+ App</Text>
-<<<<<<< HEAD
-        <View style={styles.avatar}>
-          <Pressable onPress={() => navigation.navigate('Perfil')}>
-            <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-          </Pressable>
-        </View>
-=======
         <TouchableOpacity style={styles.avatar} onPress={() => navigation.navigate("Principal", { screen: "Perfil" })}>
         <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
           </TouchableOpacity>
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        
         <View style={styles.headerSection}>
           <View>
             <Text style={styles.welcome}>Ingresos &{"\n"}Egresos</Text>
           </View>
+
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
         </View>
 
-<<<<<<< HEAD
-        <View style={styles.graphContainer}>
-          <Image
-            source={require("../assets/grafica.png")}
-            style={styles.graphImage}
-          />
-        </View>
-=======
 
         <View style={styles.carouselContainer}>
           <ScrollView 
@@ -124,13 +97,13 @@ export default function IngresosEgresos() {
     </View>
   </ScrollView>
 </View>
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
 
         <View style={styles.infoCard}>
-          <Image
-            source={require("../assets/sueldo.png")}
+          <Image 
+            source={require("../assets/sueldo.png")} 
             style={styles.smallIcon}
           />
+
           <View style={{ marginLeft: 15 }}>
             <Text style={styles.infoTitle}>Ingresos</Text>
             <Text style={styles.infoAmount}>+$1000.0</Text>
@@ -138,10 +111,11 @@ export default function IngresosEgresos() {
         </View>
 
         <View style={styles.infoCard}>
-          <Image
-            source={require("../assets/sueldo.png")}
+          <Image 
+            source={require("../assets/sueldo.png")} 
             style={styles.smallIcon}
           />
+
           <View style={{ marginLeft: 15 }}>
             <Text style={styles.infoTitle}>Ingresos</Text>
             <Text style={styles.infoAmount}>+$300.0</Text>
@@ -149,26 +123,32 @@ export default function IngresosEgresos() {
         </View>
 
         <View style={styles.infoCard}>
-          <Image
-            source={require("../assets/sueldoBajo.png")}
+          <Image 
+            source={require("../assets/sueldoBajo.png")} 
             style={styles.smallIcon}
           />
+
           <View style={{ marginLeft: 15 }}>
             <Text style={styles.infoTitle}>Egresos</Text>
             <Text style={[styles.infoAmount, { color: "red" }]}>-$230.0</Text>
           </View>
+
         </View>
+
+
+
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  container: { 
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
   },
+
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -179,32 +159,39 @@ const styles = StyleSheet.create({
     width: "95%",
     marginTop: 50,
   },
+
   leftIcons: { flexDirection: "row", alignItems: "center" },
+
   iconHeader: {
     width: 33,
     height: 22,
     resizeMode: "contain",
   },
+
   title: {
     fontSize: 18,
     fontWeight: "600",
     color: "#333",
   },
+
   avatar: {
     backgroundColor: "#b3a5ff",
     borderRadius: 50,
     padding: 8,
   },
+
   avatarIcon: {
     width: 20,
     height: 20,
     tintColor: "#fff",
     resizeMode: "contain",
   },
+
   scrollContent: {
     padding: 20,
     paddingBottom: 120,
   },
+
   headerSection: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -212,6 +199,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: "100%",
   },
+
   welcome: {
     fontSize: 26,
     paddingRight: 100,
@@ -220,12 +208,14 @@ const styles = StyleSheet.create({
     marginLeft: -10,
     marginTop: -25
   },
+
   pigImage: {
     width: 80,
     height: 80,
     resizeMode: "contain",
     marginRight: -10,
   },
+
   graphContainer: {
     width: "100%",
     backgroundColor: "#f7f2ff",
@@ -234,35 +224,82 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     alignItems: "center",
   },
+
   graphImage: {
     width: "90%",
     height: 180,
     resizeMode: "contain",
   },
+
   infoCard: {
     backgroundColor: "#f7f2ff",
     padding: 15,
     borderRadius: 20,
     marginBottom: 15,
     width: "100%",
-    flexDirection: "row",
+    flexDirection: "row", 
     alignItems: "center",
     marginTop: 10,
   },
+
   smallIcon: {
     width: 40,
     height: 40,
     resizeMode: "contain",
   },
+
+
   infoTitle: {
     fontSize: 20,
     fontWeight: "600",
     color: "#6a5acd",
   },
+
   infoAmount: {
     fontSize: 22,
     fontWeight: "700",
     color: "green",
     marginTop: 5,
+  },
+
+  bottomNav: {
+    position: "absolute",
+    bottom: 10,
+    width: "95%",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    backgroundColor: "#eae2ff",
+    paddingVertical: 12,
+    borderRadius: 30,
+  },
+
+  iconCircle: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#A084E8",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  navIcon: {
+    width: 26,
+    height: 26,
+    resizeMode: "contain",
+  },
+
+  centerButton: {
+    backgroundColor: "#7f6aff",
+    padding: 15,
+    borderRadius: 40,
+    marginBottom: 25,
+  },
+
+  centerIcon: {
+    width: 30,
+    height: 30,
+    resizeMode: "contain",
+    tintColor: "#fff",
   },
 });

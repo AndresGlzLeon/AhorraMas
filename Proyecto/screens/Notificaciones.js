@@ -39,9 +39,6 @@ export default function Notificaciones({ navigate }) {
   return (
     <View style={styles.container}>
 
-<<<<<<< HEAD
-      
-=======
       {/* <View style={styles.header}>
         <View style={styles.leftIcons}>
             <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
@@ -55,7 +52,6 @@ export default function Notificaciones({ navigate }) {
         </View>
       </View> */}
 
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerSection}>
           <View>

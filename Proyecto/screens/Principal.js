@@ -20,38 +20,12 @@ export default function Principal() {
             />
           </TouchableOpacity>
 
-<<<<<<< HEAD
-
-export default function Principal({navigation}) {
-
-    return (
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <View style={styles.leftIcons}>
-            <Pressable onPress={() => navigation.navigate('Ajustes')}> 
-               <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-            </Pressable>
-            <Pressable onPress={() => navigation.navigate('Notificaciones')}> 
-               <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]}  />
-            </Pressable>
-             
-          </View>
-
-          <Text style={styles.title}>Ahorra+ App</Text>
-
-          <View style={styles.avatar}>
-            <Pressable onPress={() => navigation.navigate('Perfil')}> 
-               <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-            </Pressable>
-          </View>
-=======
           <TouchableOpacity onPress={() => navigation.navigate("Notificaciones")}>
             <Image 
               source={require("../assets/notificaciones.png")} 
               style={[styles.iconHeader, { marginLeft: 10 }]} 
             />
           </TouchableOpacity>
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
         </View>
 
         <Text style={styles.title}>Ahorra+ App</Text>

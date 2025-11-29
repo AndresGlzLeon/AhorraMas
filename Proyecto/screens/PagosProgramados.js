@@ -1,12 +1,6 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, StyleSheet, Image, TextInput, TouchableOpacity, Modal, Alert, Pressable } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Image, TextInput, TouchableOpacity, Modal, Alert } from "react-native";
 import { Dimensions } from "react-native";
-<<<<<<< HEAD
-
-const { width } = Dimensions.get("window");
-
-export default function PagosProgramados({ navigation }) {
-=======
 import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
@@ -14,7 +8,6 @@ const { width } = Dimensions.get("window");
 export default function PagosProgramados() {
   const navigation = useNavigation();
 
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   const [pagos, setPagos] = useState([
     { titulo: "Alquiler", monto: 1500, fecha: "10 octubre 2025", tipo: "Mensual", icon: require("../assets/alquiler.png") },
     { titulo: "Seguro Auto", monto: 750, fecha: "4 enero 2026", tipo: "Anual", icon: require("../assets/auto.png") },
@@ -23,6 +16,7 @@ export default function PagosProgramados() {
 
   const [modalAdd, setModalAdd] = useState(false);
   const [modalEdit, setModalEdit] = useState(false);
+
   const [nuevoPago, setNuevoPago] = useState({ titulo: "", monto: "", fecha: "", tipo: "Mensual" });
   const [editPagoIndex, setEditPagoIndex] = useState(null);
 
@@ -31,6 +25,7 @@ export default function PagosProgramados() {
       Alert.alert("Error", "Todos los campos son obligatorios");
       return;
     }
+
     setPagos(prev => [
       ...prev,
       {
@@ -39,6 +34,7 @@ export default function PagosProgramados() {
         icon: require("../assets/servicios.png")
       }
     ]);
+
     setNuevoPago({ titulo: "", monto: "", fecha: "", tipo: "Mensual" });
     setModalAdd(false);
   };
@@ -66,11 +62,13 @@ export default function PagosProgramados() {
       };
       return copy;
     });
+
     setEditPagoIndex(null);
     setModalEdit(false);
   };
 
   const eliminarPagoDirecto = (index) => {
+    console.log("Eliminar directo index:", index);
     setPagos(prev => prev.filter((_, i) => i !== index));
   };
 
@@ -87,39 +85,38 @@ export default function PagosProgramados() {
 
   return (
     <View style={styles.container}>
-<<<<<<< HEAD
-      {/* Modal para agregar pago */}
-=======
 
       {/* MODAL AGREGAR */}
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
       <Modal visible={modalAdd} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalBox}>
             <Text style={styles.modalTitle}>Agregar Pago</Text>
-            <TextInput
-              style={styles.input}
+
+            <TextInput 
+              style={styles.input} 
               placeholder="Título"
               value={nuevoPago.titulo}
               onChangeText={(t) => setNuevoPago({ ...nuevoPago, titulo: t })}
             />
-            <TextInput
-              style={styles.input}
+            <TextInput 
+              style={styles.input} 
               placeholder="Monto"
               keyboardType="numeric"
               value={nuevoPago.monto}
               onChangeText={(t) => setNuevoPago({ ...nuevoPago, monto: t })}
             />
-            <TextInput
-              style={styles.input}
+            <TextInput 
+              style={styles.input} 
               placeholder="Fecha"
               value={nuevoPago.fecha}
               onChangeText={(t) => setNuevoPago({ ...nuevoPago, fecha: t })}
             />
+
             <View style={styles.modalButtons}>
               <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalAdd(false)}>
                 <Text style={styles.btnText}>Cancelar</Text>
               </TouchableOpacity>
+
               <TouchableOpacity style={styles.saveBtn} onPress={agregarPago}>
                 <Text style={styles.btnText}>Guardar</Text>
               </TouchableOpacity>
@@ -128,38 +125,37 @@ export default function PagosProgramados() {
         </View>
       </Modal>
 
-<<<<<<< HEAD
-      {/* Modal para editar pago */}
-=======
       {/* MODAL EDITAR */}
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
       <Modal visible={modalEdit} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalBox}>
             <Text style={styles.modalTitle}>Editar Pago</Text>
-            <TextInput
-              style={styles.input}
+
+            <TextInput 
+              style={styles.input} 
               placeholder="Título"
               value={nuevoPago.titulo}
               onChangeText={(t) => setNuevoPago({ ...nuevoPago, titulo: t })}
             />
-            <TextInput
-              style={styles.input}
+            <TextInput 
+              style={styles.input} 
               placeholder="Monto"
               keyboardType="numeric"
               value={nuevoPago.monto}
               onChangeText={(t) => setNuevoPago({ ...nuevoPago, monto: t })}
             />
-            <TextInput
-              style={styles.input}
+            <TextInput 
+              style={styles.input} 
               placeholder="Fecha"
               value={nuevoPago.fecha}
               onChangeText={(t) => setNuevoPago({ ...nuevoPago, fecha: t })}
             />
+
             <View style={styles.modalButtons}>
               <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalEdit(false)}>
                 <Text style={styles.btnText}>Cancelar</Text>
               </TouchableOpacity>
+
               <TouchableOpacity style={styles.saveBtn} onPress={guardarEdicion}>
                 <Text style={styles.btnText}>Guardar</Text>
               </TouchableOpacity>
@@ -168,37 +164,17 @@ export default function PagosProgramados() {
         </View>
       </Modal>
 
-      {/* Header con navegación */}
       <View style={styles.header}>
         <View style={styles.leftIcons}>
-<<<<<<< HEAD
-          <Pressable onPress={() => navigation.navigate('Ajustes')}>
-            <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate('Notificaciones')}>
-            <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-          </Pressable>
-=======
           <TouchableOpacity onPress={() => navigation.navigate("Principal", { screen: "Ajustes" })}>
           <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate("Principal", { screen: "Notificaciones" })}>
           <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
           </TouchableOpacity>
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
         </View>
 
         <Text style={styles.title}>Ahorra+ App</Text>
-<<<<<<< HEAD
-        <View style={styles.avatar}>
-          <Pressable onPress={() => navigation.navigate('Perfil')}>
-            <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-          </Pressable>
-        </View>
-      </View>
-
-      <ScrollView>
-=======
         <TouchableOpacity style={styles.avatar} onPress={() => navigation.navigate("Principal", { screen: "Perfil" })}>
         <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
           </TouchableOpacity>
@@ -208,7 +184,6 @@ export default function PagosProgramados() {
       {/* SCROLLVIEW ADAPTATIVO */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
         <View style={styles.headerSection}>
           <Text style={styles.mainTitle}>Gastos{"\n"}Programados</Text>
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
@@ -224,9 +199,11 @@ export default function PagosProgramados() {
                   <Text style={styles.cardSub}>{pago.tipo}</Text>
                 </View>
               </View>
+
               <View style={{ alignItems: "flex-end" }}>
                 <Text style={styles.cardAmount}>-${pago.monto}.00</Text>
                 <Text style={styles.cardDate}>{pago.fecha}</Text>
+
                 <View style={{ flexDirection: "row", marginTop: 5 }}>
                   <TouchableOpacity
                     onPress={() => abrirEditar(index)}
@@ -236,6 +213,7 @@ export default function PagosProgramados() {
                   >
                     <Image source={require("../assets/edit.png")} style={styles.navIcon} />
                   </TouchableOpacity>
+
                   <TouchableOpacity
                     onPress={() => confirmarEliminar(index)}
                     hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
@@ -244,6 +222,7 @@ export default function PagosProgramados() {
                   >
                     <Image source={require("../assets/elim.png")} style={styles.navIcon} />
                   </TouchableOpacity>
+
                 </View>
               </View>
             </View>
@@ -254,19 +233,14 @@ export default function PagosProgramados() {
           <Image source={require("../assets/Programados.png")} style={styles.addIcon} />
           <Text style={styles.addText}>Añadir Pago</Text>
         </TouchableOpacity>
-      </ScrollView>
-<<<<<<< HEAD
-=======
 
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
+      </ScrollView>
+
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-<<<<<<< HEAD
-  container: { flex: 1, backgroundColor: "#fff", alignItems: "center" },
-=======
 
   container: { 
     flex: 1,
@@ -280,7 +254,6 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
 
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -298,23 +271,17 @@ const styles = StyleSheet.create({
   title: { fontSize: 18, fontWeight: "600", color: "#333" },
   avatar: { backgroundColor: "#b3a5ff", borderRadius: 50, padding: 8 },
   avatarIcon: { width: 20, height: 20, tintColor: "#fff", resizeMode: "contain" },
-<<<<<<< HEAD
-  headerSection: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 30, padding: 20 },
-  mainTitle: { fontSize: 26, fontWeight: "700", lineHeight: 30, marginTop: 15, color: "#7b6cff" },
-  pigImage: { width: 80, height: 80, resizeMode: "contain", marginTop: 20 },
-=======
 
   headerSection: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 30 },
   mainTitle: { fontSize: 26, fontWeight: "700", lineHeight: 30, marginTop:15, color: "#7b6cff" },
   pigImage: { width: 80, height: 80, resizeMode: "contain", marginTop:20 },
 
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   cardContainer: {
     backgroundColor: "#f4f1ff",
     padding: 10,
     borderRadius: 30,
     marginBottom: 30,
-    marginHorizontal: 20,
+    marginTop: -5,
   },
 
   card: {
@@ -328,15 +295,12 @@ const styles = StyleSheet.create({
   },
 
   cardLeft: { flexDirection: "row", alignItems: "center" },
-<<<<<<< HEAD
-  cardIcon: { width: 50, height: 50, marginRight: 40, marginBottom: 15, tintColor: "#7b6cff" },
-=======
   cardIcon: { width: 50, height: 50, marginRight: 40, tintColor: "#7b6cff" },
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   cardTitle: { fontSize: 18, fontWeight: "600", color: "#000" },
   cardSub: { fontSize: 13, color: "#777" },
   cardAmount: { fontSize: 16, fontWeight: "700", color: "#000" },
   cardDate: { fontSize: 12, color: "#777" },
+
   addButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -344,41 +308,27 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     padding: 15,
     justifyContent: "center",
-    marginHorizontal: 20,
-    marginBottom: 20,
   },
-<<<<<<< HEAD
-  addIcon: { width: 25, height: 25, marginRight: 10, tintColor: "#7b6cff" },
-  addText: { fontSize: 16, color: "#000", fontWeight: "500" },
-  navIcon: { width: 26, height: 26, resizeMode: "contain" },
-=======
 
   addIcon: { width: 25, height: 25, marginRight: 10, tintColor: "#7b6cff" },
   addText: { fontSize: 16, color: "#000", fontWeight: "500" },
 
   navIcon: { width: 26, height: 26, resizeMode: "contain" },
 
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
   },
-<<<<<<< HEAD
-=======
 
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   modalBox: {
     backgroundColor: "#fff",
     padding: 20,
     borderRadius: 20,
     width: "85%",
   },
-<<<<<<< HEAD
-=======
 
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
@@ -386,18 +336,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 15,
   },
-<<<<<<< HEAD
-=======
 
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   modalButtons: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
-<<<<<<< HEAD
-=======
 
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   cancelBtn: {
     backgroundColor: "#ff6b6b",
     padding: 12,
@@ -405,10 +349,7 @@ const styles = StyleSheet.create({
     width: "45%",
     alignItems: "center",
   },
-<<<<<<< HEAD
-=======
 
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   saveBtn: {
     backgroundColor: "#7b6cff",
     padding: 12,
@@ -416,13 +357,9 @@ const styles = StyleSheet.create({
     width: "45%",
     alignItems: "center",
   },
-<<<<<<< HEAD
-  btnText: { color: "#fff", fontWeight: "bold" },
-=======
 
   btnText: { color: "#fff", fontWeight: "bold" },
 
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
   input: {
     backgroundColor: "#fff",
     padding: 10,
@@ -431,9 +368,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ddd",
   },
-<<<<<<< HEAD
-});
-=======
 
 });
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf

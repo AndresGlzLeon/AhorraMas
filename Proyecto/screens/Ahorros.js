@@ -9,16 +9,12 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
-  Alert,Pressable
+  Alert 
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-<<<<<<< HEAD
-export default function Ahorros({ navigation }) {
-=======
 export default function Ahorros() {
   const navigation = useNavigation();
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
 
   const [metas, setMetas] = useState([
     { 
@@ -230,27 +226,6 @@ export default function Ahorros() {
       </Modal>
 
       {/* Header */}
-<<<<<<< HEAD
-        <View style={styles.header}>
-          <View style={styles.leftIcons}>
-            <Pressable onPress={() => navigation.navigate('Ajustes')}> 
-               <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-            </Pressable>
-            <Pressable onPress={() => navigation.navigate('Notificaciones')}> 
-               <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]}  />
-            </Pressable>
-             
-          </View>
-
-          <Text style={styles.title}>Ahorra+ App</Text>
-
-          <View style={styles.avatar}>
-            <Pressable onPress={() => navigation.navigate('Perfil')}> 
-               <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-            </Pressable>
-          </View>
-        </View>
-=======
       <View style={styles.header}>
         <View style={styles.leftIcons}>
           <TouchableOpacity onPress={() => navigation.navigate("Principal", { screen: "Ajustes" })}>
@@ -267,7 +242,6 @@ export default function Ahorros() {
           </TouchableOpacity>
       </View>
 
->>>>>>> 3a60466ad5538551a1ba5504d5979bc0f86672cf
       <ScrollView contentContainerStyle={styles.scrollContent}>
 
         <View style={styles.headerSection}>
