@@ -1,8 +1,11 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
-export default function Notificaciones({ navigate }) {
+export default function Notificaciones() {
+  const navigation = useNavigation();
 
+  // Datos simulados (Se mantienen igual)
   const notificaciones = [
     {
       id: 1,
@@ -27,87 +30,177 @@ export default function Notificaciones({ navigate }) {
       mensaje: "Has gastado más en transporte esta semana",
       color: "#d62828"
     },
-    
   ];
 
   return (
     <View style={styles.container}>
-
       
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        
+        {/* TITULO E IMAGEN */}
         <View style={styles.headerSection}>
-          <View>
+          <View style={styles.titleContainer}>
             <Text style={styles.mainTitle}>Notificaciones</Text>
-            <Text style={styles.subtitle}>Alertas de tu actividad</Text>
+            <Text style={styles.subtitle}>Actividad reciente</Text>
           </View>
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
         </View>
 
+        {/* LISTA DE NOTIFICACIONES */}
         {notificaciones.map((n) => (
           <View key={n.id} style={styles.card}>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Image source={n.icon} style={styles.cardIcon} />
+            <View style={styles.cardHeader}>
+              <View style={styles.iconContainer}>
+                 <Image source={n.icon} style={styles.cardIcon} />
+              </View>
               <Text style={styles.category}>{n.categoria}</Text>
             </View>
+            
             <Text style={styles.message}>{n.mensaje}</Text>
-            {n.cantidad && <Text style={[styles.amount, { color: n.color }]}>{n.cantidad}</Text>}
+            
+            {n.cantidad && (
+              <Text style={[styles.amount, { color: n.color }]}>
+                {n.cantidad}
+              </Text>
+            )}
           </View>
         ))}
-      </ScrollView>
 
-        <Text style={styles.exitText}>Salir</Text>
+        {notificaciones.length === 0 && (
+          <Text style={styles.emptyText}>No tienes notificaciones nuevas.</Text>
+        )}
+
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", alignItems: "center" },
+  // =========================
+  // 🟢 LAYOUT
+  // =========================
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  scrollContent: {
+    padding: 20,
+    paddingBottom: 50,
+  },
 
+  // =========================
+  // 🟣 HEADER NAVEGACIÓN
+  // =========================
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 40,
-    backgroundColor: "#f4f1ff",
-    borderRadius: 40,
-    width: "95%",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
     marginTop: 50,
   },
-  leftIcons: { flexDirection: "row", alignItems: "center" },
-  iconHeader: { width: 33, height: 22, resizeMode: "contain" },
-  title: { fontSize: 18, fontWeight: "600", color: "#333" },
-  avatar: { backgroundColor: "#b3a5ff", borderRadius: 50, padding: 8 },
-  avatarIcon: { width: 20, height: 20, tintColor: "#fff", resizeMode: "contain" },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  backArrow: {
+    fontSize: 28,
+    color: "#7b6cff",
+    fontWeight: "300",
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#333",
+  },
 
-  scrollContent: { padding: 20, paddingBottom: 120 },
-  headerSection: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20, width: "100%" },
-  mainTitle: { fontSize: 26, fontWeight: "700", lineHeight: 30,marginTop:60, color: "#7b6cff" },
-  subtitle: { fontSize: 16, marginTop:50, color: "#000" },
-  pigImage: { width: 80, height: 80, resizeMode: "contain" },
+  // =========================
+  // 🖼️ SECCIÓN SUPERIOR
+  // =========================
+  headerSection: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 30,
+    marginTop: 10,
+  },
+  titleContainer: {
+    flex: 1,
+  },
+  mainTitle: {
+    fontSize: 28,
+    fontWeight: "800",
+    color: "#7b6cff",
+    marginBottom: 5,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#666",
+  },
+  pigImage: {
+    width: 80,
+    height: 80,
+    resizeMode: "contain",
+  },
 
+  // =========================
+  // 🔔 TARJETAS (CARDS)
+  // =========================
   card: {
     backgroundColor: "#fff",
-    padding: 18,
-    borderRadius: 18,
-    marginBottom: 18,
-    width: "95%",
-    elevation: 6,
-    shadowColor: "#b6aaff",
-    shadowOpacity: 0.25,
-    shadowOffset: { width: 0, height: 3 },
+    padding: 20,
+    borderRadius: 20,
+    marginBottom: 15,
+    width: "100%",
+    // Sombras consistentes
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: "#f0f0f0",
   },
-  cardIcon: { width: 30, height: 30, marginRight: 8 },
-  category: { fontSize: 14, fontWeight: "700", color: "#7b6cff" },
-  message: { marginTop: 6, fontSize: 15, fontWeight: "600", color: "#333" },
-  amount: { marginTop: 5, fontSize: 16, fontWeight: "700" },
-
-  exitButton: {
-    width: "60%",
-    backgroundColor: "#7f6aff",
-    paddingVertical: 12,
-    borderRadius: 30,
+  cardHeader: {
+    flexDirection: "row",
     alignItems: "center",
-    marginBottom: 15
+    marginBottom: 10,
   },
-  exitText: { fontSize: 17, color: "#fff", fontWeight: "700" }
+  iconContainer: {
+    backgroundColor: "#f4f1ff",
+    padding: 8,
+    borderRadius: 12,
+    marginRight: 10,
+  },
+  cardIcon: {
+    width: 24,
+    height: 24,
+    resizeMode: "contain",
+  },
+  category: {
+    fontSize: 12,
+    fontWeight: "800",
+    color: "#7b6cff",
+    letterSpacing: 0.5,
+  },
+  message: {
+    fontSize: 15,
+    fontWeight: "500",
+    color: "#333",
+    lineHeight: 22,
+    marginBottom: 8,
+  },
+  amount: {
+    fontSize: 16,
+    fontWeight: "800",
+    alignSelf: 'flex-end', // Alineado a la derecha para destacar
+  },
+  emptyText: {
+    textAlign: "center",
+    color: "#aaa",
+    marginTop: 50,
+    fontSize: 16,
+  },
 });

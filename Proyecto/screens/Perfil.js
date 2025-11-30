@@ -1,303 +1,203 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, StyleSheet, Image, TextInput, TouchableOpacity,Alert } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Image, TextInput, TouchableOpacity, Alert } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Perfil() {
+  const navigation = useNavigation();
+  const [data, setData] = useState({ nombre: "Valeria Morales", correo: "valeria@gmail.com", telefono: "555-789-0123" });
+  const [editando, setEditando] = useState({ nombre: false, correo: false, telefono: false });
 
-  const [nombre, setNombre] = useState("Valeria Morales González");
-  const [correo, setCorreo] = useState("vmoralesg@gmail.com");
-  const [telefono, setTelefono] = useState("555-789-0123");
+  const toggleEdit = (campo) => setEditando({ ...editando, [campo]: !editando[campo] });
+  const handleChange = (campo, valor) => setData({ ...data, [campo]: valor });
 
-  const [editNombre, setEditNombre] = useState(false);
-  const [editCorreo, setEditCorreo] = useState(false);
-  const [editTelefono, setEditTelefono] = useState(false);
-
-  const guardarCambios = () => {
-    Alert.alert("Cambios guardados", "Tu información ha sido actualizada.");
-    alert("Cambios guardados correctamente");
-  };
+  const guardar = () => Alert.alert("Éxito", "Perfil actualizado correctamente");
 
   return (
     <View style={styles.container}>
-
-      {/* <View style={styles.header}>
-        <View style={styles.leftIcons}>
-          <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-
-          <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-        </View>
-
-        <Text style={styles.title}>Ahorra+ App</Text>
-
-        <View style={styles.avatar}>
-          <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-        </View>
-      </View> */}
-
       <ScrollView contentContainerStyle={styles.scrollContent}>
-
-        <Text style={styles.perfilTitle}>TU PERFIL</Text>
-
-        <View style={styles.avatarSection}>
-          <Image 
-            source={require("../assets/usuarios.png")}
-            style={styles.bigAvatar}
-          />
-          <TouchableOpacity style={styles.uploadButton}>
-            <Text style={styles.uploadText}>Subir foto</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.inputCard}>
-          <Text style={styles.label}>NOMBRE</Text>
-
-          <View style={styles.row}>
-            <TextInput
-              style={[styles.input, !editNombre && { color: "#444" }]}
-              value={nombre}
-              onChangeText={setNombre}
-              editable={editNombre}
-            />
-
-            <TouchableOpacity 
-              style={styles.editButton}
-              onPress={() => setEditNombre(!editNombre)}
-            >
-              <Text style={styles.editText}>Editar</Text>
+        
+        {/* AVATAR SECTION */}
+        <View style={styles.avatarContainer}>
+          <View style={styles.avatarWrapper}>
+            <Image source={require("../assets/usuarios.png")} style={styles.avatarImage} />
+            <TouchableOpacity style={styles.cameraButton}>
+               <Text style={styles.cameraIcon}>📷</Text>
             </TouchableOpacity>
           </View>
+          <Text style={styles.userName}>{data.nombre}</Text>
+          <Text style={styles.userEmail}>{data.correo}</Text>
         </View>
 
-        <View style={styles.inputCard}>
-          <Text style={styles.label}>CORREO</Text>
-
-          <View style={styles.row}>
-            <TextInput
-              style={[styles.input, !editCorreo && { color: "#444" }]}
-              value={correo}
-              onChangeText={setCorreo}
-              editable={editCorreo}
-            />
-
-            <TouchableOpacity 
-              style={styles.editButton}
-              onPress={() => setEditCorreo(!editCorreo)}
-            >
-              <Text style={styles.editText}>Editar</Text>
-            </TouchableOpacity>
-          </View>
+        {/* INPUTS */}
+        <View style={styles.formContainer}>
+          {["nombre", "correo", "telefono"].map((campo) => (
+            <View key={campo} style={styles.inputGroup}>
+              <Text style={styles.label}>{campo.toUpperCase()}</Text>
+              <View style={[styles.inputWrapper, editando[campo] && styles.inputActive]}>
+                <TextInput
+                  style={styles.input}
+                  value={data[campo]}
+                  onChangeText={(t) => handleChange(campo, t)}
+                  editable={editando[campo]}
+                />
+                <TouchableOpacity onPress={() => toggleEdit(campo)}>
+                  <Text style={styles.editLink}>{editando[campo] ? "OK" : "Editar"}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
         </View>
 
-        <View style={styles.inputCard}>
-          <Text style={styles.label}>TELÉFONO</Text>
-
-          <View style={styles.row}>
-            <TextInput
-              style={[styles.input, !editTelefono && { color: "#444" }]}
-              value={telefono}
-              onChangeText={setTelefono}
-              editable={editTelefono}
-            />
-
-            <TouchableOpacity 
-              style={styles.editButton}
-              onPress={() => setEditTelefono(!editTelefono)}
-            >
-              <Text style={styles.editText}>Editar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <TouchableOpacity style={styles.saveButton} onPress={guardarCambios}>
+        <TouchableOpacity style={styles.saveButton} onPress={guardar}>
           <Text style={styles.saveText}>Guardar Cambios</Text>
         </TouchableOpacity>
 
       </ScrollView>
-
-
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
+  // =========================
+  // 🟢 LAYOUT PRINCIPAL
+  // =========================
+  container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems:"center",
   },
-
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 15,
-    backgroundColor: "#f4f1ff",
-    borderRadius: 40,
-    width: "95%",
-    marginTop: 50,
-  },
-
-  leftIcons: { 
-    flexDirection: "row",
-    alignItems: "center" 
-  },
-
-  iconHeader: { 
-    width: 33,
-    height: 22,
-    resizeMode: "contain"
-  },
-
-  title: { 
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#333"
-  },
-
-  avatar: {
-    backgroundColor: "#b3a5ff",
-    borderRadius: 50,
-    padding: 8,
-  },
-
-  avatarIcon: {
-    width: 20,
-    height: 20,
-    tintColor: "#fff",
-    resizeMode: "contain"
-  },
-
   scrollContent: {
     padding: 20,
-    paddingBottom: 140,
-    width: "100%",
+    // Un poco de espacio extra al final por si hay scroll
+    paddingBottom: 40,
+  },
+
+  // =========================
+  // 🟣 HEADER SUPERIOR
+  // =========================
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
+    padding: 20,
+    marginTop: 40,
   },
-
-  perfilTitle: {
-    textAlign: "center",
-    fontSize: 20,
-    marginTop: 50,
-    marginBottom: 15,
-    color: "#a270ff",
+  iconHeader: {
+    width: 24,
+    height: 24,
+    tintColor: "#7b6cff",
+  },
+  headerTitle: {
+    fontSize: 18,
     fontWeight: "700",
+    color: "#333",
   },
 
-  avatarSection: {
+  // =========================
+  // 👤 SECCIÓN DE AVATAR
+  // =========================
+  avatarContainer: {
     alignItems: "center",
     marginBottom: 30,
   },
-
-  bigAvatar: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    resizeMode: "contain",
+  avatarWrapper: {
+    position: "relative",
+    marginBottom: 15,
   },
-
-  uploadButton: {
-    marginTop: 10,
-    backgroundColor: "#e8dfff",
-    paddingVertical: 6,
-    paddingHorizontal: 20,
-    borderRadius: 20,
+  avatarImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "#b3a5ff",
   },
-
-  uploadText: {
-    color: "#7451ff",
-    fontWeight: "600",
-  },
-
-  inputCard: {
-    backgroundColor: "#f7f2ff",
-    borderRadius: 20,
-    padding: 15,
-    marginBottom: 18,
-  },
-
-  label: {
-    color: "#9a6aff",
-    fontWeight: "700",
-    marginBottom: 6,
-  },
-
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-
-  input: {
-    fontSize: 17,
-    fontWeight: "600",
-    width: "70%",
-    paddingVertical: 5,
-  },
-
-  editButton: {
-    backgroundColor: "#e0d1ff",
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    borderRadius: 15,
-  },
-
-  editText: {
-    color: "#704eff",
-    fontWeight: "600",
-  },
-
-  saveButton: {
-    backgroundColor: "#a58bff",
-    padding: 15,
-    borderRadius: 25,
-    alignItems: "center",
-    marginTop: 20,
-  },
-
-  saveText: {
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: 16,
-  },
-
-  bottomNav: {
+  cameraButton: {
     position: "absolute",
-    bottom: 10,
-    width: "95%",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    backgroundColor: "#eae2ff",
-    paddingVertical: 12,
-    borderRadius: 30,
-  },
-
-  iconCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: "#A084E8",
+    bottom: 0,
+    right: 0,
+    backgroundColor: "#7b6cff",
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#fff",
+  },
+  cameraIcon: {
+    fontSize: 16,
+  },
+  userName: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  userEmail: {
+    fontSize: 14,
+    color: "#888",
+    marginTop: 2,
   },
 
-  navIcon: {
-    width: 26,
-    height: 26,
-    resizeMode: "contain",
+  // =========================
+  // 📝 FORMULARIO E INPUTS
+  // =========================
+  formContainer: {
+    backgroundColor: "#f9f9f9",
+    padding: 20,
+    borderRadius: 20,
+  },
+  inputGroup: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#b3a5ff",
+    marginBottom: 8,
+    paddingLeft: 5,
+  },
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: "#eee",
+  },
+  inputActive: {
+    borderColor: "#7b6cff",
+    backgroundColor: "#f4f1ff",
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: "#333",
+  },
+  editLink: {
+    color: "#7b6cff",
+    fontWeight: "600",
+    fontSize: 14,
   },
 
-  centerButton: {
-    backgroundColor: "#7f6aff",
-    padding: 15,
-    borderRadius: 40,
-    marginBottom: 25,
+  // =========================
+  // 💾 BOTÓN GUARDAR
+  // =========================
+  saveButton: {
+    backgroundColor: "#7b6cff",
+    padding: 18,
+    borderRadius: 15,
+    alignItems: "center",
+    marginTop: 20,
+    // Sombras
+    shadowColor: "#7b6cff",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
-
-  centerIcon: {
-    width: 30,
-    height: 30,
-    tintColor: "#fff",
-    resizeMode: "contain",
+  saveText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });

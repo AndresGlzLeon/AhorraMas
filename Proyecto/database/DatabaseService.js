@@ -8,6 +8,13 @@ export default class DatabaseService {
   constructor() {
     this.db = null;
     this.isInitialized = false;
+    this.isWeb = Platform.OS === 'web';
+    this.schemaCache = {};
+    this.webSchema = {
+      usuarios: ['id', 'nombre', 'correo', 'contrasena', 'telefono', 'created_at'],
+      transacciones: ['id', 'usuarioId', 'tipo', 'monto', 'categoria', 'descripcion', 'fecha'],
+      presupuestos: ['id', 'usuarioId', 'categoria', 'monto', 'mes', 'anio', 'created_at'],
+    };
   }
 
   // Inicializar la base de datos
@@ -17,15 +24,12 @@ export default class DatabaseService {
     }
 
     try {
-      if (Platform.OS === 'web') {
-        // Para web usamos localStorage
-        this.isWeb = true;
-        this.isInitialized = true;
+      if (this.isWeb) {
         console.log('✅ BD Web (localStorage) inicializada');
+        this.isInitialized = true;
         return;
       }
 
-      // Para móvil usamos SQLite
       this.db = await SQLite.openDatabaseAsync('lanaapp.db');
       await this.crearTablas();
       this.isInitialized = true;
@@ -107,20 +111,26 @@ export default class DatabaseService {
 
   // Insertar (INSERT)
   async insert(table, data) {
+    const payload = await this.filterData(table, data, ['id']);
+
+    if (!Object.keys(payload).length) {
+      throw new Error(`No hay columnas válidas para insertar en ${table}`);
+    }
+
     if (this.isWeb) {
-      return this.insertWeb(table, data);
+      return this.insertWeb(table, payload);
     }
 
     try {
-      const keys = Object.keys(data).filter(k => data[k] !== null && k !== 'id');
-      const values = keys.map(k => data[k]);
+      const keys = Object.keys(payload);
+      const values = keys.map((k) => payload[k]);
       const placeholders = keys.map(() => '?').join(', ');
-      
+
       const sql = `INSERT INTO ${table} (${keys.join(', ')}) VALUES (${placeholders})`;
       const result = await this.db.runAsync(sql, values);
-      
+
       console.log(`✅ Insertado en ${table} con ID: ${result.lastInsertRowId}`);
-      return { id: result.lastInsertRowId, ...data };
+      return { id: result.lastInsertRowId, ...payload };
     } catch (error) {
       console.error(`❌ Error al insertar en ${table}:`, error);
       throw error;
@@ -129,20 +139,26 @@ export default class DatabaseService {
 
   // Actualizar (UPDATE)
   async update(table, id, data) {
+    const payload = await this.filterData(table, data, ['id']);
+
+    if (!Object.keys(payload).length) {
+      throw new Error(`No hay columnas válidas para actualizar en ${table}`);
+    }
+
     if (this.isWeb) {
-      return this.updateWeb(table, id, data);
+      return this.updateWeb(table, id, payload);
     }
 
     try {
-      const keys = Object.keys(data).filter(k => k !== 'id');
-      const values = keys.map(k => data[k]);
-      const setClause = keys.map(key => `${key} = ?`).join(', ');
-      
+      const keys = Object.keys(payload);
+      const values = keys.map((k) => payload[k]);
+      const setClause = keys.map((key) => `${key} = ?`).join(', ');
+
       const sql = `UPDATE ${table} SET ${setClause} WHERE id = ?`;
       await this.db.runAsync(sql, [...values, id]);
-      
+
       console.log(`✅ Actualizado en ${table} ID: ${id}`);
-      return { id, ...data };
+      return { id, ...payload };
     } catch (error) {
       console.error(`❌ Error al actualizar ${table}:`, error);
       throw error;
@@ -168,24 +184,44 @@ export default class DatabaseService {
 
   // ========== MÉTODOS PARA WEB (localStorage) ==========
 
-  queryWeb(sql, params) {
-    // Implementación básica para web
+  queryWeb(sql, params = []) {
     const table = this.extractTableName(sql);
+    if (!table) return [];
+
     const data = this.getLocalStorage();
-    return data[table] || [];
+    let rows = data[table] ? [...data[table]] : [];
+    const fields = this.extractWhereFields(sql);
+
+    if (fields.length && params.length) {
+      rows = rows.filter((row) =>
+        fields.every((field, index) => {
+          if (!(field in row)) return false;
+          const value = row[field];
+          const param = params[index];
+          return String(value) === String(param);
+        })
+      );
+    }
+
+    return rows;
   }
 
   insertWeb(table, data) {
     const allData = this.getLocalStorage();
-    if (!allData[table]) allData[table] = [];
-    
-    const newItem = { 
-      id: Date.now(), 
+    const rows = allData[table] ? [...allData[table]] : [];
+
+    const nextId = rows.length
+      ? Math.max(...rows.map((item) => Number(item.id) || 0)) + 1
+      : 1;
+
+    const newItem = {
+      id: nextId,
       ...data,
-      created_at: new Date().toISOString()
+      created_at: data.created_at ?? new Date().toISOString(),
     };
-    allData[table].push(newItem);
-    
+
+    rows.push(newItem);
+    allData[table] = rows;
     this.setLocalStorage(allData);
     console.log(`✅ [Web] Insertado en ${table}`);
     return newItem;
@@ -193,29 +229,57 @@ export default class DatabaseService {
 
   updateWeb(table, id, data) {
     const allData = this.getLocalStorage();
-    if (!allData[table]) return null;
-    
-    const index = allData[table].findIndex(item => item.id === id);
-    if (index !== -1) {
-      allData[table][index] = { ...allData[table][index], ...data };
-      this.setLocalStorage(allData);
-      console.log(`✅ [Web] Actualizado en ${table} ID: ${id}`);
-      return allData[table][index];
-    }
-    return null;
+    const rows = allData[table];
+    if (!rows) return null;
+
+    const index = rows.findIndex((item) => String(item.id) === String(id));
+    if (index === -1) return null;
+
+    rows[index] = { ...rows[index], ...data };
+    allData[table] = rows;
+    this.setLocalStorage(allData);
+    console.log(`✅ [Web] Actualizado en ${table} ID: ${id}`);
+    return rows[index];
   }
 
   deleteWeb(table, id) {
     const allData = this.getLocalStorage();
-    if (!allData[table]) return null;
-    
-    allData[table] = allData[table].filter(item => item.id !== id);
+    const rows = allData[table];
+    if (!rows) return null;
+
+    allData[table] = rows.filter((item) => String(item.id) !== String(id));
     this.setLocalStorage(allData);
     console.log(`✅ [Web] Eliminado de ${table} ID: ${id}`);
     return { id };
   }
 
-  // Helpers para localStorage
+  // ========== HELPERS INTERNOS ==========
+
+  async filterData(table, data = {}, exclude = []) {
+    const columns = await this.getTableColumns(table);
+    return Object.keys(data).reduce((acc, key) => {
+      if (exclude.includes(key)) return acc;
+      if (!columns.includes(key)) return acc;
+      const value = data[key];
+      if (value === undefined || value === null) return acc;
+      acc[key] = value;
+      return acc;
+    }, {});
+  }
+
+  async getTableColumns(table) {
+    if (this.isWeb) {
+      return this.webSchema[table] ? [...this.webSchema[table]] : [];
+    }
+
+    if (!this.schemaCache[table]) {
+      const info = await this.db.getAllAsync(`PRAGMA table_info(${table});`);
+      this.schemaCache[table] = info.map((row) => row.name);
+    }
+
+    return this.schemaCache[table];
+  }
+
   getLocalStorage() {
     try {
       const data = localStorage.getItem('lanaapp_data');
@@ -230,7 +294,21 @@ export default class DatabaseService {
   }
 
   extractTableName(sql) {
-    const match = sql.match(/FROM\s+(\w+)/i);
+    const match = sql.match(/FROM\s+([\w]+)/i);
     return match ? match[1] : '';
+  }
+
+  extractWhereFields(sql) {
+    const whereMatch = sql.match(/WHERE\s+(.+?)(ORDER BY|GROUP BY|LIMIT|$)/i);
+    if (!whereMatch) return [];
+
+    return whereMatch[1]
+      .split(/AND/i)
+      .map((fragment) => fragment.trim())
+      .map((fragment) => {
+        const match = fragment.match(/([\w.]+)\s*=\s*\?/);
+        return match ? match[1].split('.').pop() : null;
+      })
+      .filter(Boolean);
   }
 }

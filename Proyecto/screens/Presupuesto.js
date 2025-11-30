@@ -1,127 +1,255 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { 
-  View, 
-  Text, 
-  ScrollView, 
-  StyleSheet, 
-  Image, 
-  Animated, 
-  Modal, 
-  TextInput, 
-  TouchableOpacity,
-  Alert,
-  Dimensions,Pressable
+  View, Text, ScrollView, StyleSheet, Image, Pressable, 
+  Modal, TextInput, TouchableOpacity, Alert, Dimensions, ActivityIndicator 
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import DatabaseService from '../database/DatabaseService';
 
 const { width } = Dimensions.get("window");
+const dbService = new DatabaseService();
 
-export default function Presupuesto ()  {
+export default function Presupuesto() {
   const navigation = useNavigation();
 
-  const [presupuesto, setPresupuesto] = useState(10555);
-  const [gastos, setGastos] = useState([]);
+  // Estados visuales (idénticos a tu código)
+  const [presupuestoTotal, setPresupuestoTotal] = useState(0); // Ahora se calcula solo
+  const [gastos, setGastos] = useState([]); // Esto ahora son tus "Presupuestos por Categoría"
+  const [loading, setLoading] = useState(true);
 
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalGastoVisible, setModalGastoVisible] = useState(false);
+  // Estados de Modales (Intactos)
+  const [modalVisible, setModalVisible] = useState(false); // Para el total (informativo o ajuste)
+  const [modalGastoVisible, setModalGastoVisible] = useState(false); // Para agregar/editar items
 
+  // Formulario
   const [nuevoGasto, setNuevoGasto] = useState({ nombre: "", monto: "", categoria: "" });
-  const [editandoGasto, setEditandoGasto] = useState(null);
+  const [editandoGastoId, setEditandoGastoId] = useState(null);
 
-  const totalGastado = gastos.reduce((total, gasto) => total + gasto.monto, 0);
-  const porcentajeGastado = (totalGastado / presupuesto) * 100;
-  const restante = presupuesto - totalGastado;
+  // --- LOGICA BD ---
+  
+  useFocusEffect(
+    useCallback(() => {
+      cargarDatos();
+    }, [])
+  );
 
-  // CRUD
-  const agregarGasto = () => {
-    if (!nuevoGasto.nombre || !nuevoGasto.monto) {
-      Alert.alert("Error", "Por favor completa todos los campos");
-      return;
+  const cargarDatos = async () => {
+    setLoading(true);
+    try {
+      await dbService.init();
+      
+      // 1. Cargar las metas/presupuestos de la BD
+      // Usamos el mes actual como filtro (Requisito Rúbrica)
+      const mesActual = new Date().getMonth() + 1;
+      const metas = await dbService.query('SELECT * FROM presupuestos WHERE mes = ?', [mesActual]);
+      
+      // 2. Cargar lo gastado real (Transacciones)
+      const transacciones = await dbService.query('SELECT * FROM transacciones WHERE tipo = ?', ['egreso']);
+
+      // 3. Procesar datos para que encajen en tu diseño
+      let totalMeta = 0;
+      let totalGastadoReal = 0;
+
+      const itemsProcesados = metas.map(meta => {
+        // Calcular cuánto se ha gastado en esta categoría
+        const gastadoEnCategoria = transacciones
+          .filter(t => t.categoria.toLowerCase() === meta.categoria.toLowerCase())
+          .reduce((sum, t) => sum + t.monto, 0);
+
+        totalMeta += meta.monto;
+        totalGastadoReal += gastadoEnCategoria;
+
+        return {
+          id: meta.id,
+          nombre: meta.categoria, // Mapeamos 'categoria' a 'nombre' para tu UI
+          monto: meta.monto,
+          gastado: gastadoEnCategoria,
+          porcentaje: Math.min((gastadoEnCategoria / meta.monto) * 100, 100)
+        };
+      });
+
+      setGastos(itemsProcesados);
+      setPresupuestoTotal(totalMeta); // El presupuesto total es la suma de las categorías
+
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
-
-    const gasto = {
-      id: Date.now(),
-      nombre: nuevoGasto.nombre,
-      monto: Number(nuevoGasto.monto),
-    };
-
-    setGastos([...gastos, gasto]);
-    setNuevoGasto({ nombre: "", monto: "" });
-    setModalGastoVisible(false);
   };
 
-  const editarGasto = () => {
+  // --- CRUD (CONECTADO A BD) ---
+
+  const agregarGasto = async () => {
     if (!nuevoGasto.nombre || !nuevoGasto.monto) {
-      Alert.alert("Error", "Por favor completa todos los campos");
+      Alert.alert("Error", "Completa los campos");
       return;
     }
 
-    setGastos(gastos.map(gasto => 
-      gasto.id === editandoGasto.id 
-        ? { ...gasto, nombre: nuevoGasto.nombre, monto: Number(nuevoGasto.monto) }
-        : gasto
-    ));
+    try {
+      // Guardar en BD
+      await dbService.insert('presupuestos', {
+        usuarioId: 1,
+        categoria: nuevoGasto.nombre, // Usamos el nombre como categoría
+        monto: parseFloat(nuevoGasto.monto),
+        mes: new Date().getMonth() + 1,
+        anio: new Date().getFullYear()
+      });
 
-    setEditandoGasto(null);
-    setNuevoGasto({ nombre: "", monto: "" });
-    setModalGastoVisible(false);
+      setNuevoGasto({ nombre: "", monto: "", categoria: "" });
+      setModalGastoVisible(false);
+      cargarDatos(); // Recargar visual
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const editarGasto = async () => {
+    try {
+      await dbService.update('presupuestos', editandoGastoId, {
+        categoria: nuevoGasto.nombre,
+        monto: parseFloat(nuevoGasto.monto),
+        mes: new Date().getMonth() + 1
+      });
+      
+      setEditandoGastoId(null);
+      setNuevoGasto({ nombre: "", monto: "", categoria: "" });
+      setModalGastoVisible(false);
+      cargarDatos();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const eliminarGasto = (id) => {
-    Alert.alert(
-      "Eliminar gasto",
-      "¿Estás seguro de que quieres eliminar este gasto?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        { text: "Eliminar", style: "destructive", onPress: () => setGastos(gastos.filter(g => g.id !== id)) }
-      ]
-    );
+    Alert.alert("Eliminar", "¿Borrar este presupuesto?", [
+      { text: "Cancelar", style: "cancel" },
+      { text: "Eliminar", style: "destructive", onPress: async () => {
+          await dbService.delete('presupuestos', id);
+          cargarDatos();
+      }}
+    ]);
   };
 
+  // --- UI HELPERS ---
+
   const abrirModalEditar = (gasto) => {
-    setEditandoGasto(gasto);
+    setEditandoGastoId(gasto.id);
     setNuevoGasto({ nombre: gasto.nombre, monto: gasto.monto.toString() });
     setModalGastoVisible(true);
   };
 
+  // Cálculos visuales para la tarjeta principal
+  // Total asignado (Presupuesto) vs Total Gastado Real
+  const totalGastadoReal = gastos.reduce((acc, item) => acc + item.gastado, 0);
+  const porcentajeTotal = presupuestoTotal > 0 ? (totalGastadoReal / presupuestoTotal) * 100 : 0;
+  const restante = presupuestoTotal - totalGastadoReal;
+
   return (
     <View style={styles.container}>
 
-      {/* Modal editar presupuesto */}
-      <Modal visible={modalVisible} animationType="slide" transparent>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Editar Presupuesto</Text>
+      {/* --- HEADER ORIGINAL --- */}
+      <View style={styles.header}>
+        <View style={styles.leftIcons}>
+          <Pressable onPress={() => navigation.navigate('Ajustes')}>
+            <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+          </Pressable>
+          <Pressable onPress={() => navigation.navigate('Notificaciones')}>
+            <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+          </Pressable>
+        </View>
+        <Text style={styles.title}>Ahorra+ App</Text>
+        <View style={styles.avatar}>
+          <Pressable onPress={() => navigation.navigate('Perfil')}>
+            <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+          </Pressable>
+        </View>
+      </View>
 
-            <TextInput
-              style={styles.input}
-              keyboardType="numeric"
-              placeholder="Presupuesto mensual"
-              value={presupuesto.toString()}
-              onChangeText={(text) => setPresupuesto(Number(text) || 0)}
-            />
+      <ScrollView contentContainerStyle={styles.scrollContent}>
 
-            <View style={styles.modalButtons}>
-              <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={() => setModalVisible(false)}>
-                <Text style={styles.buttonText}>Cancelar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={() => setModalVisible(false)}>
-                <Text style={styles.buttonText}>Guardar</Text>
-              </TouchableOpacity>
-            </View>
+        {/* --- HERO SECTION (CERDITO) --- */}
+        <View style={styles.headerSection}>
+          <View>
+            <Text style={styles.welcome}>Presupuesto</Text>
+            <Text style={{color: '#666'}}>Planifica tus gastos</Text>
+          </View>
+          <Image source={require("../assets/logo.png")} style={styles.pigImage} />
+        </View>
+
+        {/* --- TARJETA PRINCIPAL (PRESUPUESTO INICIAL) --- */}
+        <View style={styles.cardMain}>
+          <View style={{flexDirection:'row', justifyContent:'space-between', marginBottom: 10}}>
+            <Text style={styles.cardLabel}>Presupuesto Total</Text>
+            <Text style={styles.cardValue}>${presupuestoTotal.toFixed(2)}</Text>
+          </View>
+          
+          {/* Barra Progreso Global */}
+          <View style={styles.progressBarBg}>
+            <View style={[styles.progressBarFill, { width: `${Math.min(porcentajeTotal, 100)}%` }]} />
+          </View>
+          
+          <View style={{flexDirection:'row', justifyContent:'space-between', marginTop: 5}}>
+            <Text style={{color:'#7b6cff'}}>{porcentajeTotal.toFixed(0)}% Gastado</Text>
+            <Text style={{color:'#666'}}>${restante.toFixed(2)} Restante</Text>
           </View>
         </View>
-      </Modal>
 
-      {/* Modal agregar / editar gasto */}
+        {/* --- BOTONES RESUMEN (Gastaste vs Restan) --- */}
+        <View style={styles.statsRow}>
+          <View style={[styles.statBox, {backgroundColor: '#a29bfe'}]}>
+            <Text style={styles.statLabel}>Gastaste:</Text>
+            <Text style={styles.statValue}>${totalGastadoReal.toFixed(0)}</Text>
+          </View>
+          <View style={[styles.statBox, {backgroundColor: '#b3a5ff'}]}>
+            <Text style={styles.statLabel}>Restan:</Text>
+            <Text style={styles.statValue}>${restante.toFixed(0)}</Text>
+          </View>
+        </View>
+
+        {/* --- LISTA DE PRESUPUESTOS (CATEGORÍAS) --- */}
+        <View style={styles.listHeader}>
+          <Text style={styles.sectionTitle}>Categorías</Text>
+          <TouchableOpacity onPress={() => { setEditandoGastoId(null); setNuevoGasto({nombre:'', monto:''}); setModalGastoVisible(true); }}>
+            <Text style={styles.addText}>+ Agregar</Text>
+          </TouchableOpacity>
+        </View>
+
+        {loading ? <ActivityIndicator color="#7b6cff"/> : gastos.map((item) => (
+          <TouchableOpacity 
+            key={item.id} 
+            style={styles.itemCard}
+            onLongPress={() => eliminarGasto(item.id)}
+            onPress={() => abrirModalEditar(item)}
+          >
+            <View style={styles.itemRow}>
+              <View>
+                <Text style={styles.itemTitle}>{item.nombre}</Text>
+                <Text style={styles.itemSub}>Límite: ${item.monto}</Text>
+              </View>
+              <Text style={[styles.itemAmount, {color: item.gastado > item.monto ? 'red' : '#333'}]}>
+                -${item.gastado.toFixed(0)}
+              </Text>
+            </View>
+            {/* Barra pequeña por item */}
+            <View style={[styles.progressBarBg, {height: 6, marginTop: 8}]}>
+               <View style={[styles.progressBarFill, { width: `${item.porcentaje}%`, backgroundColor: item.porcentaje > 100 ? '#ff7675' : '#55efc4' }]} />
+            </View>
+          </TouchableOpacity>
+        ))}
+
+        <View style={{height: 20}} />
+      </ScrollView>
+
+      {/* --- MODAL AGREGAR/EDITAR --- */}
       <Modal visible={modalGastoVisible} animationType="slide" transparent>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{editandoGasto ? "Editar Gasto" : "Agregar Gasto"}</Text>
+            <Text style={styles.modalTitle}>{editandoGastoId ? "Editar Meta" : "Nueva Meta"}</Text>
 
             <TextInput
               style={styles.input}
-              placeholder="Nombre del gasto"
+              placeholder="Categoría (Ej: Comida)"
               value={nuevoGasto.nombre}
               onChangeText={(text) => setNuevoGasto({ ...nuevoGasto, nombre: text })}
             />
@@ -129,7 +257,7 @@ export default function Presupuesto ()  {
             <TextInput
               style={styles.input}
               keyboardType="numeric"
-              placeholder="Monto"
+              placeholder="Monto Límite ($)"
               value={nuevoGasto.monto}
               onChangeText={(text) => setNuevoGasto({ ...nuevoGasto, monto: text })}
             />
@@ -137,328 +265,261 @@ export default function Presupuesto ()  {
             <View style={styles.modalButtons}>
               <TouchableOpacity 
                 style={[styles.button, styles.cancelButton]}
-                onPress={() => {
-                  setModalGastoVisible(false);
-                  setEditandoGasto(null);
-                  setNuevoGasto({ nombre: "", monto: "" });
-                }}
+                onPress={() => setModalGastoVisible(false)}
               >
                 <Text style={styles.buttonText}>Cancelar</Text>
               </TouchableOpacity>
 
               <TouchableOpacity 
                 style={[styles.button, styles.saveButton]}
-                onPress={editandoGasto ? editarGasto : agregarGasto}
+                onPress={editandoGastoId ? editarGasto : agregarGasto}
               >
-                <Text style={styles.buttonText}>{editandoGasto ? "Guardar" : "Agregar"}</Text>
+                <Text style={styles.buttonText}>Guardar</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
-       <View style={styles.header}>
-              <View style={styles.leftIcons}>
-                <Pressable onPress={() => navigation.navigate('Ajustes')}>
-                  <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-                </Pressable>
-                <Pressable onPress={() => navigation.navigate('Notificaciones')}>
-                  <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-                </Pressable>
-              </View>
-              <Text style={styles.title}>Ahorra+ App</Text>
-              <View style={styles.avatar}>
-                <Pressable onPress={() => navigation.navigate('Perfil')}>
-                  <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-                </Pressable>
-              </View>
-            </View>
-        
-
-      {/* SCROLL RESPONSIVO */}
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-
-        <View style={styles.headerSection}>
-          <View>
-            <Text style={styles.welcome}>Presupuesto{"\n"}</Text>
-          </View>
-          <Image source={require("../assets/logo.png")} style={styles.pigImage} />
-        </View>
-
-        {/* Tarjeta presupuesto */}
-        <View style={styles.cardContainer}>
-          <TouchableOpacity onPress={() => setModalVisible(true)}>
-            <Text style={styles.cardTitle}>
-              Presupuesto mensual: ${presupuesto.toLocaleString()}{" "}
-              <Image source={require("../assets/edit.png")} style={styles.navIcon} />
-            </Text>
-          </TouchableOpacity>
-
-          <View style={styles.progressBar}>  
-            <Animated.View 
-              style={[
-                StyleSheet.absoluteFill, 
-                {
-                  width: `${Math.min(porcentajeGastado, 100)}%`, 
-                  backgroundColor: porcentajeGastado > 80 ? "#ff6b6b" : "#7b6cff",
-                  borderRadius: 15
-                }
-              ]}
-            />
-          </View>
-
-          <View style={styles.cardLeft}>
-            <Text style={styles.cardSub}>Gastado: {porcentajeGastado.toFixed(1)}%</Text>
-            <Text style={styles.cardAmount2}>Restan: {(100 - porcentajeGastado).toFixed(1)}%</Text>
-          </View>
-        </View>
-
-        {/* Resumen */}
-        <View style={styles.headerSection}>
-          <Text style={styles.title}>Gastaste:</Text>
-          <Text style={styles.title}>Te restan:</Text>
-        </View>
-
-        <View style={styles.headerSection}>
-          <View style={styles.balanceCard}>
-            <Text style={styles.amount}>${totalGastado.toLocaleString()}</Text>
-          </View>
-
-          <View style={styles.balanceCard}>
-            <Text style={styles.amount}>${restante.toLocaleString()}</Text>
-          </View>
-        </View>
-
-        {/* Botón agregar gasto */}
-        <TouchableOpacity 
-          style={styles.addButton}
-          onPress={() => {
-            setEditandoGasto(null);
-            setNuevoGasto({ nombre: "", monto: "" });
-            setModalGastoVisible(true);
-          }}
-        >
-          <Text style={styles.addButtonText}>+ Agregar Gasto</Text>
-        </TouchableOpacity>
-
-        {/* Lista de gastos */}
-        <View style={styles.cardContainer}>
-          {gastos.map((gasto) => (
-            <View key={gasto.id} style={styles.card}>
-              <View style={styles.cardLeft}>
-                <View>
-                  <Text style={styles.cardTitle}>{gasto.nombre}</Text>
-                  <Text style={styles.cardSub}>Gasto de: ${gasto.monto.toLocaleString()}</Text>
-                  <Text style={styles.cardSub}>{((gasto.monto / presupuesto) * 100).toFixed(1)}% del presupuesto</Text>
-                </View>
-              </View>
-
-              <View style={styles.cardActions}>
-                <TouchableOpacity onPress={() => abrirModalEditar(gasto)}>
-                  <Image source={require("../assets/edit.png")} style={styles.navIcon} />
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => eliminarGasto(gasto.id)}>
-                  <Image source={require("../assets/elim.png")} style={styles.navIcon} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
-        </View>
-
-      </ScrollView>
 
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
-  container: { 
+  // =========================
+  // 🟢 LAYOUT PRINCIPAL
+  // =========================
+  container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "stretch"
+    alignItems: "center",
   },
-
   scrollContent: {
-    width: width * 0.95,
-    alignSelf: "center",
-    paddingBottom: 120,
+    padding: 20,
+    width: '100%',
+    paddingBottom: 100, // Espacio para el menú inferior
   },
 
+  // =========================
+  // 🟣 HEADER SUPERIOR
+  // =========================
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
+    justifyContent: "space-between",
+    padding: 15,
+    marginTop: 50,
+    width: "95%",
     backgroundColor: "#f4f1ff",
     borderRadius: 40,
-    padding: 15,
-    width: width * 0.95,
-    alignSelf: "center",
-    marginTop: 50,
   },
-
-  leftIcons: { flexDirection: "row", alignItems: "center" },
-  iconHeader: { width: 33, height: 22, resizeMode: "contain" },
-  title: { fontSize: 18, fontWeight: "600", color: "#333" },
-
+  leftIcons: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  iconHeader: {
+    width: 33,
+    height: 22,
+    resizeMode: "contain",
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
+  },
   avatar: {
     backgroundColor: "#b3a5ff",
     borderRadius: 50,
     padding: 8,
   },
-
-  avatarIcon: { 
-    width: 20, 
-    height: 20, 
-    tintColor: "#fff" 
+  avatarIcon: {
+    width: 20,
+    height: 20,
+    tintColor: "#fff",
+    resizeMode: "contain",
   },
 
+  // =========================
+  // 🐷 HERO SECTION (CERDITO)
+  // =========================
   headerSection: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 20,
+    marginBottom: 20,
   },
-
   welcome: {
     fontSize: 26,
+    paddingRight: 20,
     fontWeight: "700",
     color: "#7b6cff",
     lineHeight: 30,
-    
   },
-
-  subtitle: { 
-    fontSize: 14, 
-    color: "#555",
-     
-  },
-
   pigImage: {
     width: 80,
     height: 80,
     resizeMode: "contain",
   },
 
-  cardContainer: {
-    backgroundColor: "#f4f1ff",
-    padding: 15,
-    borderRadius: 30,
-    marginTop: 25,
-    width: "100%",
-  },
-
-  card: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderBottomColor: "#ddd",
-    borderBottomWidth: 2,
-    paddingVertical: 25,
-  },
-
-  cardLeft: { flexDirection: "row", alignItems: "center", gap: 10 },
-
-  cardTitle: { fontSize: 16, fontWeight: "600", color: "#000" },
-
-  cardSub: { fontSize: 13, color: "#777" },
-
-  cardAmount2: { fontSize: 16, fontWeight: "700", color: "#000" },
-
-  progressBar:{
-    height: 25,
-    width: "100%",
-    backgroundColor: "#d3d3d3",
-    borderRadius: 15,
-    marginVertical: 10,
-  },
-
-  balanceCard: {
-    backgroundColor: "#c8b6ff",
+  // =========================
+  // 💳 TARJETA PRINCIPAL (TOTAL)
+  // =========================
+  cardMain: {
+    backgroundColor: '#f8f9fa',
+    padding: 20,
     borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    height: 55,
-    width: "40%",
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#eee',
   },
-
-  amount: {
+  cardLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  cardValue: {
     fontSize: 20,
-    color: "#fff",
-    fontWeight: "bold",
+    fontWeight: 'bold',
+  },
+  progressBarBg: {
+    height: 10,
+    backgroundColor: '#eee',
+    borderRadius: 5,
+    overflow: 'hidden',
+    marginTop: 10,
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: '#7b6cff',
   },
 
-  addButton: {
-    backgroundColor: "#7b6cff",
+  // =========================
+  // 📊 RESUMEN (GASTASTE / RESTAN)
+  // =========================
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 25,
+  },
+  statBox: {
+    width: '48%',
+    padding: 20,
+    borderRadius: 20,
+    alignItems: 'center',
+  },
+  statLabel: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  statValue: {
+    color: 'white',
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginTop: 5,
+  },
+
+  // =========================
+  // 📝 LISTA DE CATEGORÍAS
+  // =========================
+  listHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  addText: {
+    color: '#7b6cff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  itemCard: {
+    backgroundColor: '#fff',
     padding: 15,
     borderRadius: 15,
-    alignItems: "center",
-    marginTop: 30,
-  
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+    // Sombras
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    elevation: 2,
   },
-
-  addButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
+  itemRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  itemTitle: {
     fontSize: 16,
-    
+    fontWeight: 'bold',
+    color: '#444',
+  },
+  itemSub: {
+    fontSize: 12,
+    color: '#888',
+  },
+  itemAmount: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 
-  navIcon: { width: 26, height: 26, resizeMode: "contain" },
-
+  // =========================
+  // 🛑 MODALES (POP-UP)
+  // =========================
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
   },
-
   modalContent: {
-    backgroundColor: "#fff",
+    width: "85%",
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 20,
-    width: "85%",
+    elevation: 10,
   },
-
   modalTitle: {
     fontSize: 20,
-    color: "#7b6cff",
     fontWeight: "bold",
-    marginBottom: 15,
+    marginBottom: 20,
     textAlign: "center",
   },
-
-  modalButtons: { 
-    flexDirection: "row", 
-    justifyContent: "space-between" 
-  },
-
-  button: {
-    padding: 12,
-    borderRadius: 10,
-    minWidth: 100,
-    alignItems: "center",
-  },
-
-  cancelButton: {
-    backgroundColor: "#ff6b6b",
-  },
-
-  saveButton: {
-    backgroundColor: "#7b6cff",
-  },
-
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 15,
+    fontSize: 16,
+    backgroundColor: '#f9f9f9',
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+  },
+  button: {
     padding: 12,
     borderRadius: 10,
-    marginBottom: 15,
+    width: "45%",
+    alignItems: "center",
   },
-
+  cancelButton: {
+    backgroundColor: "#eee",
+  },
+  saveButton: {
+    backgroundColor: "#7b6cff",
+  },
+  buttonText: {
+    fontWeight: "bold",
+    color: "#333",
+  },
 });

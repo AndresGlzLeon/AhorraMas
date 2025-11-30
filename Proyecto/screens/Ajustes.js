@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Switch, Image, ScrollView, Pressable, Alert } from "react-native";
+import { View, Text, StyleSheet, Switch, Image, ScrollView, Pressable, Alert, TouchableOpacity } from "react-native";
 
-export default function Ajustes({navigation, onLogout}) {
+export default function Ajustes({ navigation, onLogout }) {
   const [notificacionesActivas, setNotificacionesActivas] = useState(true);
 
   const handleLogout = () => {
@@ -9,17 +9,12 @@ export default function Ajustes({navigation, onLogout}) {
       "Cerrar Sesión",
       "¿Estás seguro de que quieres cerrar sesión?",
       [
-        {
-          text: "Cancelar",
-          style: "cancel"
-        },
+        { text: "Cancelar", style: "cancel" },
         {
           text: "Cerrar Sesión",
           style: "destructive",
           onPress: () => {
-            if (onLogout) {
-              onLogout();
-            }
+            if (onLogout) onLogout();
           }
         }
       ]
@@ -28,47 +23,59 @@ export default function Ajustes({navigation, onLogout}) {
 
   return (
     <View style={styles.container}>
+      
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        
+        {/* SECCIÓN DE TÍTULO E IMAGEN */}
         <View style={styles.headerSection}>
-          <View>
-            <Text style={styles.mainTitle}>Configuración</Text>
-            <Text style={styles.subtitle}>Preferencias de tu cuenta</Text>
+          <View style={styles.titleContainer}>
+            <Text style={styles.mainTitle}>Preferencias</Text>
+            <Text style={styles.subtitle}>Personaliza tu experiencia</Text>
           </View>
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
         </View>
 
         <View style={styles.content}>
+          
+          {/* SECCIÓN: CUENTA */}
+          <Text style={styles.sectionLabel}>CUENTA</Text>
+          
           <View style={styles.card}>
             <View style={styles.cardContent}>
               <View style={styles.textContainer}>
                 <Text style={styles.cardTitle}>Idioma</Text>
                 <Text style={styles.cardValue}>Español (México)</Text>
               </View>
-              <Text style={styles.editText}>Editar</Text>
+              <TouchableOpacity>
+                <Text style={styles.editText}>Editar</Text>
+              </TouchableOpacity>
             </View>
           </View>
+
+          <View style={styles.card}>
+            <View style={styles.cardContent}>
+              <View style={styles.textContainer}>
+                <Text style={styles.cardTitle}>Miembro desde</Text>
+                <Text style={styles.cardValue}>Febrero de 2023</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* SECCIÓN: GENERAL */}
+          <Text style={styles.sectionLabel}>GENERAL</Text>
 
           <View style={styles.card}>
             <View style={styles.cardContent}>
               <View style={styles.textContainer}>
                 <Text style={styles.cardTitle}>Notificaciones</Text>
-                <Text style={styles.cardValue}>Recibir alertas y recordatorios</Text>
+                <Text style={styles.cardValue}>Alertas de presupuesto y pagos</Text>
               </View>
               <Switch
                 value={notificacionesActivas}
                 onValueChange={setNotificacionesActivas}
-                trackColor={{ false: "#ccc", true: "#7b6cff" }}
-                thumbColor={notificacionesActivas ? "#fff" : "#fff"}
+                trackColor={{ false: "#e0e0e0", true: "#b3a5ff" }}
+                thumbColor={notificacionesActivas ? "#7b6cff" : "#f4f3f4"}
               />
-            </View>
-          </View>
-
-          <View style={styles.card}>
-            <View style={styles.cardContent}>
-              <View style={styles.textContainer}>
-                <Text style={styles.cardTitle}>Se unió</Text>
-                <Text style={styles.cardValue}>Febrero de 2023</Text>
-              </View>
             </View>
           </View>
 
@@ -78,6 +85,7 @@ export default function Ajustes({navigation, onLogout}) {
           >
             <Text style={styles.exitText}>Cerrar Sesión</Text>
           </Pressable>
+
         </View>
       </ScrollView>
     </View>
@@ -85,53 +93,104 @@ export default function Ajustes({navigation, onLogout}) {
 }
 
 const styles = StyleSheet.create({
+  // =========================
+  // 🟢 LAYOUT
+  // =========================
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center"
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 120
+    paddingBottom: 50,
   },
+
+  // =========================
+  // 🟣 HEADER SUPERIOR
+  // =========================
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    marginTop: 50,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  backArrow: {
+    fontSize: 28,
+    color: "#7b6cff",
+    fontWeight: "300",
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#333",
+  },
+
+  // =========================
+  // 🖼️ SECCIÓN BIENVENIDA
+  // =========================
   headerSection: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20
+    marginBottom: 30,
+    marginTop: 10,
+  },
+  titleContainer: {
+    flex: 1,
   },
   mainTitle: {
-    fontSize: 26,
-    fontWeight: "700",
-    lineHeight: 30,
-    marginTop: 15,
-    color: "#7b6cff"
+    fontSize: 28,
+    fontWeight: "800",
+    color: "#7b6cff",
+    marginBottom: 5,
   },
   subtitle: {
     fontSize: 16,
-    marginTop: 50,
-    color: "#000"
+    color: "#666",
   },
   pigImage: {
-    width: 80,
-    height: 80,
-    resizeMode: "contain"
+    width: 90,
+    height: 90,
+    resizeMode: "contain",
   },
+
+  // =========================
+  // ⚙️ TARJETAS DE OPCIONES
+  // =========================
   content: {
     width: "100%",
-    marginTop: 20
+  },
+  sectionLabel: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#aaa",
+    marginBottom: 10,
+    marginTop: 10,
+    paddingLeft: 5,
+    letterSpacing: 1,
   },
   card: {
     backgroundColor: "#fff",
-    padding: 18,
-    borderRadius: 18,
-    marginBottom: 18,
+    padding: 20,
+    borderRadius: 20,
+    marginBottom: 15,
     width: "100%",
-    elevation: 6,
-    shadowColor: "#b6aaff",
-    shadowOpacity: 0.25,
-    shadowOffset: { width: 0, height: 3 },
+    // Sombras consistentes con el resto de la app
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
     shadowRadius: 5,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: "#f0f0f0",
   },
   cardContent: {
     flexDirection: "row",
@@ -140,34 +199,47 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
+    paddingRight: 10,
   },
   cardTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#7b6cff",
-    marginBottom: 4
+    color: "#333",
+    marginBottom: 4,
   },
   cardValue: {
-    fontSize: 15,
-    color: "#555",
-    fontWeight: "500"
+    fontSize: 14,
+    color: "#888",
+    fontWeight: "500",
   },
   editText: {
     fontSize: 14,
     color: "#7b6cff",
-    fontWeight: "600"
+    fontWeight: "700",
   },
+
+  // =========================
+  // 🔴 BOTÓN LOGOUT
+  // =========================
   logoutButton: {
-    backgroundColor: "#d62828",
-    paddingVertical: 15,
-    borderRadius: 30,
+    backgroundColor: "#ff7675",
+    paddingVertical: 18,
+    borderRadius: 20,
     alignItems: "center",
-    marginTop: 40,
+    marginTop: 30,
     width: "100%",
+    borderWidth: 1,
+    borderColor: "#000000ff", // Rojo suave
   },
   exitText: {
-    fontSize: 17,
-    color: "#fff",
-    fontWeight: "700"
-  }
+    fontSize: 16,
+    color: "#000000ff",
+    fontWeight: "700",
+  },
+  versionText: {
+    textAlign: "center",
+    color: "#ddd",
+    marginTop: 20,
+    fontSize: 12,
+  },
 });
