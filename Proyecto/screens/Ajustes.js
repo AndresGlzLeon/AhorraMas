@@ -26,7 +26,6 @@ export default function Ajustes({ navigation, onLogout }) {
       
       <ScrollView contentContainerStyle={styles.scrollContent}>
         
-        {/* SECCIÓN DE TÍTULO E IMAGEN */}
         <View style={styles.headerSection}>
           <View style={styles.titleContainer}>
             <Text style={styles.mainTitle}>Preferencias</Text>
@@ -37,7 +36,6 @@ export default function Ajustes({ navigation, onLogout }) {
 
         <View style={styles.content}>
           
-          {/* SECCIÓN: CUENTA */}
           <Text style={styles.sectionLabel}>CUENTA</Text>
           
           <View style={styles.card}>
@@ -61,7 +59,6 @@ export default function Ajustes({ navigation, onLogout }) {
             </View>
           </View>
 
-          {/* SECCIÓN: GENERAL */}
           <Text style={styles.sectionLabel}>GENERAL</Text>
 
           <View style={styles.card}>
@@ -93,9 +90,6 @@ export default function Ajustes({ navigation, onLogout }) {
 }
 
 const styles = StyleSheet.create({
-  // =========================
-  // 🟢 LAYOUT
-  // =========================
   container: {
     flex: 1,
     backgroundColor: "#fff",
@@ -104,10 +98,6 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 50,
   },
-
-  // =========================
-  // 🟣 HEADER SUPERIOR
-  // =========================
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -132,10 +122,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#333",
   },
-
-  // =========================
-  // 🖼️ SECCIÓN BIENVENIDA
-  // =========================
   headerSection: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -161,10 +147,6 @@ const styles = StyleSheet.create({
     height: 90,
     resizeMode: "contain",
   },
-
-  // =========================
-  // ⚙️ TARJETAS DE OPCIONES
-  // =========================
   content: {
     width: "100%",
   },
@@ -183,7 +165,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 15,
     width: "100%",
-    // Sombras consistentes con el resto de la app
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -217,10 +198,6 @@ const styles = StyleSheet.create({
     color: "#7b6cff",
     fontWeight: "700",
   },
-
-  // =========================
-  // 🔴 BOTÓN LOGOUT
-  // =========================
   logoutButton: {
     backgroundColor: "#ff7675",
     paddingVertical: 18,
@@ -229,7 +206,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     width: "100%",
     borderWidth: 1,
-    borderColor: "#000000ff", // Rojo suave
+    borderColor: "#000000ff", 
   },
   exitText: {
     fontSize: 16,

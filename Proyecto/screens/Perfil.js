@@ -16,7 +16,6 @@ export default function Perfil() {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         
-        {/* AVATAR SECTION */}
         <View style={styles.avatarContainer}>
           <View style={styles.avatarWrapper}>
             <Image source={require("../assets/usuarios.png")} style={styles.avatarImage} />
@@ -28,7 +27,6 @@ export default function Perfil() {
           <Text style={styles.userEmail}>{data.correo}</Text>
         </View>
 
-        {/* INPUTS */}
         <View style={styles.formContainer}>
           {["nombre", "correo", "telefono"].map((campo) => (
             <View key={campo} style={styles.inputGroup}>
@@ -58,22 +56,14 @@ export default function Perfil() {
 }
 
 const styles = StyleSheet.create({
-  // =========================
-  // 🟢 LAYOUT PRINCIPAL
-  // =========================
   container: {
     flex: 1,
     backgroundColor: "#fff",
   },
   scrollContent: {
     padding: 20,
-    // Un poco de espacio extra al final por si hay scroll
     paddingBottom: 40,
   },
-
-  // =========================
-  // 🟣 HEADER SUPERIOR
-  // =========================
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -91,10 +81,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#333",
   },
-
-  // =========================
-  // 👤 SECCIÓN DE AVATAR
-  // =========================
   avatarContainer: {
     alignItems: "center",
     marginBottom: 30,
@@ -135,10 +121,6 @@ const styles = StyleSheet.create({
     color: "#888",
     marginTop: 2,
   },
-
-  // =========================
-  // 📝 FORMULARIO E INPUTS
-  // =========================
   formContainer: {
     backgroundColor: "#f9f9f9",
     padding: 20,
@@ -178,17 +160,12 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 14,
   },
-
-  // =========================
-  // 💾 BOTÓN GUARDAR
-  // =========================
   saveButton: {
     backgroundColor: "#7b6cff",
     padding: 18,
     borderRadius: 15,
     alignItems: "center",
     marginTop: 20,
-    // Sombras
     shadowColor: "#7b6cff",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,

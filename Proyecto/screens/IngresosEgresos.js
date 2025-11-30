@@ -4,7 +4,7 @@ import {
   Modal, TextInput, Alert, TouchableOpacity, ActivityIndicator, Dimensions 
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { PieChart, BarChart } from "react-native-chart-kit"; // 📊 Importamos gráficas
+import { PieChart, BarChart } from "react-native-chart-kit";
 import DatabaseService from '../database/DatabaseService';
 
 const dbService = new DatabaseService();
@@ -13,19 +13,16 @@ const screenWidth = Dimensions.get("window").width;
 export default function IngresosEgresos() {
   const navigation = useNavigation();
 
-  // Estados de datos
   const [transacciones, setTransacciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [resumen, setResumen] = useState({ ingresos: 0, egresos: 0 });
   
-  // Estados para Gráficas
   const [dataPastel, setDataPastel] = useState([]);
   const [dataBarras, setDataBarras] = useState({
     labels: ["Ingresos", "Egresos"],
     datasets: [{ data: [0, 0] }]
   });
 
-  // Modal y Form
   const [modalVisible, setModalVisible] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState({ monto: "", categoria: "", descripcion: "", tipo: "egreso" });
@@ -63,7 +60,6 @@ export default function IngresosEgresos() {
         totalIng += t.monto;
       } else {
         totalEgr += t.monto;
-        // Agrupar por categoría para el pastel
         const cat = t.categoria || "Otros";
         categoriasGasto[cat] = (categoriasGasto[cat] || 0) + t.monto;
       }
@@ -71,13 +67,11 @@ export default function IngresosEgresos() {
 
     setResumen({ ingresos: totalIng, egresos: totalEgr });
 
-    // 1. Configurar Gráfica de Barras (Balance)
     setDataBarras({
       labels: ["Ingresos", "Egresos"],
       datasets: [{ data: [totalIng, totalEgr] }]
     });
 
-    // 2. Configurar Gráfica de Pastel (Categorías)
     const colores = ["#ff7675", "#74b9ff", "#55efc4", "#a29bfe", "#ffeaa7", "#fab1a0"];
     const pastel = Object.keys(categoriasGasto).map((key, index) => ({
       name: key,
@@ -87,7 +81,6 @@ export default function IngresosEgresos() {
       legendFontSize: 12
     }));
     
-    // Si no hay gastos, poner uno dummy para que no se vea vacío
     if (pastel.length === 0) {
       pastel.push({ name: "Sin gastos", monto: 1, color: "#e0e0e0", legendFontColor: "#aaa", legendFontSize: 12 });
     }
@@ -95,7 +88,6 @@ export default function IngresosEgresos() {
     setDataPastel(pastel);
   };
 
-  // --- CRUD ---
   const guardar = async () => {
     if (!form.monto || !form.categoria) return Alert.alert("Faltan datos", "Ingresa monto y categoría");
     try {
@@ -118,7 +110,6 @@ export default function IngresosEgresos() {
     Alert.alert("Eliminar", "¿Borrar movimiento?", [{ text: "Cancelar" }, { text: "Borrar", style: "destructive", onPress: async () => { await dbService.delete('transacciones', id); cargarDatos(); }}]);
   };
 
-  // --- UI ---
   const abrirModal = (item = null) => {
     if (item) { setEditId(item.id); setForm({ monto: item.monto.toString(), categoria: item.categoria, descripcion: item.descripcion, tipo: item.tipo }); }
     else { setEditId(null); setForm({ monto: "", categoria: "", descripcion: "", tipo: "egreso" }); }
@@ -135,7 +126,6 @@ export default function IngresosEgresos() {
   return (
     <View style={styles.container}>
       
-      {/* HEADER */}
       <View style={styles.header}>
         <Pressable onPress={() => navigation.navigate('Ajustes')}>
           <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
@@ -148,7 +138,6 @@ export default function IngresosEgresos() {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         
-        {/* === CARRUSEL DE GRÁFICAS (Deslizable) === */}
         <Text style={styles.sectionTitle}>Resumen Visual</Text>
         <ScrollView 
           horizontal 
@@ -156,7 +145,6 @@ export default function IngresosEgresos() {
           showsHorizontalScrollIndicator={false} 
           style={styles.chartScroll}
         >
-          {/* SLIDE 1: GRÁFICA DE PASTEL */}
           <View style={styles.chartCard}>
             <Text style={styles.chartTitle}>Gastos por Categoría</Text>
             <PieChart
@@ -169,10 +157,8 @@ export default function IngresosEgresos() {
               paddingLeft={"15"}
               absolute
             />
-            <Text style={styles.swipeHint}>Desliza para ver Balance 👉</Text>
           </View>
 
-          {/* SLIDE 2: GRÁFICA DE BARRAS */}
           <View style={styles.chartCard}>
             <Text style={styles.chartTitle}>Balance Mensual</Text>
             <BarChart
@@ -185,11 +171,9 @@ export default function IngresosEgresos() {
               fromZero
               showValuesOnTopOfBars
             />
-            <Text style={styles.swipeHint}>👈 Desliza para ver Categorías</Text>
           </View>
         </ScrollView>
 
-        {/* RESUMEN TARJETAS */}
         <View style={styles.summaryContainer}>
           <View style={[styles.summaryCard, { backgroundColor: '#e8f5e9' }]}>
             <Image source={require("../assets/sueldo.png")} style={styles.summaryIcon} />
@@ -224,10 +208,8 @@ export default function IngresosEgresos() {
         <View style={{height: 20}} />
       </ScrollView>
 
-      {/* FAB */}
       <TouchableOpacity style={styles.fab} onPress={() => abrirModal()}><Text style={styles.fabText}>+</Text></TouchableOpacity>
 
-      {/* MODAL (Simplificado visualmente) */}
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -252,28 +234,21 @@ export default function IngresosEgresos() {
 const chartConfig = {
   backgroundGradientFrom: "#fff",
   backgroundGradientTo: "#fff",
-  color: (opacity = 1) => `rgba(123, 108, 255, ${opacity})`, // Morado base
+  color: (opacity = 1) => `rgba(123, 108, 255, ${opacity})`, 
   strokeWidth: 2,
   barPercentage: 0.7,
   decimalPlaces: 0,
 };
 
 const styles = StyleSheet.create({
-  // =========================
-  // 🟢 LAYOUT PRINCIPAL
-  // =========================
   container: {
     flex: 1,
     backgroundColor: "#fff",
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 100, // Espacio para el menú inferior
+    paddingBottom: 100, 
   },
-
-  // =========================
-  // 🟣 HEADER SUPERIOR
-  // =========================
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -301,10 +276,6 @@ const styles = StyleSheet.create({
     height: 32,
     resizeMode: "contain",
   },
-
-  // =========================
-  // 📊 CARRUSEL DE GRÁFICAS
-  // =========================
   sectionTitle: {
     fontSize: 20,
     fontWeight: "800",
@@ -319,10 +290,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 25,
     padding: 15,
-    width: screenWidth - 40, // Ocupa casi todo el ancho
+    width: screenWidth - 40, 
     alignItems: 'center',
     justifyContent: 'center',
-    // Sombra suave
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
@@ -330,7 +300,7 @@ const styles = StyleSheet.create({
     elevation: 4,
     borderWidth: 1,
     borderColor: "#f0f0f0",
-    marginRight: 20, // Espacio si hubiera margen en el scroll
+    marginRight: 20, 
   },
   chartTitle: {
     fontSize: 16,
@@ -344,10 +314,6 @@ const styles = StyleSheet.create({
     marginTop: 15,
     fontStyle: 'italic',
   },
-
-  // =========================
-  // 💳 TARJETAS DE RESUMEN
-  // =========================
   summaryContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -380,10 +346,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 2,
   },
-
-  // =========================
-  // 📝 LISTA DE MOVIMIENTOS
-  // =========================
   card: {
     flexDirection: "row",
     alignItems: "center",
@@ -428,9 +390,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
-  // =========================
-  // ➕ BOTÓN FLOTANTE (FAB)
-  // =========================
   fab: {
     position: "absolute",
     bottom: 25,
@@ -453,10 +412,6 @@ const styles = StyleSheet.create({
     lineHeight: 34,
     fontWeight: "300",
   },
-
-  // =========================
-  // 🛑 MODAL (POP-UP)
-  // =========================
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -477,7 +432,6 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   
-  // Switch Ingreso/Gasto
   switchContainer: {
     flexDirection: 'row',
     backgroundColor: '#f0f0f0',
@@ -492,18 +446,16 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   switchActiveIngreso: {
-    backgroundColor: '#2ecc71', // Verde
+    backgroundColor: '#2ecc71', 
   },
   switchActiveEgreso: {
-    backgroundColor: '#ff7675', // Rojo
+    backgroundColor: '#ff7675', 
   },
   switchText: {
     fontWeight: 'bold',
     color: '#555',
     fontSize: 14,
   },
-
-  // Inputs y Botones
   input: {
     borderWidth: 1,
     borderColor: "#eee",

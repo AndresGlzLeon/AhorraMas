@@ -7,7 +7,6 @@ import { Ionicons } from '@expo/vector-icons';
 import 'react-native-get-random-values';
 import 'react-native-gesture-handler';
 
-// Screens
 import Principal from './screens/Principal';
 import PagosProgramados from './screens/PagosProgramados';
 import Presupuesto from './screens/Presupuesto';
@@ -22,7 +21,6 @@ import Perfil from './screens/Perfil';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-// Stack de Login/Registro
 function LoginStackNavigator({ onLogin }) {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -36,7 +34,6 @@ function LoginStackNavigator({ onLogin }) {
   );
 }
 
-// Stack de Principal con sus sub-pantallas
 function PrincipalStackNavigator({ onLogout }) {
   return (
     <Stack.Navigator>
@@ -78,7 +75,6 @@ function PrincipalStackNavigator({ onLogout }) {
   );
 }
 
-// Stack de Pagos Programados
 function PagosStackNavigator() {
   return (
     <Stack.Navigator>
@@ -121,7 +117,6 @@ function PagosStackNavigator() {
   );
 }
 
-// Stack de Presupuesto
 function PresupuestoStackNavigator() {
   return (
     <Stack.Navigator>
@@ -164,7 +159,6 @@ function PresupuestoStackNavigator() {
   );
 }
 
-// Stack de Ingresos/Egresos
 function IngresosEgresosStackNavigator() {
   return (
     <Stack.Navigator>
@@ -208,7 +202,6 @@ function IngresosEgresosStackNavigator() {
 }
 
 
-// Tabs Navigator Principal
 function TabsNavigator({ onLogout }) {
   return (
     <Tab.Navigator

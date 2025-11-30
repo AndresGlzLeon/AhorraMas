@@ -5,7 +5,6 @@ import { useNavigation } from "@react-navigation/native";
 export default function Notificaciones() {
   const navigation = useNavigation();
 
-  // Datos simulados (Se mantienen igual)
   const notificaciones = [
     {
       id: 1,
@@ -37,7 +36,6 @@ export default function Notificaciones() {
       
       <ScrollView contentContainerStyle={styles.scrollContent}>
         
-        {/* TITULO E IMAGEN */}
         <View style={styles.headerSection}>
           <View style={styles.titleContainer}>
             <Text style={styles.mainTitle}>Notificaciones</Text>
@@ -46,7 +44,6 @@ export default function Notificaciones() {
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
         </View>
 
-        {/* LISTA DE NOTIFICACIONES */}
         {notificaciones.map((n) => (
           <View key={n.id} style={styles.card}>
             <View style={styles.cardHeader}>
@@ -76,9 +73,6 @@ export default function Notificaciones() {
 }
 
 const styles = StyleSheet.create({
-  // =========================
-  // 🟢 LAYOUT
-  // =========================
   container: {
     flex: 1,
     backgroundColor: "#fff",
@@ -87,10 +81,6 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 50,
   },
-
-  // =========================
-  // 🟣 HEADER NAVEGACIÓN
-  // =========================
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -115,10 +105,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#333",
   },
-
-  // =========================
-  // 🖼️ SECCIÓN SUPERIOR
-  // =========================
   headerSection: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -144,17 +130,12 @@ const styles = StyleSheet.create({
     height: 80,
     resizeMode: "contain",
   },
-
-  // =========================
-  // 🔔 TARJETAS (CARDS)
-  // =========================
   card: {
     backgroundColor: "#fff",
     padding: 20,
     borderRadius: 20,
     marginBottom: 15,
     width: "100%",
-    // Sombras consistentes
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
@@ -195,7 +176,7 @@ const styles = StyleSheet.create({
   amount: {
     fontSize: 16,
     fontWeight: "800",
-    alignSelf: 'flex-end', // Alineado a la derecha para destacar
+    alignSelf: 'flex-end',
   },
   emptyText: {
     textAlign: "center",

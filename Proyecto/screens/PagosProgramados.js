@@ -4,25 +4,21 @@ import {
   TouchableOpacity, Modal, Alert, Pressable, Dimensions 
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import { Ionicons } from '@expo/vector-icons'; // Para el icono del botón añadir
+import { Ionicons } from '@expo/vector-icons';
 import DatabaseService from '../database/DatabaseService';
 
 const { width } = Dimensions.get("window");
 const dbService = new DatabaseService();
 
 export default function PagosProgramados({ navigation }) {
-  // Estado de datos
   const [pagos, setPagos] = useState([]);
 
-  // Estados de Modales
   const [modalAdd, setModalAdd] = useState(false);
   const [modalEdit, setModalEdit] = useState(false);
   
-  // Formulario
   const [nuevoPago, setNuevoPago] = useState({ titulo: "", monto: "", fecha: "", tipo: "Mensual" });
   const [editPagoId, setEditPagoId] = useState(null);
 
-  // --- CARGAR DATOS BD ---
   useFocusEffect(
     useCallback(() => {
       cargarDatos();
@@ -50,7 +46,6 @@ export default function PagosProgramados({ navigation }) {
     }
   };
 
-  // --- IMÁGENES ---
   const obtenerIcono = (titulo) => {
     const t = titulo ? titulo.toLowerCase() : "";
     if (t.includes("alquiler") || t.includes("casa")) return require("../assets/alquiler.png");
@@ -58,7 +53,6 @@ export default function PagosProgramados({ navigation }) {
     return require("../assets/servicios.png");
   };
 
-  // --- CRUD ---
   const agregarPago = async () => {
     if (!nuevoPago.titulo || !nuevoPago.monto) {
       Alert.alert("Error", "Faltan datos");
@@ -108,7 +102,6 @@ export default function PagosProgramados({ navigation }) {
   return (
     <View style={styles.container}>
       
-      {/* Header */}
       <View style={styles.header}>
         <View style={styles.leftIcons}>
           <Pressable onPress={() => navigation.navigate('Ajustes')}>
@@ -128,11 +121,9 @@ export default function PagosProgramados({ navigation }) {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         
-        {/* Título Principal */}
         <Text style={styles.mainTitle}>Gastos{"\n"}Programados</Text>
         <Image source={require("../assets/logo.png")} style={styles.pigImage} />
 
-        {/* Lista de Pagos */}
         {pagos.map((pago) => (
           <TouchableOpacity 
             key={pago.id} 
@@ -148,7 +139,6 @@ export default function PagosProgramados({ navigation }) {
             <View style={{alignItems: 'flex-end'}}>
                <Text style={styles.montoPago}>-${pago.monto}</Text>
                <View style={styles.actionIcons}>
-                  {/* Iconos visuales de editar/borrar como en tu imagen */}
                   <View style={styles.circleIcon}><Ionicons name="pencil" size={12} color="white"/></View>
                   <View style={[styles.circleIcon, {marginLeft: 5}]}><Ionicons name="trash" size={12} color="white"/></View>
                </View>
@@ -156,7 +146,6 @@ export default function PagosProgramados({ navigation }) {
           </TouchableOpacity>
         ))}
 
-        {/* --- BOTÓN AÑADIR PAGO (COMO EN TU IMAGEN) --- */}
         <TouchableOpacity 
           style={styles.btnBigAdd} 
           onPress={() => {
@@ -170,9 +159,7 @@ export default function PagosProgramados({ navigation }) {
 
       </ScrollView>
 
-      {/* --- MODALES (INTACTOS) --- */}
       
-      {/* Agregar */}
       <Modal visible={modalAdd} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalBox}>
@@ -188,7 +175,6 @@ export default function PagosProgramados({ navigation }) {
         </View>
       </Modal>
 
-      {/* Editar */}
       <Modal visible={modalEdit} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalBox}>
@@ -209,9 +195,6 @@ export default function PagosProgramados({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  // =========================
-  // 🟢 LAYOUT PRINCIPAL
-  // =========================
   container: { 
     flex: 1, 
     backgroundColor: "#fff" 
@@ -221,10 +204,6 @@ const styles = StyleSheet.create({
     padding: 20, 
     paddingBottom: 120 
   },
-
-  // =========================
-  // 🟣 HEADER
-  // =========================
   header: {
     flexDirection: "row", 
     alignItems: "center", 
@@ -266,14 +245,10 @@ const styles = StyleSheet.create({
     tintColor: "#fff", 
     resizeMode: "contain" 
   },
-
-  // =========================
-  // 🐷 TÍTULO Y CERDITO
-  // =========================
   heroSection: {
     marginBottom: 10,
     position: 'relative',
-    height: 100, // Espacio reservado para el título y la imagen
+    height: 100, 
     justifyContent: 'center'
   },
 
@@ -292,10 +267,6 @@ const styles = StyleSheet.create({
     top: 0, 
     resizeMode: 'contain' 
   },
-
-  // =========================
-  // 💳 TARJETAS DE PAGO
-  // =========================
   card: {
     flexDirection: "row", 
     alignItems: "center", 
@@ -304,13 +275,11 @@ const styles = StyleSheet.create({
     padding: 20, 
     borderRadius: 20, 
     marginBottom: 15,
-    // Sombras
     shadowColor: "#b3a5ff", 
     shadowOffset: { width: 0, height: 4 }, 
     shadowOpacity: 0.2, 
     shadowRadius: 8, 
     elevation: 5,
-    // Borde
     borderWidth: 1, 
     borderColor: '#f4f1ff'
   },
@@ -345,7 +314,6 @@ const styles = StyleSheet.create({
     textAlign: 'right' 
   },
   
-  // Iconos de acción (Lápiz/Basura)
   actionIcons: { 
     flexDirection: 'row', 
     justifyContent: 'flex-end', 
@@ -360,10 +328,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center' 
   },
-
-  // =========================
-  // ➕ BOTÓN GRANDE AÑADIR
-  // =========================
   btnBigAdd: {
     backgroundColor: '#f4f1ff',
     flexDirection: 'row',
@@ -380,10 +344,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
   },
-
-  // =========================
-  // 🛑 MODALES
-  // =========================
   modalContainer: { 
     flex: 1, 
     justifyContent: "center", 

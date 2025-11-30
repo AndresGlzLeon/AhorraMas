@@ -12,12 +12,10 @@ const dbService = new DatabaseService();
 export default function Principal() {
   const navigation = useNavigation();
 
-  // Estados para datos reales
   const [saldo, setSaldo] = useState(0);
   const [movimientosRecientes, setMovimientosRecientes] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Cargar datos cada vez que la pantalla se enfoca (vuelves de agregar un gasto)
   useFocusEffect(
     useCallback(() => {
       cargarDatosDashboard();
@@ -28,7 +26,6 @@ export default function Principal() {
     try {
       await dbService.init();
 
-      // 1. Calcular Saldo Total (Todos los registros)
       const todasTransacciones = await dbService.query("SELECT * FROM transacciones");
       
       let total = 0;
@@ -41,8 +38,6 @@ export default function Principal() {
       });
       setSaldo(total);
 
-      // 2. Obtener solo las últimas 3 para la vista previa
-      // Ordenamos por ID descendente para ver las nuevas primero
       const recientes = await dbService.query("SELECT * FROM transacciones ORDER BY id DESC LIMIT 3");
       setMovimientosRecientes(recientes);
 
@@ -53,7 +48,6 @@ export default function Principal() {
     }
   };
 
-  // Helper para seleccionar icono según categoría (Texto guardado en BD)
   const getIcono = (categoria) => {
     const c = categoria ? categoria.toLowerCase() : "";
     if (c.includes("transporte") || c.includes("auto") || c.includes("gasolina")) return require("../assets/transporte.png");
@@ -63,7 +57,6 @@ export default function Principal() {
     return require("../assets/sueldoBajo.png"); 
   };
 
-  // Helper para formatear fecha (Ej: "2024-10-25" -> "25/10/2024")
   const formatearFecha = (fechaISO) => {
     const d = new Date(fechaISO);
     return d.toLocaleDateString(); 
@@ -72,7 +65,6 @@ export default function Principal() {
   return (
     <View style={styles.container}>
       
-      {/* HEADER */}
       <View style={styles.header}>
         <View style={styles.leftIcons}>
           <TouchableOpacity onPress={() => navigation.navigate("Ajustes")}>
@@ -92,7 +84,6 @@ export default function Principal() {
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         
-        {/* WELCOME SECTION */}
         <View style={styles.welcomeSection}>
           <View>
             <Text style={styles.welcomeText}>Bienvenido,</Text>
@@ -101,12 +92,10 @@ export default function Principal() {
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
         </View>
 
-        {/* BALANCE CARD (CON DATOS REALES) */}
         <Text style={styles.sectionLabel}>Tu dinero disponible:</Text>
         <View style={styles.balanceCard}>
           <View style={styles.balanceInner}>
             <Text style={styles.currencySymbol}>$</Text>
-            {/* Formateamos el saldo con comas y 2 decimales */}
             <Text style={styles.balanceAmount}>
               {saldo.toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </Text>
@@ -114,7 +103,6 @@ export default function Principal() {
           <Text style={styles.balanceFooter}>Saldo Actual</Text>
         </View>
 
-        {/* TRANSACTIONS (LISTA DINÁMICA) */}
         <Text style={styles.sectionTitle}>Últimas transacciones</Text>
 
         <View style={styles.transactionCard}>
@@ -131,25 +119,22 @@ export default function Principal() {
                   <View key={item.id}>
                     <View style={styles.transRow}>
                       <View style={styles.iconContainer}>
-                        {/* Icono dinámico basado en la categoría */}
                         <Image source={getIcono(item.categoria)} style={styles.transIcon} />
                       </View>
                       <View style={styles.transDetails}>
                         <Text style={styles.transTitle}>{item.categoria}</Text>
                         <Text style={styles.transDate}>
                            {formatearFecha(item.fecha)}
-                           {/* Puedes agregar item.descripcion si quieres más detalle */}
                         </Text>
                       </View>
                       <Text style={[
                         styles.transAmount, 
-                        { color: item.tipo === 'ingreso' ? "#55efc4" : "#ff7675" } // Verde o Rojo
+                        { color: item.tipo === 'ingreso' ? "#55efc4" : "#ff7675" } 
                       ]}>
                         {item.tipo === 'ingreso' ? '+' : '-'} ${item.monto}
                       </Text>
                     </View>
 
-                    {/* Divisor solo si no es el último elemento */}
                     {index < movimientosRecientes.length - 1 && <View style={styles.divider} />}
                   </View>
                 ))
@@ -164,21 +149,14 @@ export default function Principal() {
 }
 
 const styles = StyleSheet.create({
-  // =========================
-  // 🟢 LAYOUT PRINCIPAL
-  // =========================
   container: {
     flex: 1,
     backgroundColor: "#fff",
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 100, // Espacio para que no choque con el menú de abajo
+    paddingBottom: 100,
   },
-
-  // =========================
-  // 🟣 HEADER (BARRA SUPERIOR)
-  // =========================
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -215,10 +193,6 @@ const styles = StyleSheet.create({
     height: 20,
     tintColor: "#fff",
   },
-
-  // =========================
-  // 👋 SECCIÓN BIENVENIDA
-  // =========================
   welcomeSection: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -241,10 +215,6 @@ const styles = StyleSheet.create({
     height: 80,
     resizeMode: "contain",
   },
-
-  // =========================
-  // 💰 TARJETA DE SALDO
-  // =========================
   sectionLabel: {
     fontSize: 16,
     color: "#888",
@@ -258,7 +228,6 @@ const styles = StyleSheet.create({
     padding: 25,
     alignItems: "center",
     marginBottom: 30,
-    // Sombra suave morada
     shadowColor: "#7b6cff",
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
@@ -287,10 +256,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
     letterSpacing: 1,
   },
-
-  // =========================
-  // 📋 LISTA DE TRANSACCIONES
-  // =========================
   sectionTitle: {
     fontSize: 20,
     fontWeight: "700",
@@ -302,7 +267,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 20,
     padding: 20,
-    // Sombra sutil gris
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -334,7 +298,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
     color: "#333",
-    textTransform: 'capitalize', // Primera letra mayúscula
+    textTransform: 'capitalize', 
   },
   transDate: {
     fontSize: 12,
@@ -349,6 +313,6 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: "#f0f0f0",
     marginVertical: 5,
-    marginLeft: 50, // Deja espacio para no cortar el icono
+    marginLeft: 50, 
   },
 });

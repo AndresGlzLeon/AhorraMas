@@ -12,20 +12,16 @@ const dbService = new DatabaseService();
 export default function Presupuesto() {
   const navigation = useNavigation();
 
-  // Estados visuales (idénticos a tu código)
-  const [presupuestoTotal, setPresupuestoTotal] = useState(0); // Ahora se calcula solo
-  const [gastos, setGastos] = useState([]); // Esto ahora son tus "Presupuestos por Categoría"
+  const [presupuestoTotal, setPresupuestoTotal] = useState(0); 
+  const [gastos, setGastos] = useState([]); 
   const [loading, setLoading] = useState(true);
 
-  // Estados de Modales (Intactos)
-  const [modalVisible, setModalVisible] = useState(false); // Para el total (informativo o ajuste)
-  const [modalGastoVisible, setModalGastoVisible] = useState(false); // Para agregar/editar items
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalGastoVisible, setModalGastoVisible] = useState(false); 
 
-  // Formulario
   const [nuevoGasto, setNuevoGasto] = useState({ nombre: "", monto: "", categoria: "" });
   const [editandoGastoId, setEditandoGastoId] = useState(null);
 
-  // --- LOGICA BD ---
   
   useFocusEffect(
     useCallback(() => {
@@ -38,20 +34,15 @@ export default function Presupuesto() {
     try {
       await dbService.init();
       
-      // 1. Cargar las metas/presupuestos de la BD
-      // Usamos el mes actual como filtro (Requisito Rúbrica)
       const mesActual = new Date().getMonth() + 1;
       const metas = await dbService.query('SELECT * FROM presupuestos WHERE mes = ?', [mesActual]);
       
-      // 2. Cargar lo gastado real (Transacciones)
       const transacciones = await dbService.query('SELECT * FROM transacciones WHERE tipo = ?', ['egreso']);
 
-      // 3. Procesar datos para que encajen en tu diseño
       let totalMeta = 0;
       let totalGastadoReal = 0;
 
       const itemsProcesados = metas.map(meta => {
-        // Calcular cuánto se ha gastado en esta categoría
         const gastadoEnCategoria = transacciones
           .filter(t => t.categoria.toLowerCase() === meta.categoria.toLowerCase())
           .reduce((sum, t) => sum + t.monto, 0);
@@ -61,7 +52,7 @@ export default function Presupuesto() {
 
         return {
           id: meta.id,
-          nombre: meta.categoria, // Mapeamos 'categoria' a 'nombre' para tu UI
+          nombre: meta.categoria, 
           monto: meta.monto,
           gastado: gastadoEnCategoria,
           porcentaje: Math.min((gastadoEnCategoria / meta.monto) * 100, 100)
@@ -69,7 +60,7 @@ export default function Presupuesto() {
       });
 
       setGastos(itemsProcesados);
-      setPresupuestoTotal(totalMeta); // El presupuesto total es la suma de las categorías
+      setPresupuestoTotal(totalMeta); 
 
     } catch (error) {
       console.error(error);
@@ -78,7 +69,6 @@ export default function Presupuesto() {
     }
   };
 
-  // --- CRUD (CONECTADO A BD) ---
 
   const agregarGasto = async () => {
     if (!nuevoGasto.nombre || !nuevoGasto.monto) {
@@ -87,10 +77,9 @@ export default function Presupuesto() {
     }
 
     try {
-      // Guardar en BD
       await dbService.insert('presupuestos', {
         usuarioId: 1,
-        categoria: nuevoGasto.nombre, // Usamos el nombre como categoría
+        categoria: nuevoGasto.nombre, 
         monto: parseFloat(nuevoGasto.monto),
         mes: new Date().getMonth() + 1,
         anio: new Date().getFullYear()
@@ -98,7 +87,7 @@ export default function Presupuesto() {
 
       setNuevoGasto({ nombre: "", monto: "", categoria: "" });
       setModalGastoVisible(false);
-      cargarDatos(); // Recargar visual
+      cargarDatos(); 
     } catch (error) {
       console.error(error);
     }
@@ -131,7 +120,6 @@ export default function Presupuesto() {
     ]);
   };
 
-  // --- UI HELPERS ---
 
   const abrirModalEditar = (gasto) => {
     setEditandoGastoId(gasto.id);
@@ -139,8 +127,6 @@ export default function Presupuesto() {
     setModalGastoVisible(true);
   };
 
-  // Cálculos visuales para la tarjeta principal
-  // Total asignado (Presupuesto) vs Total Gastado Real
   const totalGastadoReal = gastos.reduce((acc, item) => acc + item.gastado, 0);
   const porcentajeTotal = presupuestoTotal > 0 ? (totalGastadoReal / presupuestoTotal) * 100 : 0;
   const restante = presupuestoTotal - totalGastadoReal;
@@ -148,7 +134,6 @@ export default function Presupuesto() {
   return (
     <View style={styles.container}>
 
-      {/* --- HEADER ORIGINAL --- */}
       <View style={styles.header}>
         <View style={styles.leftIcons}>
           <Pressable onPress={() => navigation.navigate('Ajustes')}>
@@ -168,7 +153,6 @@ export default function Presupuesto() {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
 
-        {/* --- HERO SECTION (CERDITO) --- */}
         <View style={styles.headerSection}>
           <View>
             <Text style={styles.welcome}>Presupuesto</Text>
@@ -177,14 +161,12 @@ export default function Presupuesto() {
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
         </View>
 
-        {/* --- TARJETA PRINCIPAL (PRESUPUESTO INICIAL) --- */}
         <View style={styles.cardMain}>
           <View style={{flexDirection:'row', justifyContent:'space-between', marginBottom: 10}}>
             <Text style={styles.cardLabel}>Presupuesto Total</Text>
             <Text style={styles.cardValue}>${presupuestoTotal.toFixed(2)}</Text>
           </View>
           
-          {/* Barra Progreso Global */}
           <View style={styles.progressBarBg}>
             <View style={[styles.progressBarFill, { width: `${Math.min(porcentajeTotal, 100)}%` }]} />
           </View>
@@ -195,7 +177,6 @@ export default function Presupuesto() {
           </View>
         </View>
 
-        {/* --- BOTONES RESUMEN (Gastaste vs Restan) --- */}
         <View style={styles.statsRow}>
           <View style={[styles.statBox, {backgroundColor: '#a29bfe'}]}>
             <Text style={styles.statLabel}>Gastaste:</Text>
@@ -207,7 +188,6 @@ export default function Presupuesto() {
           </View>
         </View>
 
-        {/* --- LISTA DE PRESUPUESTOS (CATEGORÍAS) --- */}
         <View style={styles.listHeader}>
           <Text style={styles.sectionTitle}>Categorías</Text>
           <TouchableOpacity onPress={() => { setEditandoGastoId(null); setNuevoGasto({nombre:'', monto:''}); setModalGastoVisible(true); }}>
@@ -231,7 +211,6 @@ export default function Presupuesto() {
                 -${item.gastado.toFixed(0)}
               </Text>
             </View>
-            {/* Barra pequeña por item */}
             <View style={[styles.progressBarBg, {height: 6, marginTop: 8}]}>
                <View style={[styles.progressBarFill, { width: `${item.porcentaje}%`, backgroundColor: item.porcentaje > 100 ? '#ff7675' : '#55efc4' }]} />
             </View>
@@ -241,7 +220,6 @@ export default function Presupuesto() {
         <View style={{height: 20}} />
       </ScrollView>
 
-      {/* --- MODAL AGREGAR/EDITAR --- */}
       <Modal visible={modalGastoVisible} animationType="slide" transparent>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -286,9 +264,6 @@ export default function Presupuesto() {
 }
 
 const styles = StyleSheet.create({
-  // =========================
-  // 🟢 LAYOUT PRINCIPAL
-  // =========================
   container: {
     flex: 1,
     backgroundColor: "#fff",
@@ -297,12 +272,8 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 20,
     width: '100%',
-    paddingBottom: 100, // Espacio para el menú inferior
+    paddingBottom: 100, 
   },
-
-  // =========================
-  // 🟣 HEADER SUPERIOR
-  // =========================
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -338,10 +309,6 @@ const styles = StyleSheet.create({
     tintColor: "#fff",
     resizeMode: "contain",
   },
-
-  // =========================
-  // 🐷 HERO SECTION (CERDITO)
-  // =========================
   headerSection: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -360,10 +327,6 @@ const styles = StyleSheet.create({
     height: 80,
     resizeMode: "contain",
   },
-
-  // =========================
-  // 💳 TARJETA PRINCIPAL (TOTAL)
-  // =========================
   cardMain: {
     backgroundColor: '#f8f9fa',
     padding: 20,
@@ -392,10 +355,6 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#7b6cff',
   },
-
-  // =========================
-  // 📊 RESUMEN (GASTASTE / RESTAN)
-  // =========================
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -418,10 +377,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 5,
   },
-
-  // =========================
-  // 📝 LISTA DE CATEGORÍAS
-  // =========================
   listHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -445,7 +400,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 1,
     borderColor: '#f0f0f0',
-    // Sombras
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -469,10 +423,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-
-  // =========================
-  // 🛑 MODALES (POP-UP)
-  // =========================
   modalContainer: {
     flex: 1,
     justifyContent: "center",
@@ -484,7 +434,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 20,
     borderRadius: 20,
-    elevation: 10,
+    elevation: 10, 
   },
   modalTitle: {
     fontSize: 20,

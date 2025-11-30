@@ -13,7 +13,6 @@ export default function Ahorros() {
   const [nuevaMeta, setNuevaMeta] = useState({ nombre: "", metaTotal: "", ahorrado: "0" });
   const [editandoMeta, setEditandoMeta] = useState(null);
 
-  // Lógica CRUD simplificada para demo
   const guardarMeta = () => {
     if (!nuevaMeta.nombre || !nuevaMeta.metaTotal) return Alert.alert("Error", "Completa los campos");
     
@@ -39,7 +38,6 @@ export default function Ahorros() {
 
   return (
     <View style={styles.container}>
-      {/* HEADER */}
       <View style={styles.header}>
         <View style={styles.leftIcons}>
            <TouchableOpacity onPress={() => navigation.navigate("Ajustes")}>
@@ -67,7 +65,6 @@ export default function Ahorros() {
                 <Text style={styles.cardAmount}>${meta.ahorrado} / ${meta.metaTotal}</Text>
               </View>
               
-              {/* BARRA DE PROGRESO */}
               <View style={styles.progressBarBg}>
                 <View style={[styles.progressBarFill, { width: `${progreso}%` }]} />
               </View>
@@ -81,7 +78,6 @@ export default function Ahorros() {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* MODAL */}
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -102,21 +98,14 @@ export default function Ahorros() {
 }
 
 const styles = StyleSheet.create({
-  // =========================
-  // 🟢 LAYOUT PRINCIPAL
-  // =========================
   container: {
     flex: 1,
     backgroundColor: "#fff",
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 100, // Espacio para el menú inferior
+    paddingBottom: 100, 
   },
-
-  // =========================
-  // 🟣 HEADER SUPERIOR
-  // =========================
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -147,10 +136,6 @@ const styles = StyleSheet.create({
     height: 20,
     tintColor: "#fff",
   },
-
-  // =========================
-  // 📝 TÍTULOS Y SECCIONES
-  // =========================
   introSection: {
     marginBottom: 25,
   },
@@ -163,22 +148,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#666",
   },
-
-  // =========================
-  // 💳 TARJETAS DE AHORRO
-  // =========================
   card: {
     backgroundColor: "#fff",
     borderRadius: 20,
     padding: 20,
     marginBottom: 15,
-    // Sombra suave
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
-    // Borde sutil
     borderWidth: 1,
     borderColor: "#f0f0f0",
   },
@@ -197,10 +176,6 @@ const styles = StyleSheet.create({
     color: "#666",
     fontWeight: "600",
   },
-
-  // =========================
-  // 📊 BARRA DE PROGRESO
-  // =========================
   progressBarBg: {
     height: 10,
     backgroundColor: "#f0f0f0",
@@ -218,10 +193,6 @@ const styles = StyleSheet.create({
     color: "#999",
     marginTop: 5,
   },
-
-  // =========================
-  // ➕ BOTÓN "NUEVA META"
-  // =========================
   addButton: {
     backgroundColor: "#7b6cff",
     padding: 15,
@@ -234,10 +205,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
   },
-
-  // =========================
-  // 🛑 MODAL (POP-UP)
-  // =========================
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -271,7 +238,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   
-  // Botones del Modal
   btnCancel: {
     padding: 15,
     width: "45%",

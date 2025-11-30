@@ -6,7 +6,6 @@ export default function Login({ navigation, onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   
-  // Estados para Recuperación
   const [modalVisible, setModalVisible] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetStep, setResetStep] = useState(1); // 1: Pedir Correo, 2: Pedir Respuesta
@@ -28,26 +27,23 @@ export default function Login({ navigation, onLogin }) {
     const resultado = await controller.login(email, password);
     
     if (resultado.exito) {
-      // Alert.alert("Éxito", `Bienvenido ${resultado.usuario.nombre}`);
       if (onLogin) onLogin(resultado.usuario);
     } else {
       Alert.alert("Acceso denegado", resultado.mensaje);
     }
   };
 
-  // --- LÓGICA DE RECUPERACIÓN DE CONTRASEÑA ---
 
   const buscarUsuario = async () => {
     if (!resetEmail) return Alert.alert("Error", "Ingresa tu correo");
     
     setLoading(true);
-    // Verificar si existe y traer la pregunta
     const resultado = await controller.obtenerPregunta(resetEmail);
     setLoading(false);
 
     if (resultado.exito) {
-      setPreguntaSeguridad(resultado.pregunta); // Guardamos la pregunta
-      setResetStep(2); // Pasamos al siguiente paso
+      setPreguntaSeguridad(resultado.pregunta); 
+      setResetStep(2);
     } else {
       Alert.alert("Error", "Este correo no está registrado en la app.");
     }
@@ -61,7 +57,6 @@ export default function Login({ navigation, onLogin }) {
     setLoading(false);
 
     if (resultado.exito) {
-      // ÉXITO: Mostramos la contraseña recuperada (En MVP local es válido)
       Alert.alert(
         "¡Identidad Verificada!", 
         `Tu contraseña es: \n\n${resultado.contrasena}\n\nAnótala en un lugar seguro.`,
@@ -241,7 +236,7 @@ const styles = StyleSheet.create({
 
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)", // Fondo oscuro semitransparente
+    backgroundColor: "rgba(0,0,0,0.6)", 
     justifyContent: "center",
     padding: 24,
   },
