@@ -13,8 +13,9 @@ import {
   Pressable
 } from "react-native";
 import UsuarioController from "../controllers/UsuarioController";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function Login({ navigation, onLogin }) {
+export default function Login({ navigation, onLogin, databaseService }) {
   // ========== ESTADO LOCAL ==========
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,28 +44,41 @@ export default function Login({ navigation, onLogin }) {
 
   // ========== MANEJO DE LOGIN ==========
   const handleLogin = async () => {
-    // Validación básica en la vista
     if (email.trim() === "" || password.trim() === "") {
       Alert.alert("Error", "Por favor completa todos los campos");
       return;
     }
 
-    // Llamar al CONTROLADOR para manejar la lógica
-    const resultado = await controller.login(email, password);
-    
-    if (resultado.exito) {
-      Alert.alert("Éxito", `Bienvenido ${resultado.usuario.nombre}`);
-      
-      // Limpiar campos
-      setEmail("");
-      setPassword("");
-      
-      // Notificar a App.js que el login fue exitoso
-      if (onLogin) {
-        onLogin(resultado.usuario);
+    // Validar formato de correo
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert("Error", "Por favor ingresa un correo válido");
+      return;
+    }
+
+    try {
+      const usuarios = await databaseService.query(
+        "SELECT * FROM usuarios WHERE correo = ? AND contrasena = ?",
+        [email, password]
+      );
+
+      if (usuarios.length > 0) {
+        const usuario = usuarios[0];
+        Alert.alert("Éxito", `Bienvenido ${usuario.nombre}`);
+
+        // Guardar usuario autenticado en AsyncStorage
+        await AsyncStorage.setItem("usuarioAutenticado", JSON.stringify(usuario));
+
+        // Notificar a App.js que el login fue exitoso
+        if (onLogin) {
+          onLogin(usuario);
+        }
+      } else {
+        Alert.alert("Error", "Correo o contraseña incorrectos");
       }
-    } else {
-      Alert.alert("Error", resultado.mensaje);
+    } catch (error) {
+      console.error("Error al iniciar sesión:", error);
+      Alert.alert("Error", "Hubo un problema al iniciar sesión. Inténtalo de nuevo.");
     }
   };
 

@@ -1,30 +1,62 @@
 import React, { useState } from "react";
 import {View,Text,TextInput,StyleSheet,KeyboardAvoidingView,Alert,Image,Pressable} from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function CrearCuenta({navigation, onLogin}) {
+export default function CrearCuenta({ navigation, onLogin, databaseService }) {
   const [nombre, setNombre] = useState("");
   const [correo, setCorreo] = useState("");
   const [contrasenia, setContrasenia] = useState("");
   const [telefono, setTelefono] = useState("");
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (nombre.trim() === '' || correo.trim() === '' || contrasenia.trim() === '' || telefono.trim() === '') {
       Alert.alert("Error", "Completa todos los campos");
       return;
     }
-    
-    // Aquí puedes agregar tu lógica de registro
-    // Por ejemplo, guardar en un backend
-    
-    Alert.alert("Cuenta creada", `Bienvenido ${nombre}`);
-    setNombre("");
-    setCorreo("");
-    setContrasenia("");
-    setTelefono("");
-    
-    // Llamar a la función onLogin para cambiar el estado de autenticación
-    if (onLogin) {
-      onLogin();
+
+    // Validar formato de correo
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(correo)) {
+      Alert.alert("Error", "Por favor ingresa un correo válido");
+      return;
+    }
+
+    try {
+      // Verificar si el correo ya está registrado
+      const usuariosExistentes = await databaseService.query(
+        "SELECT * FROM usuarios WHERE correo = ?",
+        [correo]
+      );
+
+      if (usuariosExistentes.length > 0) {
+        Alert.alert("Error", "El correo ya está registrado. Por favor, usa otro correo.");
+        return;
+      }
+
+      // Guardar en la base de datos
+      const nuevoUsuario = await databaseService.insert("usuarios", {
+        nombre,
+        correo,
+        contrasena: contrasenia,
+        telefono,
+      });
+
+      // Guardar usuario autenticado en AsyncStorage
+      await AsyncStorage.setItem("usuarioAutenticado", JSON.stringify(nuevoUsuario));
+
+      Alert.alert("Cuenta creada", `Bienvenido ${nuevoUsuario.nombre}`);
+      setNombre("");
+      setCorreo("");
+      setContrasenia("");
+      setTelefono("");
+
+      // Llamar a la función onLogin para cambiar el estado de autenticación
+      if (onLogin) {
+        onLogin();
+      }
+    } catch (error) {
+      console.error("Error al registrar usuario:", error);
+      Alert.alert("Error", "No se pudo crear la cuenta. Inténtalo de nuevo.");
     }
   };
 

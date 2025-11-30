@@ -1,37 +1,75 @@
-import React, { useState } from "react";
-import { View, Text, ScrollView, StyleSheet, Image, TextInput, TouchableOpacity,Alert } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, ScrollView, StyleSheet, Image, TextInput, TouchableOpacity, Alert } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function Perfil() {
-
-  const [nombre, setNombre] = useState("Valeria Morales González");
-  const [correo, setCorreo] = useState("vmoralesg@gmail.com");
-  const [telefono, setTelefono] = useState("555-789-0123");
+export default function Perfil({ databaseService }) {
+  const [nombre, setNombre] = useState("");
+  const [correo, setCorreo] = useState("");
+  const [telefono, setTelefono] = useState("");
 
   const [editNombre, setEditNombre] = useState(false);
   const [editCorreo, setEditCorreo] = useState(false);
   const [editTelefono, setEditTelefono] = useState(false);
 
-  const guardarCambios = () => {
-    Alert.alert("Cambios guardados", "Tu información ha sido actualizada.");
-    alert("Cambios guardados correctamente");
+  useEffect(() => {
+    const cargarDatosUsuario = async () => {
+      try {
+        const usuarioAutenticado = await AsyncStorage.getItem("usuarioAutenticado");
+        if (usuarioAutenticado) {
+          const usuario = JSON.parse(usuarioAutenticado);
+          setNombre(usuario.nombre);
+          setCorreo(usuario.correo);
+          setTelefono(usuario.telefono);
+        }
+      } catch (error) {
+        console.error("Error al cargar datos del usuario autenticado:", error);
+      }
+    };
+
+    cargarDatosUsuario();
+  }, []);
+
+  const toggleEdit = (field) => {
+    if (field === "nombre") {
+      setEditNombre((prev) => !prev);
+    } else if (field === "correo") {
+      setEditCorreo((prev) => !prev);
+    } else if (field === "telefono") {
+      setEditTelefono((prev) => !prev);
+    }
+  };
+
+  const guardarCambios = async () => {
+    try {
+      // Validar si el correo ya existe en la base de datos
+      const usuariosExistentes = await databaseService.query(
+        "SELECT * FROM usuarios WHERE correo = ? AND id != ?",
+        [correo, 1] // Cambiar por el ID del usuario autenticado
+      );
+
+      if (usuariosExistentes.length > 0) {
+        Alert.alert("Error", "El correo ya está registrado. Por favor, usa otro correo.");
+        return;
+      }
+
+      await databaseService.update("usuarios", 1, { // Cambiar por el ID del usuario autenticado
+        nombre,
+        correo,
+        telefono,
+      });
+
+      Alert.alert("Cambios guardados", "Tu información ha sido actualizada.");
+      setEditNombre(false);
+      setEditCorreo(false);
+      setEditTelefono(false);
+    } catch (error) {
+      console.error("Error al guardar cambios:", error);
+      Alert.alert("Error", "No se pudieron guardar los cambios.");
+    }
   };
 
   return (
     <View style={styles.container}>
-
-      {/* <View style={styles.header}>
-        <View style={styles.leftIcons}>
-          <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-
-          <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-        </View>
-
-        <Text style={styles.title}>Ahorra+ App</Text>
-
-        <View style={styles.avatar}>
-          <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-        </View>
-      </View> */}
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
 
@@ -42,9 +80,6 @@ export default function Perfil() {
             source={require("../assets/usuarios.png")}
             style={styles.bigAvatar}
           />
-          <TouchableOpacity style={styles.uploadButton}>
-            <Text style={styles.uploadText}>Subir foto</Text>
-          </TouchableOpacity>
         </View>
 
         <View style={styles.inputCard}>
@@ -60,7 +95,7 @@ export default function Perfil() {
 
             <TouchableOpacity 
               style={styles.editButton}
-              onPress={() => setEditNombre(!editNombre)}
+              onPress={() => toggleEdit("nombre")}
             >
               <Text style={styles.editText}>Editar</Text>
             </TouchableOpacity>
@@ -80,7 +115,7 @@ export default function Perfil() {
 
             <TouchableOpacity 
               style={styles.editButton}
-              onPress={() => setEditCorreo(!editCorreo)}
+              onPress={() => toggleEdit("correo")}
             >
               <Text style={styles.editText}>Editar</Text>
             </TouchableOpacity>
@@ -96,11 +131,12 @@ export default function Perfil() {
               value={telefono}
               onChangeText={setTelefono}
               editable={editTelefono}
+              keyboardType="phone-pad"
             />
 
             <TouchableOpacity 
               style={styles.editButton}
-              onPress={() => setEditTelefono(!editTelefono)}
+              onPress={() => toggleEdit("telefono")}
             >
               <Text style={styles.editText}>Editar</Text>
             </TouchableOpacity>
@@ -112,8 +148,6 @@ export default function Perfil() {
         </TouchableOpacity>
 
       </ScrollView>
-
-
 
     </View>
   );
@@ -185,27 +219,13 @@ const styles = StyleSheet.create({
 
   avatarSection: {
     alignItems: "center",
-    marginBottom: 30,
+    marginBottom: 20,
   },
 
   bigAvatar: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    resizeMode: "contain",
-  },
-
-  uploadButton: {
-    marginTop: 10,
-    backgroundColor: "#e8dfff",
-    paddingVertical: 6,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-  },
-
-  uploadText: {
-    color: "#7451ff",
-    fontWeight: "600",
+    width: 100,
+    height: 100,
+    borderRadius: 50,
   },
 
   inputCard: {

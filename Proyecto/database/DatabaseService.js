@@ -28,6 +28,7 @@ export default class DatabaseService {
       // Para móvil usamos SQLite
       this.db = await SQLite.openDatabaseAsync('lanaapp.db');
       await this.crearTablas();
+      await this.updateSchema(); // Llamar al método para actualizar el esquema de la base de datos
       this.isInitialized = true;
       console.log('✅ BD SQLite inicializada');
     } catch (error) {
@@ -85,6 +86,16 @@ export default class DatabaseService {
     } catch (error) {
       console.error('❌ Error al crear tablas:', error);
       throw error;
+    }
+  }
+
+  // Actualizar el esquema de la base de datos
+  async updateSchema() {
+    try {
+      // Eliminé la lógica para agregar la columna 'foto' ya que no se usará
+      console.log("Esquema de la base de datos actualizado.");
+    } catch (error) {
+      console.error("Error al actualizar el esquema de la base de datos:", error);
     }
   }
 

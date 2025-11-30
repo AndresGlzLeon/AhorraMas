@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import 'react-native-get-random-values';
 import 'react-native-gesture-handler';
+import DatabaseService from './database/DatabaseService';
 
 // Screens
 import Principal from './screens/Principal';
@@ -19,6 +20,11 @@ import Login from './screens/Login';
 import Notificaciones from './screens/Notificaciones';
 import Perfil from './screens/Perfil';
 
+const databaseService = new DatabaseService();
+(async () => {
+  await databaseService.init();
+})();
+
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
@@ -27,10 +33,10 @@ function LoginStackNavigator({ onLogin }) {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Login">
-        {(props) => <Login {...props} onLogin={onLogin} />}
+        {(props) => <Login {...props} onLogin={onLogin} databaseService={databaseService} />}
       </Stack.Screen>
       <Stack.Screen name="CrearCuenta">
-        {(props) => <CrearCuenta {...props} onLogin={onLogin} />}
+        {(props) => <CrearCuenta {...props} onLogin={onLogin} databaseService={databaseService} />}
       </Stack.Screen>
     </Stack.Navigator>
   );
@@ -47,14 +53,15 @@ function PrincipalStackNavigator({ onLogout }) {
       />
       <Stack.Screen 
         name="Perfil" 
-        component={Perfil}
         options={{ 
           title: 'Mi Perfil',
           headerStyle: { backgroundColor: '#f4f1ff' },
           headerTintColor: '#7b6cff',
           headerTitleStyle: { fontWeight: 'bold' }
         }}
-      />
+      >
+        {(props) => <Perfil {...props} databaseService={databaseService} />}
+      </Stack.Screen>
       <Stack.Screen name="Ajustes" 
        options={{
           title: 'Ajustes',
@@ -109,14 +116,15 @@ function PagosStackNavigator() {
       />
       <Stack.Screen 
         name="Perfil" 
-        component={Perfil}
         options={{
           title: 'Mi Perfil',
           headerStyle: { backgroundColor: '#f4f1ff' },
           headerTintColor: '#7b6cff',
           headerTitleStyle: { fontWeight: 'bold' }
         }}
-      />
+      >
+        {(props) => <Perfil {...props} databaseService={databaseService} />}
+      </Stack.Screen>
     </Stack.Navigator>
   );
 }
@@ -152,14 +160,15 @@ function PresupuestoStackNavigator() {
       />
       <Stack.Screen 
         name="Perfil" 
-        component={Perfil}
         options={{
           title: 'Mi Perfil',
           headerStyle: { backgroundColor: '#f4f1ff' },
           headerTintColor: '#7b6cff',
           headerTitleStyle: { fontWeight: 'bold' }
         }}
-      />
+      >
+        {(props) => <Perfil {...props} databaseService={databaseService} />}
+      </Stack.Screen>
     </Stack.Navigator>
   );
 }
@@ -195,14 +204,15 @@ function IngresosEgresosStackNavigator() {
       />
       <Stack.Screen 
         name="Perfil" 
-        component={Perfil}
         options={{
           title: 'Mi Perfil',
           headerStyle: { backgroundColor: '#f4f1ff' },
           headerTintColor: '#7b6cff',
           headerTitleStyle: { fontWeight: 'bold' }
         }}
-      />
+      >
+        {(props) => <Perfil {...props} databaseService={databaseService} />}
+      </Stack.Screen>
     </Stack.Navigator>
   );
 }
