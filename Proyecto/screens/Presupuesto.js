@@ -10,13 +10,13 @@ import {
   TextInput, 
   TouchableOpacity,
   Alert,
-  Dimensions
+  Dimensions,Pressable
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
-export default function Presupuesto() {
+export default function Presupuesto ()  {
   const navigation = useNavigation();
 
   const [presupuesto, setPresupuesto] = useState(10555);
@@ -156,22 +156,23 @@ export default function Presupuesto() {
           </View>
         </View>
       </Modal>
-
-      <View style={styles.header}>
-        <View style={styles.leftIcons}>
-          <TouchableOpacity onPress={() => navigation.navigate("Principal", { screen: "Ajustes" })}>
-          <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("Principal", { screen: "Notificaciones" })}>
-          <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.title}>Ahorra+ App</Text>
-        <TouchableOpacity style={styles.avatar} onPress={() => navigation.navigate("Principal", { screen: "Perfil" })}>
-        <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-          </TouchableOpacity>
-      </View>
+       <View style={styles.header}>
+              <View style={styles.leftIcons}>
+                <Pressable onPress={() => navigation.navigate('Ajustes')}>
+                  <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+                </Pressable>
+                <Pressable onPress={() => navigation.navigate('Notificaciones')}>
+                  <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+                </Pressable>
+              </View>
+              <Text style={styles.title}>Ahorra+ App</Text>
+              <View style={styles.avatar}>
+                <Pressable onPress={() => navigation.navigate('Perfil')}>
+                  <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+                </Pressable>
+              </View>
+            </View>
+        
 
       {/* SCROLL RESPONSIVO */}
       <ScrollView contentContainerStyle={styles.scrollContent}>

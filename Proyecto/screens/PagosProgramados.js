@@ -1,13 +1,10 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, StyleSheet, Image, TextInput, TouchableOpacity, Modal, Alert } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Image, TextInput, TouchableOpacity, Modal, Alert, Pressable } from "react-native";
 import { Dimensions } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
-export default function PagosProgramados() {
-  const navigation = useNavigation();
-
+export default function PagosProgramados({ navigation }) {
   const [pagos, setPagos] = useState([
     { titulo: "Alquiler", monto: 1500, fecha: "10 octubre 2025", tipo: "Mensual", icon: require("../assets/alquiler.png") },
     { titulo: "Seguro Auto", monto: 750, fecha: "4 enero 2026", tipo: "Anual", icon: require("../assets/auto.png") },
@@ -16,7 +13,6 @@ export default function PagosProgramados() {
 
   const [modalAdd, setModalAdd] = useState(false);
   const [modalEdit, setModalEdit] = useState(false);
-
   const [nuevoPago, setNuevoPago] = useState({ titulo: "", monto: "", fecha: "", tipo: "Mensual" });
   const [editPagoIndex, setEditPagoIndex] = useState(null);
 
@@ -25,7 +21,6 @@ export default function PagosProgramados() {
       Alert.alert("Error", "Todos los campos son obligatorios");
       return;
     }
-
     setPagos(prev => [
       ...prev,
       {
@@ -34,7 +29,6 @@ export default function PagosProgramados() {
         icon: require("../assets/servicios.png")
       }
     ]);
-
     setNuevoPago({ titulo: "", monto: "", fecha: "", tipo: "Mensual" });
     setModalAdd(false);
   };
@@ -62,13 +56,11 @@ export default function PagosProgramados() {
       };
       return copy;
     });
-
     setEditPagoIndex(null);
     setModalEdit(false);
   };
 
   const eliminarPagoDirecto = (index) => {
-    console.log("Eliminar directo index:", index);
     setPagos(prev => prev.filter((_, i) => i !== index));
   };
 
@@ -85,38 +77,34 @@ export default function PagosProgramados() {
 
   return (
     <View style={styles.container}>
-
-      {/* MODAL AGREGAR */}
+      {/* Modal para agregar pago */}
       <Modal visible={modalAdd} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalBox}>
             <Text style={styles.modalTitle}>Agregar Pago</Text>
-
-            <TextInput 
-              style={styles.input} 
+            <TextInput
+              style={styles.input}
               placeholder="Título"
               value={nuevoPago.titulo}
               onChangeText={(t) => setNuevoPago({ ...nuevoPago, titulo: t })}
             />
-            <TextInput 
-              style={styles.input} 
+            <TextInput
+              style={styles.input}
               placeholder="Monto"
               keyboardType="numeric"
               value={nuevoPago.monto}
               onChangeText={(t) => setNuevoPago({ ...nuevoPago, monto: t })}
             />
-            <TextInput 
-              style={styles.input} 
+            <TextInput
+              style={styles.input}
               placeholder="Fecha"
               value={nuevoPago.fecha}
               onChangeText={(t) => setNuevoPago({ ...nuevoPago, fecha: t })}
             />
-
             <View style={styles.modalButtons}>
               <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalAdd(false)}>
                 <Text style={styles.btnText}>Cancelar</Text>
               </TouchableOpacity>
-
               <TouchableOpacity style={styles.saveBtn} onPress={agregarPago}>
                 <Text style={styles.btnText}>Guardar</Text>
               </TouchableOpacity>
@@ -125,37 +113,34 @@ export default function PagosProgramados() {
         </View>
       </Modal>
 
-      {/* MODAL EDITAR */}
+      {/* Modal para editar pago */}
       <Modal visible={modalEdit} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalBox}>
             <Text style={styles.modalTitle}>Editar Pago</Text>
-
-            <TextInput 
-              style={styles.input} 
+            <TextInput
+              style={styles.input}
               placeholder="Título"
               value={nuevoPago.titulo}
               onChangeText={(t) => setNuevoPago({ ...nuevoPago, titulo: t })}
             />
-            <TextInput 
-              style={styles.input} 
+            <TextInput
+              style={styles.input}
               placeholder="Monto"
               keyboardType="numeric"
               value={nuevoPago.monto}
               onChangeText={(t) => setNuevoPago({ ...nuevoPago, monto: t })}
             />
-            <TextInput 
-              style={styles.input} 
+            <TextInput
+              style={styles.input}
               placeholder="Fecha"
               value={nuevoPago.fecha}
               onChangeText={(t) => setNuevoPago({ ...nuevoPago, fecha: t })}
             />
-
             <View style={styles.modalButtons}>
               <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalEdit(false)}>
                 <Text style={styles.btnText}>Cancelar</Text>
               </TouchableOpacity>
-
               <TouchableOpacity style={styles.saveBtn} onPress={guardarEdicion}>
                 <Text style={styles.btnText}>Guardar</Text>
               </TouchableOpacity>
@@ -164,26 +149,25 @@ export default function PagosProgramados() {
         </View>
       </Modal>
 
+      {/* Header con navegación */}
       <View style={styles.header}>
         <View style={styles.leftIcons}>
-          <TouchableOpacity onPress={() => navigation.navigate("Principal", { screen: "Ajustes" })}>
-          <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("Principal", { screen: "Notificaciones" })}>
-          <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
-          </TouchableOpacity>
+          <Pressable onPress={() => navigation.navigate('Ajustes')}>
+            <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
+          </Pressable>
+          <Pressable onPress={() => navigation.navigate('Notificaciones')}>
+            <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 10 }]} />
+          </Pressable>
         </View>
-
         <Text style={styles.title}>Ahorra+ App</Text>
-        <TouchableOpacity style={styles.avatar} onPress={() => navigation.navigate("Principal", { screen: "Perfil" })}>
-        <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
-          </TouchableOpacity>
+        <View style={styles.avatar}>
+          <Pressable onPress={() => navigation.navigate('Perfil')}>
+            <Image source={require("../assets/usuarios.png")} style={styles.avatarIcon} />
+          </Pressable>
+        </View>
       </View>
 
-
-      {/* SCROLLVIEW ADAPTATIVO */}
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        
+      <ScrollView>
         <View style={styles.headerSection}>
           <Text style={styles.mainTitle}>Gastos{"\n"}Programados</Text>
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
@@ -199,11 +183,9 @@ export default function PagosProgramados() {
                   <Text style={styles.cardSub}>{pago.tipo}</Text>
                 </View>
               </View>
-
               <View style={{ alignItems: "flex-end" }}>
                 <Text style={styles.cardAmount}>-${pago.monto}.00</Text>
                 <Text style={styles.cardDate}>{pago.fecha}</Text>
-
                 <View style={{ flexDirection: "row", marginTop: 5 }}>
                   <TouchableOpacity
                     onPress={() => abrirEditar(index)}
@@ -213,7 +195,6 @@ export default function PagosProgramados() {
                   >
                     <Image source={require("../assets/edit.png")} style={styles.navIcon} />
                   </TouchableOpacity>
-
                   <TouchableOpacity
                     onPress={() => confirmarEliminar(index)}
                     hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
@@ -222,7 +203,6 @@ export default function PagosProgramados() {
                   >
                     <Image source={require("../assets/elim.png")} style={styles.navIcon} />
                   </TouchableOpacity>
-
                 </View>
               </View>
             </View>
@@ -233,27 +213,13 @@ export default function PagosProgramados() {
           <Image source={require("../assets/Programados.png")} style={styles.addIcon} />
           <Text style={styles.addText}>Añadir Pago</Text>
         </TouchableOpacity>
-
       </ScrollView>
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
-  container: { 
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "stretch"
-  },
-
-  scrollContent: {
-    width: width * 0.95,
-    alignSelf: "center",
-    paddingBottom: 40,
-  },
-
+  container: { flex: 1, backgroundColor: "#fff", alignItems: "center" },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -262,28 +228,23 @@ const styles = StyleSheet.create({
     backgroundColor: "#f4f1ff",
     borderRadius: 40,
     width: "95%",
-    alignSelf: "center",
     marginTop: 50,
   },
-
   leftIcons: { flexDirection: "row", alignItems: "center" },
   iconHeader: { width: 33, height: 22, resizeMode: "contain" },
   title: { fontSize: 18, fontWeight: "600", color: "#333" },
   avatar: { backgroundColor: "#b3a5ff", borderRadius: 50, padding: 8 },
   avatarIcon: { width: 20, height: 20, tintColor: "#fff", resizeMode: "contain" },
-
-  headerSection: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 30 },
-  mainTitle: { fontSize: 26, fontWeight: "700", lineHeight: 30, marginTop:15, color: "#7b6cff" },
-  pigImage: { width: 80, height: 80, resizeMode: "contain", marginTop:20 },
-
+  headerSection: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 30, padding: 20 },
+  mainTitle: { fontSize: 26, fontWeight: "700", lineHeight: 30, marginTop: 15, color: "#7b6cff" },
+  pigImage: { width: 80, height: 80, resizeMode: "contain", marginTop: 20 },
   cardContainer: {
     backgroundColor: "#f4f1ff",
     padding: 10,
     borderRadius: 30,
     marginBottom: 30,
-    marginTop: -5,
+    marginHorizontal: 20,
   },
-
   card: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -293,14 +254,12 @@ const styles = StyleSheet.create({
     paddingVertical: 30,
     paddingHorizontal: 15,
   },
-
   cardLeft: { flexDirection: "row", alignItems: "center" },
-  cardIcon: { width: 50, height: 50, marginRight: 40, tintColor: "#7b6cff" },
+  cardIcon: { width: 50, height: 50, marginRight: 40, marginBottom: 15, tintColor: "#7b6cff" },
   cardTitle: { fontSize: 18, fontWeight: "600", color: "#000" },
   cardSub: { fontSize: 13, color: "#777" },
   cardAmount: { fontSize: 16, fontWeight: "700", color: "#000" },
   cardDate: { fontSize: 12, color: "#777" },
-
   addButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -308,27 +267,24 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     padding: 15,
     justifyContent: "center",
+    marginHorizontal: 20,
+    marginBottom: 20,
   },
-
   addIcon: { width: 25, height: 25, marginRight: 10, tintColor: "#7b6cff" },
   addText: { fontSize: 16, color: "#000", fontWeight: "500" },
-
   navIcon: { width: 26, height: 26, resizeMode: "contain" },
-
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
   },
-
   modalBox: {
     backgroundColor: "#fff",
     padding: 20,
     borderRadius: 20,
     width: "85%",
   },
-
   modalTitle: {
     fontSize: 20,
     fontWeight: "bold",
@@ -336,12 +292,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 15,
   },
-
   modalButtons: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
-
   cancelBtn: {
     backgroundColor: "#ff6b6b",
     padding: 12,
@@ -349,7 +303,6 @@ const styles = StyleSheet.create({
     width: "45%",
     alignItems: "center",
   },
-
   saveBtn: {
     backgroundColor: "#7b6cff",
     padding: 12,
@@ -357,9 +310,7 @@ const styles = StyleSheet.create({
     width: "45%",
     alignItems: "center",
   },
-
   btnText: { color: "#fff", fontWeight: "bold" },
-
   input: {
     backgroundColor: "#fff",
     padding: 10,
@@ -368,5 +319,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ddd",
   },
-
 });

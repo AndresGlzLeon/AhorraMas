@@ -1,34 +1,91 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, Alert, Image, Modal, TouchableOpacity, Pressable } from "react-native";
+// screens/Login.js - ACTUALIZADO CON MVC
 
-export default function Login({ navigation }) {
-  const [name, setName] = useState("");
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Alert,
+  Image,
+  Modal,
+  TouchableOpacity,
+  Pressable
+} from "react-native";
+import UsuarioController from "../controllers/UsuarioController";
+
+export default function Login({ navigation, onLogin }) {
+  // ========== ESTADO LOCAL ==========
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
 
-  const handleLogin = () => {
-    if (name.trim() === "" || email.trim() === "" || password.trim() === "") {
+  // ========== CONTROLADOR ==========
+  // Crear una ÚNICA instancia del controlador
+  const [controller] = useState(new UsuarioController());
+
+  // ========== INICIALIZACIÓN ==========
+  useEffect(() => {
+    // Inicializar el controlador cuando se monta el componente
+    const inicializar = async () => {
+      try {
+        await controller.init();
+        console.log(' Controlador inicializado en Login');
+      } catch (error) {
+        console.error(' Error al inicializar:', error);
+        Alert.alert('Error', 'No se pudo inicializar la aplicación');
+      }
+    };
+
+    inicializar();
+  }, []);
+
+  // ========== MANEJO DE LOGIN ==========
+  const handleLogin = async () => {
+    // Validación básica en la vista
+    if (email.trim() === "" || password.trim() === "") {
       Alert.alert("Error", "Por favor completa todos los campos");
       return;
     }
 
-    setName("");
-    setEmail("");
-    setPassword("");
-
-    navigation.replace("HomeTabs");
+    // Llamar al CONTROLADOR para manejar la lógica
+    const resultado = await controller.login(email, password);
+    
+    if (resultado.exito) {
+      Alert.alert("Éxito", `Bienvenido ${resultado.usuario.nombre}`);
+      
+      // Limpiar campos
+      setEmail("");
+      setPassword("");
+      
+      // Notificar a App.js que el login fue exitoso
+      if (onLogin) {
+        onLogin(resultado.usuario);
+      }
+    } else {
+      Alert.alert("Error", resultado.mensaje);
+    }
   };
 
-  const handleSendReset = () => {
+  // ========== RECUPERAR CONTRASEÑA ==========
+  const handleSendReset = async () => {
     if (resetEmail.trim() === "") {
       Alert.alert("Error", "Por favor ingresa un correo válido");
       return;
     }
+
+    // Llamar al controlador
+    const resultado = await controller.recuperarContrasena(resetEmail);
+    
     setModalVisible(false);
-    Alert.alert("Enviado", `Se ha enviado un enlace de recuperación a ${resetEmail}`);
-    setResetEmail("");
+    
+    if (resultado.exito) {
+      Alert.alert("Enviado", resultado.mensaje);
+      setResetEmail("");
+    } else {
+      Alert.alert("Error", resultado.mensaje);
+    }
   };
 
   const handleCancelReset = () => {
@@ -36,21 +93,15 @@ export default function Login({ navigation }) {
     setResetEmail("");
   };
 
+  // ========== RENDER ==========
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Bienvenid@ a</Text>
       <Text style={styles.header}>Ahorra+ App</Text>
       <Text style={styles.subheader}>INICIA SESIÓN ...</Text>
-
+      
       <Image source={require("../assets/logo.png")} style={styles.image} />
-
-      <TextInput
-        value={name}
-        onChangeText={setName}
-        placeholder="NOMBRE"
-        style={styles.input}
-        placeholderTextColor="#999"
-      />
+      
       <TextInput
         value={email}
         onChangeText={setEmail}
@@ -60,6 +111,7 @@ export default function Login({ navigation }) {
         style={styles.input}
         placeholderTextColor="#999"
       />
+      
       <TextInput
         value={password}
         onChangeText={setPassword}
@@ -68,18 +120,25 @@ export default function Login({ navigation }) {
         style={styles.input}
         placeholderTextColor="#999"
       />
-
+      
       <TouchableOpacity onPress={() => setModalVisible(true)}>
         <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
       </TouchableOpacity>
-
+      
       <Pressable style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Iniciar Sesión</Text>
       </Pressable>
+      
+      <Pressable 
+        style={styles.footer} 
+        onPress={() => navigation.navigate('CrearCuenta')}
+      >
+        <Text style={styles.footer}>
+          ¿No tienes una cuenta aún?, Crear Cuenta
+        </Text>
+      </Pressable>
 
-      <Text style={styles.footer}>¿No tienes una cuenta aún? Crea una cuenta</Text>
-      <Text style={styles.footer}>Volver</Text>
-
+      {/* Modal de Recuperación */}
       <Modal
         visible={modalVisible}
         transparent
@@ -89,9 +148,10 @@ export default function Login({ navigation }) {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Recuperar contraseña</Text>
-            <Text style={{ color: "#555", marginBottom: 8 }}>
+            <Text style={{color: "#555", marginBottom: 8}}>
               Ingresa tu correo para recibir el enlace
             </Text>
+            
             <TextInput
               value={resetEmail}
               onChangeText={setResetEmail}
@@ -101,18 +161,19 @@ export default function Login({ navigation }) {
               style={styles.modalInput}
               placeholderTextColor="#999"
             />
+            
             <View style={styles.modalButtons}>
-              <Pressable
-                style={[styles.modalButton, { backgroundColor: "#7f6aff" }]}
+              <Pressable 
+                style={[styles.modalButton, {backgroundColor: "#7f6aff"}]} 
                 onPress={handleSendReset}
               >
-                <Text style={{ color: "#fff", fontWeight: "600" }}>Enviar</Text>
+                <Text style={{color: "#fff", fontWeight: "600"}}>Enviar</Text>
               </Pressable>
-              <Pressable
-                style={[styles.modalButton, { backgroundColor: "#ddd" }]}
+              <Pressable 
+                style={[styles.modalButton, {backgroundColor: "#ddd"}]} 
                 onPress={handleCancelReset}
               >
-                <Text style={{ color: "#333", fontWeight: "600" }}>Cancelar</Text>
+                <Text style={{color: "#333", fontWeight: "600"}}>Cancelar</Text>
               </Pressable>
             </View>
           </View>
@@ -170,7 +231,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   buttonText: {
-    color: "#000000ff",
+    color: "#fff",
     fontWeight: "600",
   },
   footer: {

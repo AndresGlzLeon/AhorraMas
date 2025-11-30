@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import {View,Text,TextInput,StyleSheet,KeyboardAvoidingView,Alert,Image,
-} from "react-native";
+import {View,Text,TextInput,StyleSheet,KeyboardAvoidingView,Alert,Image,Pressable} from "react-native";
 
-export default function CrearCuenta() {
+export default function CrearCuenta({navigation, onLogin}) {
   const [nombre, setNombre] = useState("");
   const [correo, setCorreo] = useState("");
   const [contrasenia, setContrasenia] = useState("");
@@ -13,61 +12,74 @@ export default function CrearCuenta() {
       Alert.alert("Error", "Completa todos los campos");
       return;
     }
+    
+    // Aquí puedes agregar tu lógica de registro
+    // Por ejemplo, guardar en un backend
+    
     Alert.alert("Cuenta creada", `Bienvenido ${nombre}`);
     setNombre("");
     setCorreo("");
     setContrasenia("");
     setTelefono("");
- 
+    
+    // Llamar a la función onLogin para cambiar el estado de autenticación
+    if (onLogin) {
+      onLogin();
+    }
   };
 
   return (
-   <View>
-    <KeyboardAvoidingView
-      style={styles.container}
-    >
-      <Text style={styles.header}>Bienvenid@ a Ahorra+ App</Text>
-      <Text style={styles.subheader}>CREA TU CUENTA</Text>
-
-      <Image source={require("../assets/logo.png")} style={styles.image} />
-
-      <TextInput
-        value={nombre}
-        onChangeText={setNombre}
-        placeholder="NOMBRE"
-        style={styles.input}
-        placeholderTextColor="#999"
-      />
-      <TextInput
-        value={correo}
-        onChangeText={setCorreo}
-        placeholder="CORREO"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        style={styles.input}
-        placeholderTextColor="#999"
-      />
-      <TextInput
-        value={contrasenia}
-        onChangeText={setContrasenia}
-        placeholder="CONTRASEÑA"
-        secureTextEntry
-        style={styles.input}
-        placeholderTextColor="#999"
-      />
-      <TextInput
-        value={telefono}
-        onChangeText={setTelefono}
-        placeholder="TELÉFONO"
-        keyboardType="phone-pad"
-        style={styles.input}
-        placeholderTextColor="#999"
-      />
-
-        <Text style={styles.buttonText}>Crear cuenta</Text>
-
-        <Text style={styles.footer}>¿Ya tienes una cuenta? Inicia sesión</Text>
-    </KeyboardAvoidingView>
+    <View style={styles.container}>
+      <KeyboardAvoidingView style={styles.container} behavior="padding">
+        <Text style={styles.header}>Bienvenid@ a Ahorra+ App</Text>
+        <Text style={styles.subheader}>CREA TU CUENTA</Text>
+        
+        <Image source={require("../assets/logo.png")} style={styles.image} />
+        
+        <TextInput
+          value={nombre}
+          onChangeText={setNombre}
+          placeholder="NOMBRE"
+          style={styles.input}
+          placeholderTextColor="#999"
+        />
+        
+        <TextInput
+          value={correo}
+          onChangeText={setCorreo}
+          placeholder="CORREO"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          style={styles.input}
+          placeholderTextColor="#999"
+        />
+        
+        <TextInput
+          value={contrasenia}
+          onChangeText={setContrasenia}
+          placeholder="CONTRASEÑA"
+          secureTextEntry
+          style={styles.input}
+          placeholderTextColor="#999"
+        />
+        
+        <TextInput
+          value={telefono}
+          onChangeText={setTelefono}
+          placeholder="TELÉFONO"
+          keyboardType="phone-pad"
+          style={styles.input}
+          placeholderTextColor="#999"
+        />
+        
+        <Pressable style={styles.button} onPress={handleRegister}>
+          <Text style={styles.buttonText}>Registrarse</Text>
+        </Pressable>
+        
+        <Pressable style={styles.footer} onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.footer}>¿Ya tienes una cuenta? Inicia sesión</Text>
+        </Pressable>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -115,7 +127,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   buttonText: {
-    color: "#000000ff",
+    color: "#fff",
     fontWeight: "600",
   },
   footer: {
