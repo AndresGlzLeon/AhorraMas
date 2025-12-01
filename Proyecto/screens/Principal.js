@@ -70,9 +70,7 @@ export default function Principal() {
           <TouchableOpacity onPress={() => navigation.navigate("Ajustes")}>
             <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("Notificaciones")}>
-            <Image source={require("../assets/notificaciones.png")} style={[styles.iconHeader, { marginLeft: 15 }]} />
-          </TouchableOpacity>
+          
         </View>
 
         <Text style={styles.headerTitle}>Ahorra+ App</Text>

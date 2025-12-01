@@ -1,8 +1,24 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, Switch, Image, ScrollView, Pressable, Alert, TouchableOpacity } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, Switch, Image, ScrollView, Pressable, Alert, TouchableOpacity, TextInput } from "react-native";
+import UsuarioController from "../controllers/UsuarioController";
 
-export default function Ajustes({ navigation, onLogout }) {
+export default function Ajustes({ navigation, onLogout, usuario }) {
   const [notificacionesActivas, setNotificacionesActivas] = useState(true);
+  const [controller] = useState(new UsuarioController());
+  
+  const [editando, setEditando] = useState(false);
+  const [nombre, setNombre] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [correo, setCorreo] = useState("");
+
+  useEffect(() => {
+    controller.init();
+    if (usuario) {
+      setNombre(usuario.nombre || "");
+      setCorreo(usuario.correo || "");
+      setTelefono(usuario.telefono || "");
+    }
+  }, [usuario]);
 
   const handleLogout = () => {
     Alert.alert(
@@ -14,11 +30,30 @@ export default function Ajustes({ navigation, onLogout }) {
           text: "Cerrar Sesión",
           style: "destructive",
           onPress: () => {
+            controller.logout();
             if (onLogout) onLogout();
           }
         }
       ]
     );
+  };
+
+  const guardarCambios = async () => {
+    if (!usuario?.id) return;
+    
+    const resultado = await controller.actualizarPerfil(usuario.id, {
+      nombre,
+      correo,
+      telefono,
+      contrasena: "" // Mantener contraseña actual
+    });
+
+    if (resultado.exito) {
+      Alert.alert("Éxito", "Datos actualizados correctamente");
+      setEditando(false);
+    } else {
+      Alert.alert("Error", resultado.mensaje);
+    }
   };
 
   return (
@@ -35,31 +70,17 @@ export default function Ajustes({ navigation, onLogout }) {
         </View>
 
         <View style={styles.content}>
-          
-          <Text style={styles.sectionLabel}>CUENTA</Text>
-          
+        
+          <Text style={styles.sectionLabel}>GENERAL</Text>
+
           <View style={styles.card}>
             <View style={styles.cardContent}>
               <View style={styles.textContainer}>
                 <Text style={styles.cardTitle}>Idioma</Text>
                 <Text style={styles.cardValue}>Español (México)</Text>
               </View>
-              <TouchableOpacity>
-                <Text style={styles.editText}>Editar</Text>
-              </TouchableOpacity>
             </View>
           </View>
-
-          <View style={styles.card}>
-            <View style={styles.cardContent}>
-              <View style={styles.textContainer}>
-                <Text style={styles.cardTitle}>Miembro desde</Text>
-                <Text style={styles.cardValue}>Febrero de 2023</Text>
-              </View>
-            </View>
-          </View>
-
-          <Text style={styles.sectionLabel}>GENERAL</Text>
 
           <View style={styles.card}>
             <View style={styles.cardContent}>
@@ -76,10 +97,7 @@ export default function Ajustes({ navigation, onLogout }) {
             </View>
           </View>
 
-          <Pressable
-            style={styles.logoutButton}
-            onPress={handleLogout}
-          >
+          <Pressable style={styles.logoutButton} onPress={handleLogout}>
             <Text style={styles.exitText}>Cerrar Sesión</Text>
           </Pressable>
 
@@ -97,30 +115,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 20,
     paddingBottom: 50,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    marginTop: 50,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  backArrow: {
-    fontSize: 28,
-    color: "#7b6cff",
-    fontWeight: "300",
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#333",
   },
   headerSection: {
     flexDirection: "row",
@@ -193,9 +187,55 @@ const styles = StyleSheet.create({
     color: "#888",
     fontWeight: "500",
   },
-  editText: {
+  inputEdit: {
     fontSize: 14,
-    color: "#7b6cff",
+    color: "#333",
+    fontWeight: "500",
+    borderBottomWidth: 1,
+    borderBottomColor: "#7b6cff",
+    paddingVertical: 5,
+  },
+  editButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: "#e0e0e0",
+    paddingVertical: 15,
+    borderRadius: 15,
+    marginRight: 10,
+    alignItems: "center",
+  },
+  cancelText: {
+    fontSize: 16,
+    color: "#666",
+    fontWeight: "700",
+  },
+  saveButton: {
+    flex: 1,
+    backgroundColor: "#7b6cff",
+    paddingVertical: 15,
+    borderRadius: 15,
+    alignItems: "center",
+  },
+  saveText: {
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "700",
+  },
+  editProfileButton: {
+    backgroundColor: "#7b6cff",
+    paddingVertical: 15,
+    borderRadius: 15,
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  editProfileText: {
+    fontSize: 16,
+    color: "#fff",
     fontWeight: "700",
   },
   logoutButton: {
@@ -205,18 +245,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 30,
     width: "100%",
-    borderWidth: 1,
-    borderColor: "#000000ff", 
+    
+    
   },
   exitText: {
     fontSize: 16,
-    color: "#000000ff",
+    color: "#3d0505ff",
     fontWeight: "700",
-  },
-  versionText: {
-    textAlign: "center",
-    color: "#ddd",
-    marginTop: 20,
-    fontSize: 12,
   },
 });

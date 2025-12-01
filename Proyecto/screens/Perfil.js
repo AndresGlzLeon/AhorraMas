@@ -1,16 +1,63 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView, StyleSheet, Image, TextInput, TouchableOpacity, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import UsuarioController from "../controllers/UsuarioController";
 
-export default function Perfil() {
+export default function Perfil({ usuario }) {
   const navigation = useNavigation();
-  const [data, setData] = useState({ nombre: "Valeria Morales", correo: "valeria@gmail.com", telefono: "555-789-0123" });
-  const [editando, setEditando] = useState({ nombre: false, correo: false, telefono: false });
+  const [controller] = useState(new UsuarioController());
+  
+  const [data, setData] = useState({ 
+    nombre: "", 
+    correo: "", 
+    telefono: "" 
+  });
+  
+  const [editando, setEditando] = useState({ 
+    nombre: false, 
+    correo: false, 
+    telefono: false 
+  });
 
-  const toggleEdit = (campo) => setEditando({ ...editando, [campo]: !editando[campo] });
-  const handleChange = (campo, valor) => setData({ ...data, [campo]: valor });
+  useEffect(() => {
+    controller.init();
+    if (usuario) {
+      setData({
+        nombre: usuario.nombre || "",
+        correo: usuario.correo || "",
+        telefono: usuario.telefono || ""
+      });
+    }
+  }, [usuario]);
 
-  const guardar = () => Alert.alert("Éxito", "Perfil actualizado correctamente");
+  const toggleEdit = (campo) => {
+    setEditando({ ...editando, [campo]: !editando[campo] });
+  };
+
+  const handleChange = (campo, valor) => {
+    setData({ ...data, [campo]: valor });
+  };
+
+  const guardar = async () => {
+    if (!usuario?.id) {
+      Alert.alert("Error", "No se pudo identificar el usuario");
+      return;
+    }
+
+    const resultado = await controller.actualizarPerfil(usuario.id, {
+      nombre: data.nombre,
+      correo: data.correo,
+      telefono: data.telefono,
+      contrasena: "" // Mantener contraseña actual
+    });
+
+    if (resultado.exito) {
+      Alert.alert("Éxito", "Perfil actualizado correctamente");
+      setEditando({ nombre: false, correo: false, telefono: false });
+    } else {
+      Alert.alert("Error", resultado.mensaje);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -19,12 +66,10 @@ export default function Perfil() {
         <View style={styles.avatarContainer}>
           <View style={styles.avatarWrapper}>
             <Image source={require("../assets/usuarios.png")} style={styles.avatarImage} />
-            <TouchableOpacity style={styles.cameraButton}>
-               <Text style={styles.cameraIcon}>📷</Text>
-            </TouchableOpacity>
+            
           </View>
-          <Text style={styles.userName}>{data.nombre}</Text>
-          <Text style={styles.userEmail}>{data.correo}</Text>
+          <Text style={styles.userName}>{data.nombre || "Usuario"}</Text>
+          <Text style={styles.userEmail}>{data.correo || "correo@ejemplo.com"}</Text>
         </View>
 
         <View style={styles.formContainer}>
@@ -63,23 +108,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 20,
     paddingBottom: 40,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 20,
-    marginTop: 40,
-  },
-  iconHeader: {
-    width: 24,
-    height: 24,
-    tintColor: "#7b6cff",
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#333",
   },
   avatarContainer: {
     alignItems: "center",
