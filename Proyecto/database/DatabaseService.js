@@ -1,6 +1,3 @@
-// database/DatabaseService.js
-// Servicio para manejar la base de datos SQLite y Web
-
 import * as SQLite from 'expo-sqlite';
 import { Platform } from 'react-native';
 
@@ -11,13 +8,14 @@ export default class DatabaseService {
     this.isWeb = Platform.OS === 'web';
     this.schemaCache = {};
     this.webSchema = {
-      usuarios: ['id', 'nombre', 'correo', 'contrasena', 'telefono', 'created_at'],
+      usuarios: ['id', 'nombre', 'correo', 'contrasena', 'telefono', 'pregunta', 'respuesta', 'created_at'],
       transacciones: ['id', 'usuarioId', 'tipo', 'monto', 'categoria', 'descripcion', 'fecha'],
       presupuestos: ['id', 'usuarioId', 'categoria', 'monto', 'mes', 'anio', 'created_at'],
+      presupuesto_total: ['id', 'monto', 'mes', 'anio', 'created_at'],
+      pagos_programados: ['id', 'titulo', 'monto', 'fecha', 'tipo']
     };
   }
 
-  // Inicializar la base de datos
   async init() {
     if (this.isInitialized) {
       return;
@@ -40,12 +38,11 @@ export default class DatabaseService {
     }
   }
 
-  // Crear las tablas necesarias
   async crearTablas() {
     if (this.isWeb) return;
 
     try {
-      // Tabla de usuarios
+      // Tabla de usuarios con campos de seguridad
       await this.db.execAsync(`
         CREATE TABLE IF NOT EXISTS usuarios (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -53,6 +50,8 @@ export default class DatabaseService {
           correo TEXT UNIQUE NOT NULL,
           contrasena TEXT NOT NULL,
           telefono TEXT,
+          pregunta TEXT,
+          respuesta TEXT,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
       `);
@@ -71,7 +70,7 @@ export default class DatabaseService {
         );
       `);
 
-      // Tabla de presupuestos
+      // Tabla de presupuestos por categoría
       await this.db.execAsync(`
         CREATE TABLE IF NOT EXISTS presupuestos (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -85,6 +84,28 @@ export default class DatabaseService {
         );
       `);
 
+      // Nueva tabla: presupuesto total mensual
+      await this.db.execAsync(`
+        CREATE TABLE IF NOT EXISTS presupuesto_total (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          monto REAL NOT NULL,
+          mes INTEGER NOT NULL,
+          anio INTEGER NOT NULL,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+
+      // Tabla de pagos programados
+      await this.db.execAsync(`
+        CREATE TABLE IF NOT EXISTS pagos_programados (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          titulo TEXT,
+          monto REAL,
+          fecha TEXT,
+          tipo TEXT
+        );
+      `);
+
       console.log('✅ Tablas creadas correctamente');
     } catch (error) {
       console.error('❌ Error al crear tablas:', error);
@@ -94,7 +115,6 @@ export default class DatabaseService {
 
   // ========== MÉTODOS CRUD ==========
 
-  // Consultar (SELECT)
   async query(sql, params = []) {
     if (this.isWeb) {
       return this.queryWeb(sql, params);
@@ -109,7 +129,6 @@ export default class DatabaseService {
     }
   }
 
-  // Insertar (INSERT)
   async insert(table, data) {
     const payload = await this.filterData(table, data, ['id']);
 
@@ -137,7 +156,6 @@ export default class DatabaseService {
     }
   }
 
-  // Actualizar (UPDATE)
   async update(table, id, data) {
     const payload = await this.filterData(table, data, ['id']);
 
@@ -165,7 +183,6 @@ export default class DatabaseService {
     }
   }
 
-  // Eliminar (DELETE)
   async delete(table, id) {
     if (this.isWeb) {
       return this.deleteWeb(table, id);
