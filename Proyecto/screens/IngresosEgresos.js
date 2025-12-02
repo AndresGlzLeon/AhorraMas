@@ -27,6 +27,7 @@ export default function IngresosEgresos() {
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
   const [dataPastel, setDataPastel] = useState([]);
+  const [dataPastelIngresos, setDataPastelIngresos] = useState([]); // <-- agregado: pastel de ingresos
   const [dataBarras, setDataBarras] = useState({
     labels: ["Ingresos", "Egresos"],
     datasets: [{ data: [0, 0] }]
@@ -135,6 +136,32 @@ export default function IngresosEgresos() {
     }
 
     setDataPastel(pastel);
+
+    // ---------------------------
+    // Nuevo: Datos para pastel de INGRESOS por categoría
+    // ---------------------------
+    const categoriasIngreso = {};
+    data.forEach(t => {
+      if (t.tipo === 'ingreso') {
+        const cat = t.categoria || "Otros";
+        categoriasIngreso[cat] = (categoriasIngreso[cat] || 0) + t.monto;
+      }
+    });
+
+    const coloresIng = ["#7bed9f", "#70a1ff", "#2ed573", "#1e90ff", "#7efff5", "#55efc4"];
+    const pastelIngresos = Object.keys(categoriasIngreso).map((key, index) => ({
+      name: key,
+      monto: categoriasIngreso[key],
+      color: coloresIng[index % coloresIng.length],
+      legendFontColor: "#7F7F7F",
+      legendFontSize: 12
+    }));
+
+    if (pastelIngresos.length === 0) {
+      pastelIngresos.push({ name: "Sin ingresos", monto: 1, color: "#e0e0e0", legendFontColor: "#aaa", legendFontSize: 12 });
+    }
+
+    setDataPastelIngresos(pastelIngresos);
   };
 
   const guardar = async () => {
@@ -286,6 +313,23 @@ export default function IngresosEgresos() {
             <Text style={styles.chartTitle}>Gastos por Categoría</Text>
             <PieChart
               data={dataPastel}
+              width={screenWidth - 80}
+              height={200}
+              chartConfig={chartConfig}
+              accessor={"monto"}
+              backgroundColor={"transparent"}
+              paddingLeft={"15"}
+              absolute
+            />
+          </View>
+
+          {/* ---------------------------
+              NUEVA TARJETA: INGRESOS POR CATEGORÍA
+              --------------------------- */}
+          <View style={styles.chartCard}>
+            <Text style={styles.chartTitle}>Ingresos por Categoría</Text>
+            <PieChart
+              data={dataPastelIngresos}
               width={screenWidth - 80}
               height={200}
               chartConfig={chartConfig}
