@@ -16,7 +16,7 @@ export default class Presupuesto {
     this.anio = anio;
   }
 
-  // Validaciones del presupuesto
+  
   validar() {
     const errores = [];
 

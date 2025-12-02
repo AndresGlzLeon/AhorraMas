@@ -9,71 +9,69 @@ export default class PresupuestoController {
   async init() {
     try {
       await this.dbService.init();
-      console.log('✅ PresupuestoController inicializado');
+      console.log(' PresupuestoController inicializado');
     } catch (error) {
-      console.error('❌ Error al inicializar:', error);
+      console.error(' Error al inicializar:', error);
       throw error;
     }
   }
 
-  // ========== PRESUPUESTO TOTAL ==========
-  async obtenerPresupuestoTotal(mes, anio) {
-    try {
-      const resultado = await this.dbService.query(
-        'SELECT * FROM presupuesto_total WHERE mes = ? AND anio = ?',
-        [mes, anio]
-      );
-
-      if (resultado && resultado.length > 0) {
-        return { exito: true, presupuesto: resultado[0] };
-      }
-      return { exito: true, presupuesto: null };
-    } catch (error) {
-      console.error('❌ Error al obtener presupuesto total:', error);
-      return { exito: false, mensaje: 'Error al obtener presupuesto' };
+ async obtenerPresupuestoTotal(usuarioId, mes, anio) {
+  try {
+    const result = await this.dbService.query(
+      'SELECT * FROM presupuesto_total WHERE usuarioId = ? AND mes = ? AND anio = ?',
+      [usuarioId, mes, anio]
+    );
+    
+    if (result && result.length > 0) {
+      return { exito: true, presupuesto: result[0] };
     }
+    return { exito: false, mensaje: 'No existe presupuesto' };
+  } catch (error) {
+    console.error('Error al obtener presupuesto:', error);
+    return { exito: false, mensaje: 'Error al obtener presupuesto' };
   }
-
-  async guardarPresupuestoTotal(monto, mes, anio) {
-    try {
-      // Validación básica
-      if (monto <= 0) {
-        return { exito: false, mensaje: 'El monto debe ser mayor a 0' };
-      }
-
-      // Verificar si ya existe
-      const existe = await this.dbService.query(
-        'SELECT * FROM presupuesto_total WHERE mes = ? AND anio = ?',
-        [mes, anio]
-      );
-
-      if (existe && existe.length > 0) {
-        // Actualizar
-        await this.dbService.update('presupuesto_total', existe[0].id, {
-          monto,
-          mes,
-          anio
-        });
-      } else {
-        // Crear nuevo
-        await this.dbService.insert('presupuesto_total', {
-          monto,
-          mes,
-          anio
-        });
-      }
-
-      return { exito: true, mensaje: 'Presupuesto total guardado' };
-    } catch (error) {
-      console.error('❌ Error al guardar presupuesto total:', error);
-      return { exito: false, mensaje: 'Error al guardar presupuesto' };
+}
+async guardarPresupuestoTotal(usuarioId, monto, mes, anio) {
+  try {
+    if (monto <= 0) {
+      return { exito: false, mensaje: 'El monto debe ser mayor a 0' };
     }
-  }
 
-  // ========== PRESUPUESTOS POR CATEGORÍA ==========
+   
+    const existe = await this.dbService.query(
+      'SELECT * FROM presupuesto_total WHERE usuarioId = ? AND mes = ? AND anio = ?',
+      [usuarioId, mes, anio]  
+    );
+
+    if (existe && existe.length > 0) {
+      // Actualizar
+      await this.dbService.update('presupuesto_total', existe[0].id, {
+        monto,
+        mes,
+        anio
+      });
+    } else {
+      // Crear nuevo con usuarioId
+      await this.dbService.insert('presupuesto_total', {
+        usuarioId,  
+        monto,
+        mes,
+        anio
+      });
+    }
+
+    return { exito: true, mensaje: 'Presupuesto total guardado' };
+  } catch (error) {
+    console.error(' Error al guardar presupuesto total:', error);
+    return { exito: false, mensaje: 'Error al guardar presupuesto' };
+  }
+}
+
+ 
   async crearPresupuesto(usuarioId, categoria, monto, mes, anio) {
     try {
-      // ✅ USAR MODELO CON VALIDACIÓN
+     
       const presupuesto = new Presupuesto(
         null,
         usuarioId,
@@ -83,7 +81,7 @@ export default class PresupuestoController {
         anio
       );
 
-      // Validar
+     
       const validacion = presupuesto.validar();
       if (!validacion.valido) {
         return { 
@@ -92,7 +90,7 @@ export default class PresupuestoController {
         };
       }
 
-      // Insertar
+     
       const resultado = await this.dbService.insert(
         'presupuestos',
         presupuesto.toJSON()
@@ -104,14 +102,14 @@ export default class PresupuestoController {
         id: resultado.id 
       };
     } catch (error) {
-      console.error('❌ Error al crear presupuesto:', error);
+      console.error(' Error al crear presupuesto:', error);
       return { exito: false, mensaje: 'Error al crear presupuesto' };
     }
   }
 
   async actualizarPresupuesto(id, usuarioId, categoria, monto, mes, anio) {
     try {
-      // ✅ USAR MODELO CON VALIDACIÓN
+      
       const presupuesto = new Presupuesto(
         id,
         usuarioId,
@@ -121,7 +119,7 @@ export default class PresupuestoController {
         anio
       );
 
-      // Validar
+     
       const validacion = presupuesto.validar();
       if (!validacion.valido) {
         return { 
@@ -130,12 +128,12 @@ export default class PresupuestoController {
         };
       }
 
-      // Actualizar
+      
       await this.dbService.update('presupuestos', id, presupuesto.toJSON());
 
       return { exito: true, mensaje: 'Presupuesto actualizado' };
     } catch (error) {
-      console.error('❌ Error al actualizar presupuesto:', error);
+      console.error(' Error al actualizar presupuesto:', error);
       return { exito: false, mensaje: 'Error al actualizar presupuesto' };
     }
   }
@@ -145,7 +143,7 @@ export default class PresupuestoController {
       await this.dbService.delete('presupuestos', id);
       return { exito: true, mensaje: 'Presupuesto eliminado' };
     } catch (error) {
-      console.error('❌ Error al eliminar presupuesto:', error);
+      console.error(' Error al eliminar presupuesto:', error);
       return { exito: false, mensaje: 'Error al eliminar presupuesto' };
     }
   }
@@ -159,12 +157,12 @@ export default class PresupuestoController {
 
       return { exito: true, presupuestos: resultados };
     } catch (error) {
-      console.error('❌ Error al obtener presupuestos:', error);
+      console.error(' Error al obtener presupuestos:', error);
       return { exito: false, mensaje: 'Error al obtener presupuestos' };
     }
   }
 
-  // ========== CALCULAR GASTOS POR CATEGORÍA ==========
+  
   async calcularGastosPorCategoria(mes, anio, fechaInicio = null, fechaFin = null) {
     try {
       let query = 'SELECT * FROM transacciones WHERE tipo = ?';
@@ -193,12 +191,11 @@ export default class PresupuestoController {
 
       return { exito: true, gastos: gastosPorCategoria };
     } catch (error) {
-      console.error('❌ Error al calcular gastos:', error);
+      console.error(' Error al calcular gastos:', error);
       return { exito: false, mensaje: 'Error al calcular gastos' };
     }
   }
 
-  // ========== VALIDAR EXCESO DE PRESUPUESTO ==========
   async validarExcesoPresupuesto(usuarioId, mes, anio) {
     try {
       // Obtener presupuesto total
@@ -227,7 +224,7 @@ export default class PresupuestoController {
         presupuestoTotal: presupuestoTotal.presupuesto?.monto || 0
       };
     } catch (error) {
-      console.error('❌ Error al validar exceso:', error);
+      console.error(' Error al validar exceso:', error);
       return { exito: false, mensaje: 'Error al validar' };
     }
   }

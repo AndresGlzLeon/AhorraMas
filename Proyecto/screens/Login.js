@@ -8,7 +8,7 @@ export default function Login({ navigation, onLogin }) {
   
   const [modalVisible, setModalVisible] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
-  const [resetStep, setResetStep] = useState(1); // 1: Pedir Correo, 2: Pedir Respuesta
+  const [resetStep, setResetStep] = useState(1); 
   const [preguntaSeguridad, setPreguntaSeguridad] = useState("");
   const [respuestaSeguridad, setRespuestaSeguridad] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,7 +26,8 @@ export default function Login({ navigation, onLogin }) {
     }
     const resultado = await controller.login(email, password);
     if (resultado.exito) {
-      console.log('✅ Usuario logueado:', resultado.usuario); // DEBUG
+      console.log('Usuario logueado:', resultado.usuario); 
+
       if (onLogin) onLogin(resultado.usuario);
     }
     

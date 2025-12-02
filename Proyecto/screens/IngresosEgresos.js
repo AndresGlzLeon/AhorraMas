@@ -21,9 +21,10 @@ export default function IngresosEgresos({ usuario }) {
   const [loading, setLoading] = useState(true);
   const [resumen, setResumen] = useState({ ingresos: 0, egresos: 0 });
 
+  // FILTROS 
   const [categoriaFiltro, setCategoriaFiltro] = useState("Todas");
-  const [fechaInicio, setFechaInicio] = useState("");
-  const [fechaFin, setFechaFin] = useState("");
+  const [mesFiltro, setMesFiltro] = useState(new Date().getMonth() + 1);
+  const [anioFiltro, setAnioFiltro] = useState(new Date().getFullYear());
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
   const [dataPastel, setDataPastel] = useState([]);
@@ -37,12 +38,20 @@ export default function IngresosEgresos({ usuario }) {
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState({ monto: "", categoria: "", descripcion: "", tipo: "egreso" });
 
+  
+  const meses = [
+    { label: "Enero", value: 1 }, { label: "Febrero", value: 2 }, { label: "Marzo", value: 3 },
+    { label: "Abril", value: 4 }, { label: "Mayo", value: 5 }, { label: "Junio", value: 6 },
+    { label: "Julio", value: 7 }, { label: "Agosto", value: 8 }, { label: "Septiembre", value: 9 },
+    { label: "Octubre", value: 10 }, { label: "Noviembre", value: 11 }, { label: "Diciembre", value: 12 }
+  ];
+
   useFocusEffect(
     useCallback(() => {
       if (usuario && usuario.id) {
         cargarDatos();
       }
-    }, [usuario])
+    }, [usuario, mesFiltro, anioFiltro, categoriaFiltro])
   );
 
   const cargarDatos = async () => {
@@ -50,14 +59,23 @@ export default function IngresosEgresos({ usuario }) {
     try {
       await dbService.init();
       
-      
-      
       const sql = 'SELECT * FROM transacciones WHERE usuarioId = ? ORDER BY id DESC';
       const resultados = await dbService.query(sql, [usuario.id]);
-      
+     
+      let filtradas = resultados.filter(t => {
+        const fecha = new Date(t.fecha);
+        return fecha.getMonth() + 1 === mesFiltro && fecha.getFullYear() === anioFiltro;
+      });
+
+      if (categoriaFiltro !== "Todas") {
+        filtradas = filtradas.filter(t =>
+          t.categoria.toLowerCase().includes(categoriaFiltro.toLowerCase())
+        );
+      }
+
       setTransacciones(resultados);
-      setTransaccionesFiltradas(resultados);
-      procesarDatos(resultados);
+      setTransaccionesFiltradas(filtradas);
+      procesarDatos(filtradas);
     } catch (error) {
       console.error(error);
     } finally {
@@ -66,41 +84,14 @@ export default function IngresosEgresos({ usuario }) {
   };
 
   const aplicarFiltros = () => {
-    let filtradas = [...transacciones];
-
-    if (categoriaFiltro !== "Todas") {
-      filtradas = filtradas.filter(t =>
-        t.categoria.toLowerCase().includes(categoriaFiltro.toLowerCase())
-      );
-    }
-
-    if (fechaInicio) {
-      filtradas = filtradas.filter(t => {
-        const fechaTransaccion = new Date(t.fecha);
-        const fechaInicioObj = new Date(fechaInicio);
-        return fechaTransaccion >= fechaInicioObj;
-      });
-    }
-
-    if (fechaFin) {
-      filtradas = filtradas.filter(t => {
-        const fechaTransaccion = new Date(t.fecha);
-        const fechaFinObj = new Date(fechaFin);
-        return fechaTransaccion <= fechaFinObj;
-      });
-    }
-
-    setTransaccionesFiltradas(filtradas);
-    procesarDatos(filtradas);
     setMostrarFiltros(false);
+    cargarDatos();
   };
 
   const limpiarFiltros = () => {
     setCategoriaFiltro("Todas");
-    setFechaInicio("");
-    setFechaFin("");
-    setTransaccionesFiltradas(transacciones);
-    procesarDatos(transacciones);
+    setMesFiltro(new Date().getMonth() + 1);
+    setAnioFiltro(new Date().getFullYear());
     setMostrarFiltros(false);
   };
 
@@ -129,7 +120,6 @@ export default function IngresosEgresos({ usuario }) {
       datasets: [{ data: [totalIng, totalEgr] }]
     });
 
-    // Gráfica de gastos
     const colores = ["#ff7675", "#74b9ff", "#55efc4", "#a29bfe", "#ffeaa7", "#fab1a0"];
     const pastel = Object.keys(categoriasGasto).map((key, index) => ({
       name: key,
@@ -144,7 +134,6 @@ export default function IngresosEgresos({ usuario }) {
     }
     setDataPastel(pastel);
 
-    // Gráfica de ingresos
     const coloresIng = ["#e37bedff", "#e4ae4aff", "#2ed573", "#1e90ff", "#6848b4ff", "#55efc4"];
     const pastelIngresos = Object.keys(categoriasIngreso).map((key, index) => ({
       name: key,
@@ -235,8 +224,6 @@ export default function IngresosEgresos({ usuario }) {
   return (
     <View style={styles.container}>
 
-      
-      
       <View style={styles.header}>
         <View style={styles.leftIcons}>
           <Pressable onPress={() => navigation.navigate('Ajustes')}>
@@ -253,65 +240,82 @@ export default function IngresosEgresos({ usuario }) {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         
-        
         <View style={styles.headerSection}>
           <View>
             <Text style={styles.welcome}>Ingresos & {"\n"}Egresos</Text>
-            <Text style={{color: '#666'}}>Planifica tus gastos</Text>
+            <TouchableOpacity onPress={() => setMostrarFiltros(!mostrarFiltros)}>
+              <Text style={styles.monthSelector}>
+                Filtrar:    {meses[mesFiltro - 1].label} {anioFiltro}
+              </Text>
+            </TouchableOpacity>
           </View>
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
         </View>
 
-        
-        <View style={styles.filterRow}>
-          <Text style={styles.sectionTitle}>Resumen Visual</Text>
-          <TouchableOpacity onPress={() => setMostrarFiltros(!mostrarFiltros)}>
-            <Text style={styles.filterButton}>Filtros</Text>
-          </TouchableOpacity>
-        </View>
+       
+        <Modal visible={mostrarFiltros} animationType="slide" transparent>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Filtrar Transacciones</Text>
 
-        {mostrarFiltros && (
-          <View style={styles.filterContainer}>
-            <Text style={styles.filterLabel}>Categoría:</Text>
-            <View style={styles.pickerWrapper}>
-              <Picker
-                selectedValue={categoriaFiltro}
-                onValueChange={(itemValue) => setCategoriaFiltro(itemValue)}
-              >
-                {CATEGORIAS.map(cat => (
-                  <Picker.Item key={cat} label={cat} value={cat} />
-                ))}
-              </Picker>
-            </View>
+              <Text style={styles.inputLabel}>Mes:</Text>
+              <View style={styles.pickerWrapper}>
+                <Picker
+                  style={styles.picker}
+                  selectedValue={mesFiltro}
+                  onValueChange={(itemValue) => setMesFiltro(itemValue)}
+                >
+                  {meses.map(mes => (
+                    <Picker.Item key={mes.value} label={mes.label} value={mes.value} />
+                  ))}
+                </Picker>
+              </View>
 
-            <Text style={styles.filterLabel}>Desde:</Text>
-            <TextInput
-              style={styles.dateInput}
-              placeholder="YYYY-MM-DD"
-              value={fechaInicio}
-              onChangeText={setFechaInicio}
-            />
+              <Text style={styles.inputLabel}>Año:</Text>
+              <View style={styles.pickerWrapper}>
+                <Picker
+                  style={styles.picker}
+                  selectedValue={anioFiltro}
+                  onValueChange={(itemValue) => setAnioFiltro(itemValue)}
+                >
+                  {[2024, 2025, 2026].map(anio => (
+                    <Picker.Item key={anio} label={anio.toString()} value={anio} />
+                  ))}
+                </Picker>
+              </View>
 
-            <Text style={styles.filterLabel}>Hasta:</Text>
-            <TextInput
-              style={styles.dateInput}
-              placeholder="YYYY-MM-DD"
-              value={fechaFin}
-              onChangeText={setFechaFin}
-            />
+              <Text style={styles.inputLabel}>Categoría:</Text>
+              <View style={styles.pickerWrapper}>
+                <Picker
+                  style={styles.picker}
+                  selectedValue={categoriaFiltro}
+                  onValueChange={(itemValue) => setCategoriaFiltro(itemValue)}
+                >
+                  {CATEGORIAS.map(cat => (
+                    <Picker.Item key={cat} label={cat} value={cat} />
+                  ))}
+                </Picker>
+              </View>
 
-            <View style={styles.filterButtons}>
-              <TouchableOpacity style={styles.btnLimpiar} onPress={limpiarFiltros}>
-                <Text style={styles.btnLimpiarText}>Limpiar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.btnAplicar} onPress={aplicarFiltros}>
-                <Text style={styles.btnAplicarText}>Aplicar</Text>
-              </TouchableOpacity>
+              <View style={styles.modalButtons}>
+                <TouchableOpacity 
+                  style={[styles.button, styles.cancelButton]}
+                  onPress={limpiarFiltros}
+                >
+                  <Text style={styles.buttonText}>Limpiar</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={[styles.button, styles.saveButton]}
+                  onPress={aplicarFiltros}
+                >
+                  <Text style={[styles.buttonText, {color: '#fff'}]}>Aplicar</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        )}
+        </Modal>
 
-        {/* Gráficas */}
         <ScrollView
           horizontal
           pagingEnabled
@@ -361,7 +365,6 @@ export default function IngresosEgresos({ usuario }) {
           </View>
         </ScrollView>
 
-        {/* Resumen */}
         <View style={styles.summaryContainer}>
           <View style={[styles.summaryCard, { backgroundColor: '#e8f5e9' }]}>
             <Image source={require("../assets/sueldo.png")} style={styles.summaryIcon} />
@@ -381,25 +384,36 @@ export default function IngresosEgresos({ usuario }) {
 
         <Text style={styles.sectionTitle}>Historial</Text>
 
-        {loading ? <ActivityIndicator color="#7b6cff" /> : transaccionesFiltradas.map((item) => (
-          <Pressable key={item.id} style={styles.card} onPress={() => abrirModal(item)} onLongPress={() => eliminar(item.id)}>
-            <View style={styles.iconBox}><Image source={getIcono(item.categoria)} style={styles.cardIcon} /></View>
-            <View style={styles.cardInfo}>
-              <Text style={styles.cardTitle}>{item.categoria}</Text>
-              <Text style={styles.cardSub}>{item.descripcion || "Sin descripción"}</Text>
-              <Text style={styles.cardDate}>{formatearFecha(item.fecha)}</Text>
-            </View>
-            <Text style={[styles.cardAmount, { color: item.tipo === 'ingreso' ? '#2ecc71' : '#ff7675' }]}>
-              {item.tipo === 'ingreso' ? '+' : '-'}${item.monto}
-            </Text>
-          </Pressable>
-        ))}
+        {loading ? <ActivityIndicator color="#7b6cff" /> : (
+          <>
+            {transaccionesFiltradas.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyText}>
+                  No hay transacciones para {meses[mesFiltro - 1].label} {anioFiltro}
+                </Text>
+              </View>
+            ) : (
+              transaccionesFiltradas.map((item) => (
+                <Pressable key={item.id} style={styles.card} onPress={() => abrirModal(item)} onLongPress={() => eliminar(item.id)}>
+                  <View style={styles.iconBox}><Image source={getIcono(item.categoria)} style={styles.cardIcon} /></View>
+                  <View style={styles.cardInfo}>
+                    <Text style={styles.cardTitle}>{item.categoria}</Text>
+                    <Text style={styles.cardSub}>{item.descripcion || "Sin descripción"}</Text>
+                    <Text style={styles.cardDate}>{formatearFecha(item.fecha)}</Text>
+                  </View>
+                  <Text style={[styles.cardAmount, { color: item.tipo === 'ingreso' ? '#2ecc71' : '#ff7675' }]}>
+                    {item.tipo === 'ingreso' ? '+' : '-'}${item.monto}
+                  </Text>
+                </Pressable>
+              ))
+            )}
+          </>
+        )}
         <View style={{ height: 20 }} />
       </ScrollView>
 
       <TouchableOpacity style={styles.fab} onPress={() => abrirModal()}><Text style={styles.fabText}>+</Text></TouchableOpacity>
 
-      {/* Modal */}
       <ScrollView>
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalOverlay}>
@@ -457,19 +471,8 @@ const styles = StyleSheet.create({
   avatarIcon: { width: 20, height: 20, tintColor: "#fff", resizeMode: "contain" },
   headerSection: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 },
   welcome: { fontSize: 26, paddingRight: 20, fontWeight: "700", color: "#7b6cff", lineHeight: 30 },
+  monthSelector: { fontSize: 16, color: '#666', marginTop: 5, fontWeight: '600' },
   pigImage: { width: 80, height: 80, resizeMode: "contain" },
-  filterRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  sectionTitle: { fontSize: 20, fontWeight: "800", color: "#7b6cff", paddingLeft: 5 },
-  filterButton: { fontSize: 16, color: "#7b6cff", fontWeight: "600" },
-  filterContainer: { backgroundColor: "#f9f9f9", padding: 15, borderRadius: 15, marginBottom: 20 },
-  filterLabel: { fontSize: 14, fontWeight: "600", color: "#666", marginTop: 10, marginBottom: 5 },
-  pickerWrapper: { backgroundColor: "#cfc8ddff", borderRadius: 10, borderWidth: 1, borderColor: "#ddd", marginBottom: 10 },
-  dateInput: { backgroundColor: "#fff", borderRadius: 10, padding: 12, borderWidth: 1, borderColor: "#ddd", marginBottom: 10 },
-  filterButtons: { flexDirection: "row", justifyContent: "space-between", marginTop: 10 },
-  btnLimpiar: { flex: 1, backgroundColor: "#e0e0e0", padding: 12, borderRadius: 10, marginRight: 10, alignItems: "center" },
-  btnLimpiarText: { color: "#666", fontWeight: "600" },
-  btnAplicar: { flex: 1, backgroundColor: "#7b6cff", padding: 12, borderRadius: 10, alignItems: "center" },
-  btnAplicarText: { color: "#fff", fontWeight: "600" },
   chartScroll: { marginBottom: 25 },
   chartCard: { backgroundColor: "#fff", borderRadius: 25, padding: 15, width: screenWidth - 40, alignItems: 'center', justifyContent: 'center', shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 4, borderWidth: 1, borderColor: "#f0f0f0", marginRight: 20 },
   chartTitle: { fontSize: 16, fontWeight: "bold", color: "#333", marginBottom: 10 },
@@ -478,6 +481,9 @@ const styles = StyleSheet.create({
   summaryIcon: { width: 35, height: 35, marginRight: 10, resizeMode: 'contain' },
   summaryLabel: { fontSize: 12, color: '#555', fontWeight: '600' },
   summaryValue: { fontSize: 16, fontWeight: 'bold', marginTop: 2 },
+  sectionTitle: { fontSize: 20, fontWeight: "800", color: "#7b6cff", paddingLeft: 5, marginBottom: 15 },
+  emptyState: { alignItems: 'center', padding: 40 },
+  emptyText: { fontSize: 16, color: '#999', fontWeight: '600', textAlign: 'center' },
   card: { flexDirection: "row", alignItems: "center", backgroundColor: "#fff", padding: 15, borderRadius: 20, marginBottom: 12, borderWidth: 1, borderColor: "#f0f0f0", shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 5, elevation: 2 },
   iconBox: { backgroundColor: "#f9f9f9", padding: 12, borderRadius: 15, marginRight: 15 },
   cardIcon: { width: 26, height: 26, resizeMode: "contain" },
@@ -497,7 +503,15 @@ const styles = StyleSheet.create({
   switchActiveEgreso: { backgroundColor: '#ff7675' },
   switchText: { fontWeight: 'bold', color: '#555', fontSize: 14 },
   input: { borderWidth: 1, borderColor: "#eee", borderRadius: 12, padding: 14, marginBottom: 15, fontSize: 16, backgroundColor: "#fafafa" },
+  inputLabel: { fontSize: 14, fontWeight: '600', color: '#666', marginBottom: 8, marginTop: 5 },
+  picker: { height: 150, width: 350 },
+  pickerWrapper: { borderWidth: 1, borderColor: "#ccc", borderRadius: 10, marginBottom: 15, backgroundColor: '#fcfcfcff' },
   modalButtons: { flexDirection: "row", justifyContent: "space-between", marginTop: 10 },
+  button: { padding: 12, borderRadius: 10, width: "48%", alignItems: "center" },
+  cancelButton: { backgroundColor: "#eee" },
+  saveButton: { backgroundColor: "#7b6cff" },
+  buttonText: { fontWeight: "bold", color: "#333" },
   btnCancel: { padding: 15, width: "45%", alignItems: "center", borderWidth: 1, borderColor: '#eee', borderRadius: 12 },
   btnSave: { backgroundColor: "#7b6cff", padding: 15, width: "45%", alignItems: "center", borderRadius: 12 },
+  modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
 });

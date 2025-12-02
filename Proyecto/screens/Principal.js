@@ -18,9 +18,8 @@ export default function Principal({ usuario }) {
 
   useFocusEffect(
     useCallback(() => {
-      // ✅ VALIDACIÓN CRÍTICA
       if (!usuario || !usuario.id) {
-        console.error('❌ Error: Usuario no definido en Principal');
+        console.error(' Error: Usuario no definido en Principal');
         setLoading(false);
         return;
       }
@@ -31,7 +30,7 @@ export default function Principal({ usuario }) {
 
   const cargarDatosDashboard = async () => {
     if (!usuario || !usuario.id) {
-      console.error('❌ No se puede cargar datos sin usuario');
+      console.error(' No se puede cargar datos sin usuario');
       setLoading(false);
       return;
     }
@@ -83,7 +82,6 @@ export default function Principal({ usuario }) {
     return d.toLocaleDateString(); 
   };
 
-  // ✅ VALIDACIÓN: Si no hay usuario, mostrar mensaje
   if (!usuario || !usuario.id) {
     return (
       <View style={styles.container}>
@@ -100,6 +98,7 @@ export default function Principal({ usuario }) {
       
       <View style={styles.header}>
         <View style={styles.leftIcons}>
+          
           <TouchableOpacity onPress={() => navigation.navigate("Ajustes")}>
             <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
           </TouchableOpacity>

@@ -26,20 +26,20 @@ export default class DatabaseService {
         return;
       }
 
-      // ✅ COMPATIBLE CON VERSIÓN ANTIGUA Y NUEVA
+     
       if (SQLite.openDatabaseAsync) {
-        // Nueva API (Expo SDK 51+)
+        
         this.db = await SQLite.openDatabaseAsync('lanaapp.db');
       } else {
-        // API antigua (Expo SDK 50 y anteriores)
+        
         this.db = SQLite.openDatabase('lanaapp.db');
       }
       
       await this.crearTablas();
       this.isInitialized = true;
-      console.log('✅ BD SQLite inicializada');
+      console.log('BD SQLite inicializada');
     } catch (error) {
-      console.error('❌ Error al inicializar BD:', error);
+      console.error(' Error al inicializar BD:', error);
       throw error;
     }
   }
@@ -87,39 +87,30 @@ export default class DatabaseService {
           anio INTEGER NOT NULL,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (usuarioId) REFERENCES usuarios(id)
-        );`,
-        `CREATE TABLE IF NOT EXISTS pagos_programados (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          usuarioId INTEGER NOT NULL,
-          titulo TEXT,
-          monto REAL,
-          fecha TEXT,
-          tipo TEXT,
-          FOREIGN KEY (usuarioId) REFERENCES usuarios(id)
         );`
       ];
 
-      // ✅ EJECUTAR QUERIES SEGÚN LA API DISPONIBLE
+     
       if (this.db.execAsync) {
-        // Nueva API
+        
         for (const query of queries) {
           await this.db.execAsync(query);
         }
       } else {
-        // API antigua
+       
         for (const query of queries) {
           await this.executeSqlAsync(query);
         }
       }
 
-      console.log('✅ Tablas creadas correctamente');
+      console.log(' Tablas creadas correctamente');
     } catch (error) {
-      console.error('❌ Error al crear tablas:', error);
+      console.error(' Error al crear tablas:', error);
       throw error;
     }
   }
 
-  // ✅ WRAPPER PARA API ANTIGUA
+  
   executeSqlAsync(sql, params = []) {
     return new Promise((resolve, reject) => {
       this.db.transaction(tx => {
@@ -139,18 +130,18 @@ export default class DatabaseService {
     }
 
     try {
-      // ✅ COMPATIBLE CON AMBAS APIS
+      
       if (this.db.getAllAsync) {
-        // Nueva API
+       
         const result = await this.db.getAllAsync(sql, params);
         return result;
       } else {
-        // API antigua
+        
         const result = await this.executeSqlAsync(sql, params);
         return result.rows._array || [];
       }
     } catch (error) {
-      console.error('❌ Error en query:', error);
+      console.error(' Error en query:', error);
       throw error;
     }
   }
@@ -173,7 +164,7 @@ export default class DatabaseService {
 
       const sql = `INSERT INTO ${table} (${keys.join(', ')}) VALUES (${placeholders})`;
       
-      // ✅ COMPATIBLE CON AMBAS APIS
+      
       if (this.db.runAsync) {
         // Nueva API
         const result = await this.db.runAsync(sql, values);
@@ -184,7 +175,7 @@ export default class DatabaseService {
         return { id: result.insertId, ...payload };
       }
     } catch (error) {
-      console.error(`❌ Error al insertar en ${table}:`, error);
+      console.error(` Error al insertar en ${table}:`, error);
       throw error;
     }
   }
@@ -207,7 +198,7 @@ export default class DatabaseService {
 
       const sql = `UPDATE ${table} SET ${setClause} WHERE id = ?`;
       
-      // ✅ COMPATIBLE CON AMBAS APIS
+     
       if (this.db.runAsync) {
         await this.db.runAsync(sql, [...values, id]);
       } else {
@@ -216,7 +207,7 @@ export default class DatabaseService {
 
       return { id, ...payload };
     } catch (error) {
-      console.error(`❌ Error al actualizar ${table}:`, error);
+      console.error(`Error al actualizar ${table}:`, error);
       throw error;
     }
   }
@@ -229,7 +220,7 @@ export default class DatabaseService {
     try {
       const sql = `DELETE FROM ${table} WHERE id = ?`;
       
-      // ✅ COMPATIBLE CON AMBAS APIS
+      
       if (this.db.runAsync) {
         await this.db.runAsync(sql, [id]);
       } else {
@@ -238,12 +229,12 @@ export default class DatabaseService {
       
       return { id };
     } catch (error) {
-      console.error(`❌ Error al eliminar de ${table}:`, error);
+      console.error(` Error al eliminar de ${table}:`, error);
       throw error;
     }
   }
 
-  // MÉTODOS WEB (sin cambios)
+  
   queryWeb(sql, params = []) {
     const table = this.extractTableName(sql);
     if (!table) return [];
@@ -328,7 +319,7 @@ export default class DatabaseService {
     }
 
     if (!this.schemaCache[table]) {
-      // ✅ COMPATIBLE CON AMBAS APIS
+      
       if (this.db.getAllAsync) {
         const info = await this.db.getAllAsync(`PRAGMA table_info(${table});`);
         this.schemaCache[table] = info.map((row) => row.name);

@@ -6,81 +6,74 @@ import {
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Picker } from '@react-native-picker/picker';
 import PresupuestoController from '../controllers/PresupuestoController';
+import DatabaseService from '../database/DatabaseService';
 
 const CATEGORIAS = ["Comida", "Transporte", "Entretenimiento", "Servicios", "Salud", "Educación", "Otros"];
 
 export default function Presupuesto({ usuario }) {
   const navigation = useNavigation();
   const [controller] = useState(new PresupuestoController());
+  const [dbService] = useState(new DatabaseService());
 
   const [presupuestoTotal, setPresupuestoTotal] = useState(0); 
   const [gastos, setGastos] = useState([]); 
   const [loading, setLoading] = useState(true);
 
-  const [modalPresupuestoTotal, setModalPresupuestoTotal] = useState(false);
   const [modalGastoVisible, setModalGastoVisible] = useState(false); 
   const [modalFiltros, setModalFiltros] = useState(false);
 
-  const [nuevoPresupuestoTotal, setNuevoPresupuestoTotal] = useState("");
   const [nuevoGasto, setNuevoGasto] = useState({ nombre: "", monto: "" });
   const [editandoGastoId, setEditandoGastoId] = useState(null);
 
-  // Filtros
+  // Filtros mejorados
   const [categoriaFiltro, setCategoriaFiltro] = useState("Todas");
-  const [fechaInicio, setFechaInicio] = useState("");
-  const [fechaFin, setFechaFin] = useState("");
+  const [mesFiltro, setMesFiltro] = useState(new Date().getMonth() + 1);
+  const [anioFiltro, setAnioFiltro] = useState(new Date().getFullYear());
+
+  const meses = [
+    { label: "Enero", value: 1 }, { label: "Febrero", value: 2 }, { label: "Marzo", value: 3 },
+    { label: "Abril", value: 4 }, { label: "Mayo", value: 5 }, { label: "Junio", value: 6 },
+    { label: "Julio", value: 7 }, { label: "Agosto", value: 8 }, { label: "Septiembre", value: 9 },
+    { label: "Octubre", value: 10 }, { label: "Noviembre", value: 11 }, { label: "Diciembre", value: 12 }
+  ];
 
   useFocusEffect(
     useCallback(() => {
       if (usuario && usuario.id) {
         cargarDatos();
       }
-    }, [usuario])
+    }, [usuario, mesFiltro, anioFiltro, categoriaFiltro])
   );
 
   const cargarDatos = async () => {
     setLoading(true);
     try {
       await controller.init();
-      
-      const mesActual = new Date().getMonth() + 1;
-      const anioActual = new Date().getFullYear();
+      await dbService.init();
 
-      // ✅ USAR CONTROLADOR: Obtener presupuesto total
-      const resultadoTotal = await controller.obtenerPresupuestoTotal(usuario.id, mesActual, anioActual);
-      if (resultadoTotal.exito && resultadoTotal.presupuesto) {
-        setPresupuestoTotal(resultadoTotal.presupuesto.monto);
-      } else {
-        setPresupuestoTotal(0);
-      }
+     
+      const totalIngresos = await calcularIngresosMes(usuario.id, mesFiltro, anioFiltro);
+      setPresupuestoTotal(totalIngresos);
 
-      // ✅ USAR CONTROLADOR: Obtener presupuestos por categoría
-      const resultadoPresupuestos = await controller.obtenerPresupuestos(usuario.id, mesActual, anioActual);
+     
+      let resultadoPresupuestos = await controller.obtenerPresupuestos(
+        usuario.id, 
+        mesFiltro, 
+        anioFiltro
+      );
       let metas = resultadoPresupuestos.exito ? resultadoPresupuestos.presupuestos : [];
 
-      // Aplicar filtros
+     
       if (categoriaFiltro !== "Todas") {
         metas = metas.filter(m => m.categoria.toLowerCase() === categoriaFiltro.toLowerCase());
       }
 
-      // ✅ USAR CONTROLADOR: Calcular gastos por categoría
-      const resultadoGastos = await controller.calcularGastosPorCategoria(
-        mesActual, 
-        anioActual, 
-        fechaInicio, 
-        fechaFin
-      );
-
-      const gastosPorCategoria = resultadoGastos.exito ? resultadoGastos.gastos : {};
-
-      let totalGastadoReal = 0;
+      
+      const gastosPorCategoria = await calcularGastosMes(usuario.id, mesFiltro, anioFiltro);
 
       const itemsProcesados = metas.map(meta => {
         const catLower = meta.categoria.toLowerCase();
         const gastadoEnCategoria = gastosPorCategoria[catLower] || 0;
-
-        totalGastadoReal += gastadoEnCategoria;
-
         const porcentaje = Math.min((gastadoEnCategoria / meta.monto) * 100, 100);
         const excedido = gastadoEnCategoria > meta.monto;
 
@@ -97,149 +90,55 @@ export default function Presupuesto({ usuario }) {
       setGastos(itemsProcesados);
 
     } catch (error) {
-      console.error('❌ Error al cargar datos:', error);
+      console.error(' Error al cargar datos:', error);
       Alert.alert("Error", "No se pudieron cargar los datos");
     } finally {
       setLoading(false);
     }
   };
 
-  const guardarPresupuestoTotal = async () => {
-    const monto = parseFloat(nuevoPresupuestoTotal);
-    
-    if (isNaN(monto) || monto <= 0) {
-      Alert.alert("Error", "Ingresa un monto válido");
-      return;
-    }
-
+  const calcularIngresosMes = async (usuarioId, mes, anio) => {
     try {
-      const mesActual = new Date().getMonth() + 1;
-      const anioActual = new Date().getFullYear();
-
-      // ✅ USAR CONTROLADOR
-      const resultado = await controller.guardarPresupuestoTotal(usuario.id, monto, mesActual, anioActual);
-      
-
-      if (resultado.exito) {
-        setPresupuestoTotal(monto);
-        setModalPresupuestoTotal(false);
-        setNuevoPresupuestoTotal("");
-        Alert.alert("Éxito", "Presupuesto total actualizado");
-        cargarDatos();
-      } else {
-        Alert.alert("Error", resultado.mensaje);
-      }
-    } catch (error) {
-      console.error('❌ Error:', error);
-      Alert.alert("Error", "No se pudo guardar el presupuesto");
-    }
-  };
-
-  const agregarGasto = async () => {
-    if (!nuevoGasto.nombre || !nuevoGasto.monto) {
-      Alert.alert("Error", "Selecciona una categoría y monto");
-      return;
-    }
-
-    const monto = parseFloat(nuevoGasto.monto);
-
-    try {
-      const mesActual = new Date().getMonth() + 1;
-      const anioActual = new Date().getFullYear();
-
-      // ✅ VALIDAR CON CONTROLADOR
-      const validacion = await controller.validarExcesoPresupuesto(usuario.id, mesActual, anioActual);
-      
-      if (validacion.exito && validacion.sumaPresupuestos + monto > validacion.presupuestoTotal) {
-        Alert.alert(
-          "Advertencia", 
-          "La suma de presupuestos por categoría excederá tu presupuesto total. ¿Deseas continuar?",
-          [
-            { text: "Cancelar", style: "cancel" },
-            { text: "Continuar", onPress: () => guardarNuevoGasto(monto, mesActual, anioActual) }
-          ]
-        );
-        return;
-      }
-
-      await guardarNuevoGasto(monto, mesActual, anioActual);
-    } catch (error) {
-      console.error('❌ Error:', error);
-      Alert.alert("Error", "No se pudo crear el presupuesto");
-    }
-  };
-
-  const guardarNuevoGasto = async (monto, mes, anio) => {
-    // ✅ USAR CONTROLADOR CON VALIDACIÓN DEL MODELO
-    const resultado = await controller.crearPresupuesto(
-      usuario.id, // usuarioId
-      nuevoGasto.nombre,
-      monto,
-      mes,
-      anio
-    );
-
-    if (resultado.exito) {
-      setNuevoGasto({ nombre: "", monto: "" });
-      setModalGastoVisible(false);
-      cargarDatos();
-      Alert.alert("Éxito", "Presupuesto por categoría agregado");
-    } else {
-      Alert.alert("Error", resultado.mensaje);
-    }
-  };
-
-  const editarGasto = async () => {
-    const monto = parseFloat(nuevoGasto.monto);
-
-    try {
-      const mesActual = new Date().getMonth() + 1;
-      const anioActual = new Date().getFullYear();
-
-      // ✅ USAR CONTROLADOR CON VALIDACIÓN DEL MODELO
-      const resultado = await controller.actualizarPresupuesto(
-        editandoGastoId,
-        usuario.id, // usuarioId
-        nuevoGasto.nombre,
-        monto,
-        mesActual,
-        anioActual
+      const transacciones = await dbService.query(
+        `SELECT * FROM transacciones WHERE usuarioId = ? AND tipo = 'ingreso'`,
+        [usuarioId]
       );
-      
-      if (resultado.exito) {
-        setEditandoGastoId(null);
-        setNuevoGasto({ nombre: "", monto: "" });
-        setModalGastoVisible(false);
-        cargarDatos();
-        Alert.alert("Éxito", "Presupuesto actualizado");
-      } else {
-        Alert.alert("Error", resultado.mensaje);
-      }
+
+      const ingresosDelMes = transacciones.filter(t => {
+        const fecha = new Date(t.fecha);
+        return fecha.getMonth() + 1 === mes && fecha.getFullYear() === anio;
+      });
+
+      return ingresosDelMes.reduce((sum, t) => sum + t.monto, 0);
     } catch (error) {
-      console.error('❌ Error:', error);
-      Alert.alert("Error", "No se pudo actualizar el presupuesto");
+      console.error('Error calculando ingresos:', error);
+      return 0;
     }
   };
 
-  const eliminarGasto = (id) => {
-    Alert.alert("Eliminar", "¿Borrar este presupuesto?", [
-      { text: "Cancelar", style: "cancel" },
-      { text: "Eliminar", style: "destructive", onPress: async () => {
-          // ✅ USAR CONTROLADOR
-          const resultado = await controller.eliminarPresupuesto(id);
-          if (resultado.exito) {
-            cargarDatos();
-          } else {
-            Alert.alert("Error", resultado.mensaje);
-          }
-      }}
-    ]);
-  };
+  const calcularGastosMes = async (usuarioId, mes, anio) => {
+    try {
+      const transacciones = await dbService.query(
+        `SELECT * FROM transacciones WHERE usuarioId = ? AND tipo = 'egreso'`,
+        [usuarioId]
+      );
 
-  const abrirModalEditar = (gasto) => {
-    setEditandoGastoId(gasto.id);
-    setNuevoGasto({ nombre: gasto.nombre, monto: gasto.monto.toString() });
-    setModalGastoVisible(true);
+      const gastosDelMes = transacciones.filter(t => {
+        const fecha = new Date(t.fecha);
+        return fecha.getMonth() + 1 === mes && fecha.getFullYear() === anio;
+      });
+
+      const gastosPorCategoria = {};
+      gastosDelMes.forEach(t => {
+        const cat = t.categoria.toLowerCase();
+        gastosPorCategoria[cat] = (gastosPorCategoria[cat] || 0) + t.monto;
+      });
+
+      return gastosPorCategoria;
+    } catch (error) {
+      console.error('Error calculando gastos:', error);
+      return {};
+    }
   };
 
   const aplicarFiltros = () => {
@@ -249,10 +148,62 @@ export default function Presupuesto({ usuario }) {
 
   const limpiarFiltros = () => {
     setCategoriaFiltro("Todas");
-    setFechaInicio("");
-    setFechaFin("");
+    setMesFiltro(new Date().getMonth() + 1);
+    setAnioFiltro(new Date().getFullYear());
     setModalFiltros(false);
-    cargarDatos();
+  };
+
+  const agregarGasto = async () => {
+    if (!nuevoGasto.nombre || !nuevoGasto.monto) {
+      Alert.alert("Error", "Selecciona una categoría y monto");
+      return;
+    }
+
+    const resultado = await controller.crearPresupuesto(
+      usuario.id, nuevoGasto.nombre, parseFloat(nuevoGasto.monto), mesFiltro, anioFiltro
+    );
+
+    if (resultado.exito) {
+      setNuevoGasto({ nombre: "", monto: "" });
+      setModalGastoVisible(false);
+      cargarDatos();
+      Alert.alert("Éxito", "Presupuesto agregado");
+    } else {
+      Alert.alert("Error", resultado.mensaje);
+    }
+  };
+
+  const editarGasto = async () => {
+    const resultado = await controller.actualizarPresupuesto(
+      editandoGastoId, usuario.id, nuevoGasto.nombre, 
+      parseFloat(nuevoGasto.monto), mesFiltro, anioFiltro
+    );
+    
+    if (resultado.exito) {
+      setEditandoGastoId(null);
+      setNuevoGasto({ nombre: "", monto: "" });
+      setModalGastoVisible(false);
+      cargarDatos();
+      Alert.alert("Éxito", "Presupuesto actualizado");
+    } else {
+      Alert.alert("Error", resultado.mensaje);
+    }
+  };
+
+  const eliminarGasto = (id) => {
+    Alert.alert("Eliminar", "¿Borrar este presupuesto?", [
+      { text: "Cancelar", style: "cancel" },
+      { text: "Eliminar", style: "destructive", onPress: async () => {
+        await controller.eliminarPresupuesto(id);
+        cargarDatos();
+      }}
+    ]);
+  };
+
+  const abrirModalEditar = (gasto) => {
+    setEditandoGastoId(gasto.id);
+    setNuevoGasto({ nombre: gasto.nombre, monto: gasto.monto.toString() });
+    setModalGastoVisible(true);
   };
 
   const totalGastadoReal = gastos.reduce((acc, item) => acc + item.gastado, 0);
@@ -264,6 +215,7 @@ export default function Presupuesto({ usuario }) {
 
       <View style={styles.header}>
         <View style={styles.leftIcons}>
+         
           <Pressable onPress={() => navigation.navigate('Ajustes')}>
             <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
           </Pressable>
@@ -281,20 +233,20 @@ export default function Presupuesto({ usuario }) {
         <View style={styles.headerSection}>
           <View>
             <Text style={styles.welcome}>Presupuesto</Text>
-            <Text style={{color: '#666'}}>Planifica tus gastos</Text>
+            <TouchableOpacity onPress={() => setModalFiltros(true)}>
+              <Text style={styles.monthSelector}>
+
+                 Filtrar:   {meses[mesFiltro - 1].label} {anioFiltro}
+              </Text>
+            </TouchableOpacity>
           </View>
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
         </View>
 
         <View style={styles.cardMain}>
           <View style={{flexDirection:'row', justifyContent:'space-between', marginBottom: 10, alignItems: 'center'}}>
-            <Text style={styles.cardLabel}>Presupuesto Total</Text>
-            <TouchableOpacity onPress={() => {
-              setNuevoPresupuestoTotal(presupuestoTotal.toString());
-              setModalPresupuestoTotal(true);
-            }}>
-              <Text style={styles.editBtnText}>Editar</Text>
-            </TouchableOpacity>
+            <Text style={styles.cardLabel}>Ingresos del Mes</Text>
+            <Text style={styles.infoText}>Automático</Text>
           </View>
           <Text style={styles.cardValue}>${presupuestoTotal.toFixed(2)}</Text>
           
@@ -329,91 +281,64 @@ export default function Presupuesto({ usuario }) {
 
         <View style={styles.listHeader}>
           <Text style={styles.sectionTitle}>Categorías</Text>
-          <View style={{flexDirection: 'row', gap: 10}}>
-            <TouchableOpacity onPress={() => setModalFiltros(true)}>
-              <Text style={styles.filterText}>Filtrar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => { 
-              setEditandoGastoId(null); 
-              setNuevoGasto({nombre:'', monto:''}); 
-              setModalGastoVisible(true); 
-            }}>
-              <Text style={styles.addText}>+ Agregar</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity onPress={() => { 
+            setEditandoGastoId(null); 
+            setNuevoGasto({nombre:'', monto:''}); 
+            setModalGastoVisible(true); 
+          }}>
+            <Text style={styles.addText}>+ Agregar</Text>
+          </TouchableOpacity>
         </View>
 
-        {loading ? <ActivityIndicator color="#7b6cff"/> : gastos.map((item) => (
-          <TouchableOpacity 
-            key={item.id} 
-            style={[styles.itemCard, item.excedido && styles.itemCardExcedido]}
-            onLongPress={() => eliminarGasto(item.id)}
-            onPress={() => abrirModalEditar(item)}
-          >
-            <View style={styles.itemRow}>
-              <View>
-                <Text style={styles.itemTitle}>{item.nombre}</Text>
-                <Text style={styles.itemSub}>Límite: ${item.monto}</Text>
-                {item.excedido && (
-                  <Text style={styles.warningText}>⚠️ Presupuesto excedido</Text>
-                )}
+        {loading ? <ActivityIndicator color="#7b6cff"/> : (
+          <>
+            {gastos.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyText}>
+                  No hay presupuestos para {meses[mesFiltro - 1].label}
+                </Text>
+                
               </View>
-              <Text style={[styles.itemAmount, {color: item.excedido ? '#ff7675' : '#333'}]}>
-                -${item.gastado.toFixed(0)}
-              </Text>
-            </View>
-            <View style={[styles.progressBarBg, {height: 6, marginTop: 8}]}>
-               <View style={[
-                 styles.progressBarFill, 
-                 { 
-                   width: `${Math.min(item.porcentaje, 100)}%`, 
-                   backgroundColor: item.excedido ? '#ff7675' : '#55efc4' 
-                 }
-               ]} />
-            </View>
-          </TouchableOpacity>
-        ))}
+            ) : (
+              gastos.map((item) => (
+                <TouchableOpacity 
+                  key={item.id} 
+                  style={[styles.itemCard, item.excedido && styles.itemCardExcedido]}
+                  onLongPress={() => eliminarGasto(item.id)}
+                  onPress={() => abrirModalEditar(item)}
+                >
+                  <View style={styles.itemRow}>
+                    <View>
+                      <Text style={styles.itemTitle}>{item.nombre}</Text>
+                      <Text style={styles.itemSub}>Límite: ${item.monto}</Text>
+                      {item.excedido && (
+                        <Text style={styles.warningText}> PRESUPUESTO EXCEDIDO</Text>
+                      )}
+                    </View>
+                    <Text style={[styles.itemAmount, {color: item.excedido ? '#ff7675' : '#333'}]}>
+                      -${item.gastado.toFixed(0)}
+                    </Text>
+                  </View>
+                  <View style={[styles.progressBarBg, {height: 6, marginTop: 8}]}>
+                    <View style={[
+                      styles.progressBarFill, 
+                      { 
+                        width: `${Math.min(item.porcentaje, 100)}%`, 
+                        backgroundColor: item.excedido ? '#ff7675' : '#55efc4' 
+                      }
+                    ]} />
+                  </View>
+                </TouchableOpacity>
+              ))
+            )}
+          </>
+        )}
 
         <View style={{height: 20}} />
       </ScrollView>
 
-      {/* Modal Presupuesto Total */}
-      <Modal visible={modalPresupuestoTotal} animationType="slide" transparent>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Presupuesto Total Mensual</Text>
-            <Text style={styles.modalSubtitle}>
-              Define cuánto dinero planeas gastar este mes
-            </Text>
-
-            <TextInput
-              style={styles.input}
-              keyboardType="numeric"
-              placeholder="Monto Total ($)"
-              value={nuevoPresupuestoTotal}
-              onChangeText={setNuevoPresupuestoTotal}
-            />
-
-            <View style={styles.modalButtons}>
-              <TouchableOpacity 
-                style={[styles.button, styles.cancelButton]}
-                onPress={() => setModalPresupuestoTotal(false)}
-              >
-                <Text style={styles.buttonText}>Cancelar</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity 
-                style={[styles.button, styles.saveButton]}
-                onPress={guardarPresupuestoTotal}
-              >
-                <Text style={[styles.buttonText, {color: '#fff'}]}>Guardar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
-
       {/* Modal Categoría */}
+      <ScrollView>
       <Modal visible={modalGastoVisible} animationType="slide" transparent>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -465,16 +390,44 @@ export default function Presupuesto({ usuario }) {
           </View>
         </View>
       </Modal>
+      </ScrollView>
 
-      {/* Modal Filtros */}
+    
       <Modal visible={modalFiltros} animationType="slide" transparent>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Filtrar Presupuestos</Text>
+            <Text style={styles.modalTitle}>Seleccionar Período</Text>
+
+            <Text style={styles.inputLabel}>Mes:</Text>
+            <View style={styles.pickerWrapper}>
+              <Picker
+                 style={styles.picker}
+                selectedValue={mesFiltro}
+                onValueChange={(itemValue) => setMesFiltro(itemValue)}
+              >
+                {meses.map(mes => (
+                  <Picker.Item key={mes.value} label={mes.label} value={mes.value} />
+                ))}
+              </Picker>
+            </View>
+
+            <Text style={styles.inputLabel}>Año:</Text>
+            <View style={styles.pickerWrapper}>
+              <Picker
+                style={styles.picker}
+                selectedValue={anioFiltro}
+                onValueChange={(itemValue) => setAnioFiltro(itemValue)}
+              >
+                {[2024, 2025, 2026].map(anio => (
+                  <Picker.Item key={anio} label={anio.toString()} value={anio} />
+                ))}
+              </Picker>
+            </View>
 
             <Text style={styles.inputLabel}>Categoría:</Text>
             <View style={styles.pickerWrapper}>
               <Picker
+               style={styles.picker}
                 selectedValue={categoriaFiltro}
                 onValueChange={(itemValue) => setCategoriaFiltro(itemValue)}
               >
@@ -484,22 +437,6 @@ export default function Presupuesto({ usuario }) {
                 ))}
               </Picker>
             </View>
-
-            <Text style={styles.inputLabel}>Desde:</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="YYYY-MM-DD"
-              value={fechaInicio}
-              onChangeText={setFechaInicio}
-            />
-
-            <Text style={styles.inputLabel}>Hasta:</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="YYYY-MM-DD"
-              value={fechaFin}
-              onChangeText={setFechaFin}
-            />
 
             <View style={styles.modalButtons}>
               <TouchableOpacity 
@@ -524,7 +461,6 @@ export default function Presupuesto({ usuario }) {
   );
 }
 
-// Estilos (mismos que antes, no cambió nada)
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", alignItems: "center" },
   scrollContent: { padding: 20, width: '100%', paddingBottom: 100 },
@@ -536,11 +472,12 @@ const styles = StyleSheet.create({
   avatarIcon: { width: 20, height: 20, tintColor: "#fff", resizeMode: "contain" },
   headerSection: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 },
   welcome: { fontSize: 26, paddingRight: 20, fontWeight: "700", color: "#7b6cff", lineHeight: 30 },
+  monthSelector: { fontSize: 16, color: '#666', marginTop: 5, fontWeight: '600' },
   pigImage: { width: 80, height: 80, resizeMode: "contain" },
   cardMain: { backgroundColor: '#f8f9fa', padding: 20, borderRadius: 20, marginBottom: 20, borderWidth: 1, borderColor: '#eee' },
   cardLabel: { fontSize: 16, fontWeight: '600', color: '#333' },
   cardValue: { fontSize: 32, fontWeight: 'bold', color: '#7b6cff', marginBottom: 10 },
-  editBtnText: { color: '#7b6cff', fontWeight: '600', fontSize: 14 },
+  infoText: { color: '#999', fontWeight: '500', fontSize: 12, fontStyle: 'italic' },
   progressBarBg: { height: 10, backgroundColor: '#eee', borderRadius: 5, overflow: 'hidden', marginTop: 10 },
   progressBarFill: { height: '100%', backgroundColor: '#7b6cff' },
   statsRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 25 },
@@ -549,8 +486,10 @@ const styles = StyleSheet.create({
   statValue: { color: 'white', fontSize: 22, fontWeight: 'bold', marginTop: 5 },
   listHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
   sectionTitle: { fontSize: 20, fontWeight: 'bold', color: '#333' },
-  filterText: { color: '#666', fontWeight: 'bold', fontSize: 14 },
   addText: { color: '#7b6cff', fontWeight: 'bold', fontSize: 16 },
+  emptyState: { alignItems: 'center', padding: 40 },
+  emptyText: { fontSize: 16, color: '#999', fontWeight: '600', marginBottom: 8 },
+  emptySubtext: { fontSize: 14, color: '#bbb' },
   itemCard: { backgroundColor: '#fff', padding: 15, borderRadius: 15, marginBottom: 12, borderWidth: 1, borderColor: '#f0f0f0', shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, elevation: 2 },
   itemCardExcedido: { borderColor: '#ff7675', borderWidth: 2, backgroundColor: '#fff5f5' },
   itemRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
@@ -561,10 +500,10 @@ const styles = StyleSheet.create({
   modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
   modalContent: { width: "85%", backgroundColor: "white", padding: 20, borderRadius: 20, elevation: 10 },
   modalTitle: { fontSize: 20, fontWeight: "bold", marginBottom: 10, textAlign: "center", color: '#333' },
-  modalSubtitle: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 20 },
   inputLabel: { fontSize: 14, fontWeight: '600', color: '#666', marginBottom: 8, marginTop: 5 },
   input: { borderWidth: 1, borderColor: "#ccc", borderRadius: 10, padding: 12, marginBottom: 15, fontSize: 16, backgroundColor: '#f9f9f9' },
-  pickerWrapper: { borderWidth: 1, borderColor: "#ccc", borderRadius: 10, marginBottom: 15, backgroundColor: '#cfc8ddff' },
+  picker:{height:150,weight:100, },
+  pickerWrapper: { borderWidth: 1, borderColor: "#ccc", borderRadius: 10, marginBottom: 15, backgroundColor: '#fcfcfcff' },
   modalButtons: { flexDirection: "row", justifyContent: "space-between", marginTop: 10 },
   button: { padding: 12, borderRadius: 10, width: "48%", alignItems: "center" },
   cancelButton: { backgroundColor: "#eee" },

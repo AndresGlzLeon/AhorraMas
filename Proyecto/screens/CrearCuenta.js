@@ -14,7 +14,7 @@ import {
 import UsuarioController from "../controllers/UsuarioController";
 
 export default function CrearCuenta({ navigation, onLogin }) {
-  // Datos del Usuario
+  
   const [nombre, setNombre] = useState("");
   const [correo, setCorreo] = useState("");
   const [contrasenia, setContrasenia] = useState("");
@@ -24,16 +24,16 @@ export default function CrearCuenta({ navigation, onLogin }) {
   const [pregunta, setPregunta] = useState("");
   const [respuesta, setRespuesta] = useState("");
 
-  // Instancia del Controlador
+  
   const [controller] = useState(new UsuarioController());
 
   useEffect(() => {
     controller.init();
   }, []);
 
-  // CORREGIR: Eliminar el primer if duplicado
+  
     const handleRegister = async () => {
-      // 1. Validar campos vacíos
+      
       if (
         nombre.trim() === '' || 
         correo.trim() === '' || 
@@ -46,7 +46,7 @@ export default function CrearCuenta({ navigation, onLogin }) {
         return;
       }
       
-      // 2. Llamar al controlador
+     
       try {
         const resultado = await controller.registrar(
           nombre, 
@@ -62,11 +62,11 @@ export default function CrearCuenta({ navigation, onLogin }) {
           
           Alert.alert("¡Cuenta Creada!", `Bienvenido ${nombre}, ya puedes gestionar tus gastos.`);
           
-          // Limpiar formulario
+          
           setNombre(""); setCorreo(""); setContrasenia(""); setTelefono("");
           setPregunta(""); setRespuesta("");
 
-          // Notificar login exitoso
+          
           if (onLogin) onLogin(resultado.usuario);
         } else {
           Alert.alert("Error", resultado.mensaje);

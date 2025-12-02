@@ -10,9 +10,9 @@ export default function Ajustes({ navigation, onLogout, usuario }) {
     const initController = async () => {
       try {
         await controller.init();
-        console.log('✅ Controlador inicializado en Ajustes');
+        console.log(' Controlador inicializado en Ajustes');
       } catch (error) {
-        console.error('❌ Error al inicializar controlador:', error);
+        console.error(' Error al inicializar controlador:', error);
         Alert.alert(
           "Error de Inicialización",
           "Hubo un problema al cargar la configuración. Por favor reinicia la aplicación."
@@ -22,9 +22,9 @@ export default function Ajustes({ navigation, onLogout, usuario }) {
 
     initController();
 
-    // Suscribirse al sistema de observadores
+    
     const observerCallback = (action, data) => {
-      console.log('📢 Evento en Ajustes:', action);
+      console.log(' Evento en Ajustes:', action);
       
       if (action === 'USUARIO_LOGOUT') {
         console.log('Usuario ha cerrado sesión');
@@ -33,7 +33,7 @@ export default function Ajustes({ navigation, onLogout, usuario }) {
 
     controller.subscribe(observerCallback);
 
-    // Cleanup
+    
     return () => {
       controller.unsubscribe(observerCallback);
     };
@@ -61,15 +61,15 @@ export default function Ajustes({ navigation, onLogout, usuario }) {
                 onLogout();
               }
 
-              console.log('✅ Sesión cerrada correctamente');
+              console.log('Sesión cerrada correctamente');
             } catch (error) {
-              console.error('❌ Error al cerrar sesión:', error);
+              console.error('Error al cerrar sesión:', error);
               Alert.alert(
                 "Error",
                 "Hubo un problema al cerrar sesión, pero se procederá de todos modos."
               );
               
-              // Intentar cerrar sesión de todos modos
+              
               if (onLogout) {
                 onLogout();
               }
@@ -83,11 +83,11 @@ export default function Ajustes({ navigation, onLogout, usuario }) {
   const handleNotificacionesToggle = (value) => {
     setNotificacionesActivas(value);
     
-    // Aquí podrías guardar esta preferencia en la base de datos
+    
     if (value) {
-      console.log('✅ Notificaciones activadas');
+      console.log(' Notificaciones activadas');
     } else {
-      console.log('❌ Notificaciones desactivadas');
+      console.log(' Notificaciones desactivadas');
     }
   };
 
