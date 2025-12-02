@@ -4,11 +4,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
-import 'react-native-get-random-values';
-import 'react-native-gesture-handler';
 
 import Principal from './screens/Principal';
-import PagosProgramados from './screens/PagosProgramados';
+
+
 import Presupuesto from './screens/Presupuesto';
 import IngresosEgresos from './screens/IngresosEgresos';
 import Ajustes from './screens/Ajustes';
@@ -37,9 +36,10 @@ function PrincipalStackNavigator({ onLogout, usuario }) {
     <Stack.Navigator>
       <Stack.Screen 
         name="PrincipalHome" 
-        component={Principal}
         options={{ headerShown: false }}
-      />
+      >
+        {(props) => <Principal {...props} usuario={usuario} />}
+      </Stack.Screen>
       <Stack.Screen 
         name="Perfil" 
         options={{ 
@@ -66,57 +66,28 @@ function PrincipalStackNavigator({ onLogout, usuario }) {
   );
 }
 
-function PagosStackNavigator({ usuario }) {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen 
-        name="PagosHome" 
-        component={PagosProgramados}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen 
-        name="Ajustes" 
-        component={Ajustes}
-        options={{
-          title: 'Configuración',
-          headerStyle: { backgroundColor: '#f4f1ff' },
-          headerTintColor: '#7b6cff',
-          headerTitleStyle: { fontWeight: 'bold' }
-        }}
-      />
-      <Stack.Screen 
-        name="Perfil" 
-        options={{
-          title: 'Mi Perfil',
-          headerStyle: { backgroundColor: '#f4f1ff' },
-          headerTintColor: '#7b6cff',
-          headerTitleStyle: { fontWeight: 'bold' }
-        }}
-      >
-        {(props) => <Perfil {...props} usuario={usuario} />}
-      </Stack.Screen>
-    </Stack.Navigator>
-  );
-}
 
-function PresupuestoStackNavigator({ usuario }) {
+
+function PresupuestoStackNavigator({ onLogout, usuario }) {
   return (
     <Stack.Navigator>
       <Stack.Screen 
         name="PresupuestoHome" 
-        component={Presupuesto}
         options={{ headerShown: false }}
-      />
+      >
+        {(props) => <Presupuesto {...props} usuario={usuario} />}
+      </Stack.Screen>
       <Stack.Screen 
         name="Ajustes" 
-        component={Ajustes}
         options={{
           title: 'Configuración',
           headerStyle: { backgroundColor: '#f4f1ff' },
           headerTintColor: '#7b6cff',
           headerTitleStyle: { fontWeight: 'bold' }
         }}
-      />
+      >
+        {(props) => <Ajustes {...props} onLogout={onLogout} usuario={usuario} />}
+      </Stack.Screen>
       <Stack.Screen 
         name="Perfil" 
         options={{
@@ -132,24 +103,26 @@ function PresupuestoStackNavigator({ usuario }) {
   );
 }
 
-function IngresosEgresosStackNavigator({ usuario }) {
+function IngresosEgresosStackNavigator({ onLogout, usuario }) {
   return (
     <Stack.Navigator>
       <Stack.Screen 
         name="IngresosEgresosHome" 
-        component={IngresosEgresos}
         options={{ headerShown: false }}
-      />
+      >
+        {(props) => <IngresosEgresos {...props} usuario={usuario} />}
+      </Stack.Screen>
       <Stack.Screen 
         name="Ajustes" 
-        component={Ajustes}
         options={{
           title: 'Configuración',
           headerStyle: { backgroundColor: '#f4f1ff' },
           headerTintColor: '#7b6cff',
           headerTitleStyle: { fontWeight: 'bold' }
         }}
-      />
+      >
+        {(props) => <Ajustes {...props} onLogout={onLogout} usuario={usuario} />}
+      </Stack.Screen>
       <Stack.Screen 
         name="Perfil" 
         options={{
@@ -186,24 +159,23 @@ function TabsNavigator({ onLogout, usuario }) {
           height: 70,
           width: '95%',
           alignSelf: 'center',
-          borderRadius: 50,
+          borderRadius: 60,
+          alignItems: 'center',
+          margin:20,
           left: 10,
           right: 10,
-          bottom: 15
+          bottom: 5
         },
       })}
     >
       <Tab.Screen name="Principal">
         {(props) => <PrincipalStackNavigator {...props} onLogout={onLogout} usuario={usuario} />}
       </Tab.Screen>
-      <Tab.Screen name="PagosProgramados">
-        {(props) => <PagosStackNavigator {...props} usuario={usuario} />}
-      </Tab.Screen>
       <Tab.Screen name="Presupuesto">
-        {(props) => <PresupuestoStackNavigator {...props} usuario={usuario} />}
+        {(props) => <PresupuestoStackNavigator {...props} onLogout={onLogout} usuario={usuario} />}
       </Tab.Screen>
       <Tab.Screen name="IngresosEgresos">
-        {(props) => <IngresosEgresosStackNavigator {...props} usuario={usuario} />}
+        {(props) => <IngresosEgresosStackNavigator {...props} onLogout={onLogout} usuario={usuario} />}
       </Tab.Screen>
     </Tab.Navigator>
   );
@@ -214,18 +186,30 @@ export default function App() {
   const [usuario, setUsuario] = useState(null);
 
   const handleLogin = (user) => {
+    console.log('✅ Login exitoso:', user);
+    
+    // Validar que el usuario tenga id
+    if (!user || !user.id) {
+      console.error('❌ Error: Usuario sin ID');
+      return;
+    }
+    
     setUsuario(user);
     setIsLoggedIn(true);
   };
 
   const handleLogout = () => {
+    console.log('🚪 Cerrando sesión');
     setUsuario(null);
     setIsLoggedIn(false);
   };
   
+  // Debug: Mostrar estado actual
+  console.log('Estado actual - Logged in:', isLoggedIn, 'Usuario:', usuario);
+  
   return (
     <NavigationContainer>
-      {isLoggedIn ? (
+      {isLoggedIn && usuario && usuario.id ? (
         <TabsNavigator onLogout={handleLogout} usuario={usuario} />
       ) : (
         <LoginStackNavigator onLogin={handleLogin} />

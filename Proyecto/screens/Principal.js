@@ -9,7 +9,7 @@ import DatabaseService from '../database/DatabaseService';
 const { width } = Dimensions.get("window");
 const dbService = new DatabaseService();
 
-export default function Principal() {
+export default function Principal({ usuario }) {
   const navigation = useNavigation();
 
   const [saldo, setSaldo] = useState(0);
@@ -18,15 +18,31 @@ export default function Principal() {
 
   useFocusEffect(
     useCallback(() => {
+      // ✅ VALIDACIÓN CRÍTICA
+      if (!usuario || !usuario.id) {
+        console.error('❌ Error: Usuario no definido en Principal');
+        setLoading(false);
+        return;
+      }
+      
       cargarDatosDashboard();
-    }, [])
+    }, [usuario])
   );
 
   const cargarDatosDashboard = async () => {
+    if (!usuario || !usuario.id) {
+      console.error('❌ No se puede cargar datos sin usuario');
+      setLoading(false);
+      return;
+    }
+
     try {
       await dbService.init();
 
-      const todasTransacciones = await dbService.query("SELECT * FROM transacciones");
+      const todasTransacciones = await dbService.query(
+        "SELECT * FROM transacciones WHERE usuarioId = ?",
+        [usuario.id]
+      );
       
       let total = 0;
       todasTransacciones.forEach(t => {
@@ -38,7 +54,10 @@ export default function Principal() {
       });
       setSaldo(total);
 
-      const recientes = await dbService.query("SELECT * FROM transacciones ORDER BY id DESC LIMIT 3");
+      const recientes = await dbService.query(
+        "SELECT * FROM transacciones WHERE usuarioId = ? ORDER BY id DESC LIMIT 3",
+        [usuario.id]
+      );
       setMovimientosRecientes(recientes);
 
     } catch (error) {
@@ -50,10 +69,12 @@ export default function Principal() {
 
   const getIcono = (categoria) => {
     const c = categoria ? categoria.toLowerCase() : "";
-    if (c.includes("transporte") || c.includes("auto") || c.includes("gasolina")) return require("../assets/transporte.png");
-    if (c.includes("sueldo") || c.includes("nomina") || c.includes("ingreso")) return require("../assets/sueldo.png");
-    if (c.includes("despensa") || c.includes("comida") || c.includes("super")) return require("../assets/despensa.png");
-    // Default
+    if (c.includes("transporte") || c.includes("auto") || c.includes("gasolina")) 
+      return require("../assets/transporte.png");
+    if (c.includes("sueldo") || c.includes("nomina") || c.includes("ingreso")) 
+      return require("../assets/sueldo.png");
+    if (c.includes("despensa") || c.includes("comida") || c.includes("super")) 
+      return require("../assets/despensa.png");
     return require("../assets/sueldoBajo.png"); 
   };
 
@@ -61,6 +82,18 @@ export default function Principal() {
     const d = new Date(fechaISO);
     return d.toLocaleDateString(); 
   };
+
+  // ✅ VALIDACIÓN: Si no hay usuario, mostrar mensaje
+  if (!usuario || !usuario.id) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>Error: Usuario no identificado</Text>
+          <Text style={styles.errorSubtext}>Por favor inicia sesión nuevamente</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -70,7 +103,6 @@ export default function Principal() {
           <TouchableOpacity onPress={() => navigation.navigate("Ajustes")}>
             <Image source={require("../assets/ajustes.png")} style={styles.iconHeader} />
           </TouchableOpacity>
-          
         </View>
 
         <Text style={styles.headerTitle}>Ahorra+ App</Text>
@@ -85,12 +117,13 @@ export default function Principal() {
         <View style={styles.welcomeSection}>
           <View>
             <Text style={styles.welcomeText}>Bienvenido,</Text>
-            <Text style={styles.subWelcomeText}>Consulta tus gastos</Text>
+            <Text style={styles.userName}>{usuario.nombre || "Usuario"}</Text>
           </View>
           <Image source={require("../assets/logo.png")} style={styles.pigImage} />
         </View>
 
         <Text style={styles.sectionLabel}>Tu dinero disponible:</Text>
+        
         <View style={styles.balanceCard}>
           <View style={styles.balanceInner}>
             <Text style={styles.currencySymbol}>$</Text>
@@ -147,14 +180,24 @@ export default function Principal() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  container: { flex: 1, backgroundColor: "#fff" },
+  errorContainer: {
     flex: 1,
-    backgroundColor: "#fff",
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20
   },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 100,
+  errorText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ff7675',
+    marginBottom: 10
   },
+  errorSubtext: {
+    fontSize: 14,
+    color: '#999'
+  },
+  scrollContent: { padding: 20, paddingBottom: 100 },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -166,31 +209,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
     borderRadius: 30,
   },
-  leftIcons: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  iconHeader: {
-    width: 24,
-    height: 24,
-    resizeMode: "contain",
-    tintColor: "#7b6cff",
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#333",
-  },
-  avatar: {
-    backgroundColor: "#b3a5ff",
-    borderRadius: 20,
-    padding: 8,
-  },
-  avatarIcon: {
-    width: 20,
-    height: 20,
-    tintColor: "#fff",
-  },
+  leftIcons: { flexDirection: "row", alignItems: "center" },
+  iconHeader: { width: 24, height: 24, resizeMode: "contain", tintColor: "#7b6cff" },
+  headerTitle: { fontSize: 18, fontWeight: "700", color: "#333" },
+  avatar: { backgroundColor: "#b3a5ff", borderRadius: 20, padding: 8 },
+  avatarIcon: { width: 20, height: 20, tintColor: "#fff" },
   welcomeSection: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -198,28 +221,10 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     marginTop: 10,
   },
-  welcomeText: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: "#7b6cff",
-  },
-  subWelcomeText: {
-    fontSize: 18,
-    color: "#666",
-    marginTop: -5,
-  },
-  pigImage: {
-    width: 80,
-    height: 80,
-    resizeMode: "contain",
-  },
-  sectionLabel: {
-    fontSize: 16,
-    color: "#888",
-    marginBottom: 10,
-    fontWeight: "600",
-    paddingLeft: 5,
-  },
+  welcomeText: { fontSize: 28, fontWeight: "800", color: "#7b6cff" },
+  userName: { fontSize: 18, color: "#666", marginTop: -5, fontWeight: "600" },
+  pigImage: { width: 80, height: 80, resizeMode: "contain" },
+  sectionLabel: { fontSize: 16, color: "#888", marginBottom: 10, fontWeight: "600", paddingLeft: 5 },
   balanceCard: {
     backgroundColor: "#7b6cff",
     borderRadius: 25,
@@ -232,10 +237,7 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 8,
   },
-  balanceInner: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
+  balanceInner: { flexDirection: 'row', alignItems: 'flex-start' },
   currencySymbol: {
     fontSize: 24,
     color: 'rgba(255,255,255,0.7)',
@@ -243,24 +245,14 @@ const styles = StyleSheet.create({
     marginRight: 5,
     fontWeight: "bold",
   },
-  balanceAmount: {
-    fontSize: 48,
-    color: "#fff",
-    fontWeight: "bold",
-  },
+  balanceAmount: { fontSize: 48, color: "#fff", fontWeight: "bold" },
   balanceFooter: {
     color: "rgba(255,255,255,0.8)",
     fontSize: 14,
     marginTop: 5,
     letterSpacing: 1,
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#333",
-    marginBottom: 15,
-    paddingLeft: 5,
-  },
+  sectionTitle: { fontSize: 20, fontWeight: "700", color: "#333", marginBottom: 15, paddingLeft: 5 },
   transactionCard: {
     backgroundColor: "#fff",
     borderRadius: 20,
@@ -273,44 +265,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#f0f0f0",
   },
-  transRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
-  },
-  iconContainer: {
-    backgroundColor: "#f4f1ff",
-    padding: 10,
-    borderRadius: 15,
-    marginRight: 15,
-  },
-  transIcon: {
-    width: 24,
-    height: 24,
-    resizeMode: "contain",
-  },
-  transDetails: {
-    flex: 1,
-  },
-  transTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#333",
-    textTransform: 'capitalize', 
-  },
-  transDate: {
-    fontSize: 12,
-    color: "#999",
-    marginTop: 2,
-  },
-  transAmount: {
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#f0f0f0",
-    marginVertical: 5,
-    marginLeft: 50, 
-  },
+  transRow: { flexDirection: "row", alignItems: "center", paddingVertical: 10 },
+  iconContainer: { backgroundColor: "#f4f1ff", padding: 10, borderRadius: 15, marginRight: 15 },
+  transIcon: { width: 24, height: 24, resizeMode: "contain" },
+  transDetails: { flex: 1 },
+  transTitle: { fontSize: 16, fontWeight: "700", color: "#333", textTransform: 'capitalize' },
+  transDate: { fontSize: 12, color: "#999", marginTop: 2 },
+  transAmount: { fontSize: 16, fontWeight: "700" },
+  divider: { height: 1, backgroundColor: "#f0f0f0", marginVertical: 5, marginLeft: 50 },
 });

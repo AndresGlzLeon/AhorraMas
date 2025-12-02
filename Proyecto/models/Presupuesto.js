@@ -1,5 +1,3 @@
-// models/Presupuesto.js
-// Clase que define la estructura de un Presupuesto
 
 export default class Presupuesto {
   constructor(

@@ -20,7 +20,7 @@ export default function CrearCuenta({ navigation, onLogin }) {
   const [contrasenia, setContrasenia] = useState("");
   const [telefono, setTelefono] = useState("");
   
-  // DATOS PARA RECUPERACIÓN (RÚBRICA)
+  // DATOS PARA RECUPERACIÓN
   const [pregunta, setPregunta] = useState("");
   const [respuesta, setRespuesta] = useState("");
 
@@ -31,49 +31,51 @@ export default function CrearCuenta({ navigation, onLogin }) {
     controller.init();
   }, []);
 
-  const handleRegister = async () => {
-    // 1. Validar campos vacíos
-    if (
-      nombre.trim() === '' || 
-      correo.trim() === '' || 
-      contrasenia.trim() === '' || 
-      telefono.trim() === '' ||
-      pregunta.trim() === '' ||
-      respuesta.trim() === ''
-    ) {
-      Alert.alert("Error", "Por favor completa todos los campos, son obligatorios para tu seguridad.");
-      return;
-    }
-    
-    // 2. Llamar al controlador
-    try {
-      const resultado = await controller.registrar(
-        nombre, 
-        correo, 
-        contrasenia, 
-        telefono,
-        pregunta,   // Nuevo campo
-        respuesta   // Nuevo campo
-      );
-
-      if (resultado.exito) {
-        Alert.alert("¡Cuenta Creada!", `Bienvenido ${nombre}, ya puedes gestionar tus gastos.`);
-        
-        // Limpiar formulario
-        setNombre(""); setCorreo(""); setContrasenia(""); setTelefono("");
-        setPregunta(""); setRespuesta("");
-
-        // Notificar login exitoso
-        if (onLogin) onLogin(resultado.usuario);
-      } else {
-        Alert.alert("Error", resultado.mensaje);
+  // CORREGIR: Eliminar el primer if duplicado
+    const handleRegister = async () => {
+      // 1. Validar campos vacíos
+      if (
+        nombre.trim() === '' || 
+        correo.trim() === '' || 
+        contrasenia.trim() === '' || 
+        telefono.trim() === '' ||
+        pregunta.trim() === '' ||
+        respuesta.trim() === ''
+      ) {
+        Alert.alert("Error", "Por favor completa todos los campos, son obligatorios para tu seguridad.");
+        return;
       }
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "Ocurrió un problema técnico");
-    }
-  };
+      
+      // 2. Llamar al controlador
+      try {
+        const resultado = await controller.registrar(
+          nombre, 
+          correo, 
+          contrasenia, 
+          telefono,
+          pregunta,
+          respuesta
+        );
+        
+        if (resultado.exito) {
+          console.log('Usuario registrado:', resultado.usuario);
+          
+          Alert.alert("¡Cuenta Creada!", `Bienvenido ${nombre}, ya puedes gestionar tus gastos.`);
+          
+          // Limpiar formulario
+          setNombre(""); setCorreo(""); setContrasenia(""); setTelefono("");
+          setPregunta(""); setRespuesta("");
 
+          // Notificar login exitoso
+          if (onLogin) onLogin(resultado.usuario);
+        } else {
+          Alert.alert("Error", resultado.mensaje);
+        }
+      } catch (error) {
+        console.error(error);
+        Alert.alert("Error", "Ocurrió un problema técnico");
+      }
+    };
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView 

@@ -1,19 +1,17 @@
 import React, { useState, useCallback } from "react";
 import { 
   View, Text, ScrollView, StyleSheet, Image, Pressable, 
-  Modal, TextInput, TouchableOpacity, Alert, Dimensions, ActivityIndicator 
+  Modal, TextInput, TouchableOpacity, Alert, ActivityIndicator 
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Picker } from '@react-native-picker/picker';
-import DatabaseService from '../database/DatabaseService';
+import PresupuestoController from '../controllers/PresupuestoController';
 
 const CATEGORIAS = ["Comida", "Transporte", "Entretenimiento", "Servicios", "Salud", "Educación", "Otros"];
 
-const { width } = Dimensions.get("window");
-const dbService = new DatabaseService();
-
-export default function Presupuesto() {
+export default function Presupuesto({ usuario }) {
   const navigation = useNavigation();
+  const [controller] = useState(new PresupuestoController());
 
   const [presupuestoTotal, setPresupuestoTotal] = useState(0); 
   const [gastos, setGastos] = useState([]); 
@@ -24,7 +22,7 @@ export default function Presupuesto() {
   const [modalFiltros, setModalFiltros] = useState(false);
 
   const [nuevoPresupuestoTotal, setNuevoPresupuestoTotal] = useState("");
-  const [nuevoGasto, setNuevoGasto] = useState({ nombre: "", monto: "", categoria: "" });
+  const [nuevoGasto, setNuevoGasto] = useState({ nombre: "", monto: "" });
   const [editandoGastoId, setEditandoGastoId] = useState(null);
 
   // Filtros
@@ -34,80 +32,53 @@ export default function Presupuesto() {
 
   useFocusEffect(
     useCallback(() => {
-      cargarDatos();
-    }, [])
+      if (usuario && usuario.id) {
+        cargarDatos();
+      }
+    }, [usuario])
   );
 
   const cargarDatos = async () => {
     setLoading(true);
     try {
-      await dbService.init();
+      await controller.init();
       
-      // Crear tabla para presupuesto total si no existe
-      if (!dbService.isWeb) {
-        await dbService.db.execAsync(`
-          CREATE TABLE IF NOT EXISTS presupuesto_total (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            monto REAL NOT NULL,
-            mes INTEGER NOT NULL,
-            anio INTEGER NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-          );
-        `);
-      }
-
       const mesActual = new Date().getMonth() + 1;
       const anioActual = new Date().getFullYear();
 
-      // Obtener presupuesto total
-      const presupuestoTotalDB = await dbService.query(
-        'SELECT * FROM presupuesto_total WHERE mes = ? AND anio = ?', 
-        [mesActual, anioActual]
-      );
-
-      if (presupuestoTotalDB && presupuestoTotalDB.length > 0) {
-        setPresupuestoTotal(presupuestoTotalDB[0].monto);
+      // ✅ USAR CONTROLADOR: Obtener presupuesto total
+      const resultadoTotal = await controller.obtenerPresupuestoTotal(usuario.id, mesActual, anioActual);
+      if (resultadoTotal.exito && resultadoTotal.presupuesto) {
+        setPresupuestoTotal(resultadoTotal.presupuesto.monto);
       } else {
         setPresupuestoTotal(0);
       }
 
-      // Obtener metas por categoría
-      let metas = await dbService.query(
-        'SELECT * FROM presupuestos WHERE mes = ? AND anio = ?', 
-        [mesActual, anioActual]
-      );
+      // ✅ USAR CONTROLADOR: Obtener presupuestos por categoría
+      const resultadoPresupuestos = await controller.obtenerPresupuestos(usuario.id, mesActual, anioActual);
+      let metas = resultadoPresupuestos.exito ? resultadoPresupuestos.presupuestos : [];
 
       // Aplicar filtros
       if (categoriaFiltro !== "Todas") {
         metas = metas.filter(m => m.categoria.toLowerCase() === categoriaFiltro.toLowerCase());
       }
 
-      // Obtener transacciones con filtros de fecha
-      let queryTransacciones = 'SELECT * FROM transacciones WHERE tipo = ?';
-      let params = ['egreso'];
+      // ✅ USAR CONTROLADOR: Calcular gastos por categoría
+      const resultadoGastos = await controller.calcularGastosPorCategoria(
+        mesActual, 
+        anioActual, 
+        fechaInicio, 
+        fechaFin
+      );
 
-      if (fechaInicio || fechaFin) {
-        if (fechaInicio) {
-          queryTransacciones += ' AND fecha >= ?';
-          params.push(fechaInicio);
-        }
-        if (fechaFin) {
-          queryTransacciones += ' AND fecha <= ?';
-          params.push(fechaFin);
-        }
-      }
+      const gastosPorCategoria = resultadoGastos.exito ? resultadoGastos.gastos : {};
 
-      const transacciones = await dbService.query(queryTransacciones, params);
-
-      let totalMeta = 0;
       let totalGastadoReal = 0;
 
       const itemsProcesados = metas.map(meta => {
-        const gastadoEnCategoria = transacciones
-          .filter(t => t.categoria.toLowerCase() === meta.categoria.toLowerCase())
-          .reduce((sum, t) => sum + t.monto, 0);
+        const catLower = meta.categoria.toLowerCase();
+        const gastadoEnCategoria = gastosPorCategoria[catLower] || 0;
 
-        totalMeta += meta.monto;
         totalGastadoReal += gastadoEnCategoria;
 
         const porcentaje = Math.min((gastadoEnCategoria / meta.monto) * 100, 100);
@@ -126,7 +97,8 @@ export default function Presupuesto() {
       setGastos(itemsProcesados);
 
     } catch (error) {
-      console.error(error);
+      console.error('❌ Error al cargar datos:', error);
+      Alert.alert("Error", "No se pudieron cargar los datos");
     } finally {
       setLoading(false);
     }
@@ -134,6 +106,7 @@ export default function Presupuesto() {
 
   const guardarPresupuestoTotal = async () => {
     const monto = parseFloat(nuevoPresupuestoTotal);
+    
     if (isNaN(monto) || monto <= 0) {
       Alert.alert("Error", "Ingresa un monto válido");
       return;
@@ -143,32 +116,21 @@ export default function Presupuesto() {
       const mesActual = new Date().getMonth() + 1;
       const anioActual = new Date().getFullYear();
 
-      // Verificar si ya existe
-      const existe = await dbService.query(
-        'SELECT * FROM presupuesto_total WHERE mes = ? AND anio = ?',
-        [mesActual, anioActual]
-      );
+      // ✅ USAR CONTROLADOR
+      const resultado = await controller.guardarPresupuestoTotal(usuario.id, monto, mesActual, anioActual);
+      
 
-      if (existe && existe.length > 0) {
-        await dbService.update('presupuesto_total', existe[0].id, {
-          monto: monto,
-          mes: mesActual,
-          anio: anioActual
-        });
+      if (resultado.exito) {
+        setPresupuestoTotal(monto);
+        setModalPresupuestoTotal(false);
+        setNuevoPresupuestoTotal("");
+        Alert.alert("Éxito", "Presupuesto total actualizado");
+        cargarDatos();
       } else {
-        await dbService.insert('presupuesto_total', {
-          monto: monto,
-          mes: mesActual,
-          anio: anioActual
-        });
+        Alert.alert("Error", resultado.mensaje);
       }
-
-      setPresupuestoTotal(monto);
-      setModalPresupuestoTotal(false);
-      setNuevoPresupuestoTotal("");
-      Alert.alert("Éxito", "Presupuesto total actualizado");
     } catch (error) {
-      console.error(error);
+      console.error('❌ Error:', error);
       Alert.alert("Error", "No se pudo guardar el presupuesto");
     }
   };
@@ -180,75 +142,82 @@ export default function Presupuesto() {
     }
 
     const monto = parseFloat(nuevoGasto.monto);
-    if (isNaN(monto) || monto <= 0) {
-      Alert.alert("Error", "El monto debe ser mayor a 0");
-      return;
-    }
 
     try {
       const mesActual = new Date().getMonth() + 1;
       const anioActual = new Date().getFullYear();
 
-      // Verificar que no exceda el presupuesto total
-      const sumaActual = gastos.reduce((sum, g) => sum + g.monto, 0);
-      if (sumaActual + monto > presupuestoTotal) {
+      // ✅ VALIDAR CON CONTROLADOR
+      const validacion = await controller.validarExcesoPresupuesto(usuario.id, mesActual, anioActual);
+      
+      if (validacion.exito && validacion.sumaPresupuestos + monto > validacion.presupuestoTotal) {
         Alert.alert(
           "Advertencia", 
           "La suma de presupuestos por categoría excederá tu presupuesto total. ¿Deseas continuar?",
           [
             { text: "Cancelar", style: "cancel" },
-            { text: "Continuar", onPress: () => guardarGasto(monto, mesActual, anioActual) }
+            { text: "Continuar", onPress: () => guardarNuevoGasto(monto, mesActual, anioActual) }
           ]
         );
         return;
       }
 
-      await guardarGasto(monto, mesActual, anioActual);
+      await guardarNuevoGasto(monto, mesActual, anioActual);
     } catch (error) {
-      console.error(error);
+      console.error('❌ Error:', error);
+      Alert.alert("Error", "No se pudo crear el presupuesto");
     }
   };
 
-  const guardarGasto = async (monto, mes, anio) => {
-    await dbService.insert('presupuestos', {
-      usuarioId: 1,
-      categoria: nuevoGasto.nombre, 
-      monto: monto,
-      mes: mes,
-      anio: anio
-    });
+  const guardarNuevoGasto = async (monto, mes, anio) => {
+    // ✅ USAR CONTROLADOR CON VALIDACIÓN DEL MODELO
+    const resultado = await controller.crearPresupuesto(
+      usuario.id, // usuarioId
+      nuevoGasto.nombre,
+      monto,
+      mes,
+      anio
+    );
 
-    setNuevoGasto({ nombre: "", monto: "", categoria: "" });
-    setModalGastoVisible(false);
-    cargarDatos();
-    Alert.alert("Éxito", "Presupuesto por categoría agregado");
+    if (resultado.exito) {
+      setNuevoGasto({ nombre: "", monto: "" });
+      setModalGastoVisible(false);
+      cargarDatos();
+      Alert.alert("Éxito", "Presupuesto por categoría agregado");
+    } else {
+      Alert.alert("Error", resultado.mensaje);
+    }
   };
 
   const editarGasto = async () => {
     const monto = parseFloat(nuevoGasto.monto);
-    if (isNaN(monto) || monto <= 0) {
-      Alert.alert("Error", "El monto debe ser mayor a 0");
-      return;
-    }
 
     try {
       const mesActual = new Date().getMonth() + 1;
       const anioActual = new Date().getFullYear();
 
-      await dbService.update('presupuestos', editandoGastoId, {
-        categoria: nuevoGasto.nombre,
-        monto: monto,
-        mes: mesActual,
-        anio: anioActual
-      });
+      // ✅ USAR CONTROLADOR CON VALIDACIÓN DEL MODELO
+      const resultado = await controller.actualizarPresupuesto(
+        editandoGastoId,
+        usuario.id, // usuarioId
+        nuevoGasto.nombre,
+        monto,
+        mesActual,
+        anioActual
+      );
       
-      setEditandoGastoId(null);
-      setNuevoGasto({ nombre: "", monto: "", categoria: "" });
-      setModalGastoVisible(false);
-      cargarDatos();
-      Alert.alert("Éxito", "Presupuesto actualizado");
+      if (resultado.exito) {
+        setEditandoGastoId(null);
+        setNuevoGasto({ nombre: "", monto: "" });
+        setModalGastoVisible(false);
+        cargarDatos();
+        Alert.alert("Éxito", "Presupuesto actualizado");
+      } else {
+        Alert.alert("Error", resultado.mensaje);
+      }
     } catch (error) {
-      console.error(error);
+      console.error('❌ Error:', error);
+      Alert.alert("Error", "No se pudo actualizar el presupuesto");
     }
   };
 
@@ -256,8 +225,13 @@ export default function Presupuesto() {
     Alert.alert("Eliminar", "¿Borrar este presupuesto?", [
       { text: "Cancelar", style: "cancel" },
       { text: "Eliminar", style: "destructive", onPress: async () => {
-          await dbService.delete('presupuestos', id);
-          cargarDatos();
+          // ✅ USAR CONTROLADOR
+          const resultado = await controller.eliminarPresupuesto(id);
+          if (resultado.exito) {
+            cargarDatos();
+          } else {
+            Alert.alert("Error", resultado.mensaje);
+          }
       }}
     ]);
   };
@@ -404,7 +378,6 @@ export default function Presupuesto() {
       </ScrollView>
 
       {/* Modal Presupuesto Total */}
-      <ScrollView>
       <Modal visible={modalPresupuestoTotal} animationType="slide" transparent>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -439,10 +412,8 @@ export default function Presupuesto() {
           </View>
         </View>
       </Modal>
-      </ScrollView>
 
       {/* Modal Categoría */}
-      <ScrollView>
       <Modal visible={modalGastoVisible} animationType="slide" transparent>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -494,8 +465,7 @@ export default function Presupuesto() {
           </View>
         </View>
       </Modal>
-      </ScrollView>
-      <ScrollView>
+
       {/* Modal Filtros */}
       <Modal visible={modalFiltros} animationType="slide" transparent>
         <View style={styles.modalContainer}>
@@ -549,264 +519,55 @@ export default function Presupuesto() {
           </View>
         </View>
       </Modal>
-      </ScrollView>
 
     </View>
   );
 }
 
+// Estilos (mismos que antes, no cambió nada)
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-  },
-  scrollContent: {
-    padding: 20,
-    width: '100%',
-    paddingBottom: 100, 
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 15,
-    marginTop: 50,
-    width: "95%",
-    backgroundColor: "#f4f1ff",
-    borderRadius: 40,
-  },
-  leftIcons: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  iconHeader: {
-    width: 33,
-    height: 22,
-    resizeMode: "contain",
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#333",
-  },
-  avatar: {
-    backgroundColor: "#b3a5ff",
-    borderRadius: 50,
-    padding: 8,
-  },
-  avatarIcon: {
-    width: 20,
-    height: 20,
-    tintColor: "#fff",
-    resizeMode: "contain",
-  },
-  headerSection: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  welcome: {
-    fontSize: 26,
-    paddingRight: 20,
-    fontWeight: "700",
-    color: "#7b6cff",
-    lineHeight: 30,
-  },
-  pigImage: {
-    width: 80,
-    height: 80,
-    resizeMode: "contain",
-  },
-  cardMain: {
-    backgroundColor: '#f8f9fa',
-    padding: 20,
-    borderRadius: 20,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#eee',
-  },
-  cardLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
-  cardValue: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#7b6cff',
-    marginBottom: 10,
-  },
-  editBtnText: {
-    color: '#7b6cff',
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  progressBarBg: {
-    height: 10,
-    backgroundColor: '#eee',
-    borderRadius: 5,
-    overflow: 'hidden',
-    marginTop: 10,
-  },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: '#7b6cff',
-  },
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 25,
-  },
-  statBox: {
-    width: '48%',
-    padding: 20,
-    borderRadius: 20,
-    alignItems: 'center',
-  },
-  statLabel: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  statValue: {
-    color: 'white',
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginTop: 5,
-  },
-  listHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  filterText: {
-    color: '#666',
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
-  addText: {
-    color: '#7b6cff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  itemCard: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 15,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    elevation: 2,
-  },
-  itemCardExcedido: {
-    borderColor: '#ff7675',
-    borderWidth: 2,
-    backgroundColor: '#fff5f5',
-  },
-  itemRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  itemTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#444',
-  },
-  itemSub: {
-    fontSize: 12,
-    color: '#888',
-    marginTop: 2,
-  },
-  warningText: {
-    fontSize: 11,
-    color: '#ff7675',
-    marginTop: 4,
-    fontWeight: '600',
-  },
-  itemAmount: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContent: {
-    width: "85%",
-    backgroundColor: "white",
-    padding: 20,
-    borderRadius: 20,
-    elevation: 10, 
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
-    textAlign: "center",
-    color: '#333',
-  },
-  modalSubtitle: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666',
-    marginBottom: 8,
-    marginTop: 5,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 15,
-    fontSize: 16,
-    backgroundColor: '#f9f9f9',
-  },
-  pickerWrapper: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    marginBottom: 15,
-    backgroundColor: '#cfc8ddff',
-  },
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 10,
-  },
-  button: {
-    padding: 12,
-    borderRadius: 10,
-    width: "48%",
-    alignItems: "center",
-  },
-  cancelButton: {
-    backgroundColor: "#eee",
-  },
-  saveButton: {
-    backgroundColor: "#7b6cff",
-  },
-  buttonText: {
-    fontWeight: "bold",
-    color: "#333",
-  },
+  container: { flex: 1, backgroundColor: "#fff", alignItems: "center" },
+  scrollContent: { padding: 20, width: '100%', paddingBottom: 100 },
+  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 15, marginTop: 50, width: "95%", backgroundColor: "#f4f1ff", borderRadius: 40 },
+  leftIcons: { flexDirection: "row", alignItems: "center" },
+  iconHeader: { width: 33, height: 22, resizeMode: "contain" },
+  title: { fontSize: 18, fontWeight: "600", color: "#333" },
+  avatar: { backgroundColor: "#b3a5ff", borderRadius: 50, padding: 8 },
+  avatarIcon: { width: 20, height: 20, tintColor: "#fff", resizeMode: "contain" },
+  headerSection: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 },
+  welcome: { fontSize: 26, paddingRight: 20, fontWeight: "700", color: "#7b6cff", lineHeight: 30 },
+  pigImage: { width: 80, height: 80, resizeMode: "contain" },
+  cardMain: { backgroundColor: '#f8f9fa', padding: 20, borderRadius: 20, marginBottom: 20, borderWidth: 1, borderColor: '#eee' },
+  cardLabel: { fontSize: 16, fontWeight: '600', color: '#333' },
+  cardValue: { fontSize: 32, fontWeight: 'bold', color: '#7b6cff', marginBottom: 10 },
+  editBtnText: { color: '#7b6cff', fontWeight: '600', fontSize: 14 },
+  progressBarBg: { height: 10, backgroundColor: '#eee', borderRadius: 5, overflow: 'hidden', marginTop: 10 },
+  progressBarFill: { height: '100%', backgroundColor: '#7b6cff' },
+  statsRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 25 },
+  statBox: { width: '48%', padding: 20, borderRadius: 20, alignItems: 'center' },
+  statLabel: { color: 'white', fontSize: 16, fontWeight: '600' },
+  statValue: { color: 'white', fontSize: 22, fontWeight: 'bold', marginTop: 5 },
+  listHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
+  sectionTitle: { fontSize: 20, fontWeight: 'bold', color: '#333' },
+  filterText: { color: '#666', fontWeight: 'bold', fontSize: 14 },
+  addText: { color: '#7b6cff', fontWeight: 'bold', fontSize: 16 },
+  itemCard: { backgroundColor: '#fff', padding: 15, borderRadius: 15, marginBottom: 12, borderWidth: 1, borderColor: '#f0f0f0', shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, elevation: 2 },
+  itemCardExcedido: { borderColor: '#ff7675', borderWidth: 2, backgroundColor: '#fff5f5' },
+  itemRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  itemTitle: { fontSize: 16, fontWeight: 'bold', color: '#444' },
+  itemSub: { fontSize: 12, color: '#888', marginTop: 2 },
+  warningText: { fontSize: 11, color: '#ff7675', marginTop: 4, fontWeight: '600' },
+  itemAmount: { fontSize: 16, fontWeight: 'bold' },
+  modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
+  modalContent: { width: "85%", backgroundColor: "white", padding: 20, borderRadius: 20, elevation: 10 },
+  modalTitle: { fontSize: 20, fontWeight: "bold", marginBottom: 10, textAlign: "center", color: '#333' },
+  modalSubtitle: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 20 },
+  inputLabel: { fontSize: 14, fontWeight: '600', color: '#666', marginBottom: 8, marginTop: 5 },
+  input: { borderWidth: 1, borderColor: "#ccc", borderRadius: 10, padding: 12, marginBottom: 15, fontSize: 16, backgroundColor: '#f9f9f9' },
+  pickerWrapper: { borderWidth: 1, borderColor: "#ccc", borderRadius: 10, marginBottom: 15, backgroundColor: '#cfc8ddff' },
+  modalButtons: { flexDirection: "row", justifyContent: "space-between", marginTop: 10 },
+  button: { padding: 12, borderRadius: 10, width: "48%", alignItems: "center" },
+  cancelButton: { backgroundColor: "#eee" },
+  saveButton: { backgroundColor: "#7b6cff" },
+  buttonText: { fontWeight: "bold", color: "#333" },
 });

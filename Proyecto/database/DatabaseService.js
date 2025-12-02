@@ -11,15 +11,13 @@ export default class DatabaseService {
       usuarios: ['id', 'nombre', 'correo', 'contrasena', 'telefono', 'pregunta', 'respuesta', 'created_at'],
       transacciones: ['id', 'usuarioId', 'tipo', 'monto', 'categoria', 'descripcion', 'fecha'],
       presupuestos: ['id', 'usuarioId', 'categoria', 'monto', 'mes', 'anio', 'created_at'],
-      presupuesto_total: ['id', 'monto', 'mes', 'anio', 'created_at'],
-      pagos_programados: ['id', 'titulo', 'monto', 'fecha', 'tipo']
+      presupuesto_total: ['id', 'usuarioId', 'monto', 'mes', 'anio', 'created_at'],
+      pagos_programados: ['id', 'usuarioId', 'titulo', 'monto', 'fecha', 'tipo']
     };
   }
 
   async init() {
-    if (this.isInitialized) {
-      return;
-    }
+    if (this.isInitialized) return;
 
     try {
       if (this.isWeb) {
@@ -28,7 +26,15 @@ export default class DatabaseService {
         return;
       }
 
-      this.db = await SQLite.openDatabaseAsync('lanaapp.db');
+      // ✅ COMPATIBLE CON VERSIÓN ANTIGUA Y NUEVA
+      if (SQLite.openDatabaseAsync) {
+        // Nueva API (Expo SDK 51+)
+        this.db = await SQLite.openDatabaseAsync('lanaapp.db');
+      } else {
+        // API antigua (Expo SDK 50 y anteriores)
+        this.db = SQLite.openDatabase('lanaapp.db');
+      }
+      
       await this.crearTablas();
       this.isInitialized = true;
       console.log('✅ BD SQLite inicializada');
@@ -42,9 +48,8 @@ export default class DatabaseService {
     if (this.isWeb) return;
 
     try {
-      // Tabla de usuarios con campos de seguridad
-      await this.db.execAsync(`
-        CREATE TABLE IF NOT EXISTS usuarios (
+      const queries = [
+        `CREATE TABLE IF NOT EXISTS usuarios (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           nombre TEXT NOT NULL,
           correo TEXT UNIQUE NOT NULL,
@@ -53,12 +58,8 @@ export default class DatabaseService {
           pregunta TEXT,
           respuesta TEXT,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        );
-      `);
-
-      // Tabla de transacciones
-      await this.db.execAsync(`
-        CREATE TABLE IF NOT EXISTS transacciones (
+        );`,
+        `CREATE TABLE IF NOT EXISTS transacciones (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           usuarioId INTEGER NOT NULL,
           tipo TEXT NOT NULL CHECK(tipo IN ('ingreso', 'egreso')),
@@ -67,12 +68,8 @@ export default class DatabaseService {
           descripcion TEXT,
           fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (usuarioId) REFERENCES usuarios(id)
-        );
-      `);
-
-      // Tabla de presupuestos por categoría
-      await this.db.execAsync(`
-        CREATE TABLE IF NOT EXISTS presupuestos (
+        );`,
+        `CREATE TABLE IF NOT EXISTS presupuestos (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           usuarioId INTEGER NOT NULL,
           categoria TEXT NOT NULL,
@@ -81,30 +78,39 @@ export default class DatabaseService {
           anio INTEGER NOT NULL,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
           FOREIGN KEY (usuarioId) REFERENCES usuarios(id)
-        );
-      `);
-
-      // Nueva tabla: presupuesto total mensual
-      await this.db.execAsync(`
-        CREATE TABLE IF NOT EXISTS presupuesto_total (
+        );`,
+        `CREATE TABLE IF NOT EXISTS presupuesto_total (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
+          usuarioId INTEGER NOT NULL,
           monto REAL NOT NULL,
           mes INTEGER NOT NULL,
           anio INTEGER NOT NULL,
-          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        );
-      `);
-
-      // Tabla de pagos programados
-      await this.db.execAsync(`
-        CREATE TABLE IF NOT EXISTS pagos_programados (
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (usuarioId) REFERENCES usuarios(id)
+        );`,
+        `CREATE TABLE IF NOT EXISTS pagos_programados (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
+          usuarioId INTEGER NOT NULL,
           titulo TEXT,
           monto REAL,
           fecha TEXT,
-          tipo TEXT
-        );
-      `);
+          tipo TEXT,
+          FOREIGN KEY (usuarioId) REFERENCES usuarios(id)
+        );`
+      ];
+
+      // ✅ EJECUTAR QUERIES SEGÚN LA API DISPONIBLE
+      if (this.db.execAsync) {
+        // Nueva API
+        for (const query of queries) {
+          await this.db.execAsync(query);
+        }
+      } else {
+        // API antigua
+        for (const query of queries) {
+          await this.executeSqlAsync(query);
+        }
+      }
 
       console.log('✅ Tablas creadas correctamente');
     } catch (error) {
@@ -113,7 +119,19 @@ export default class DatabaseService {
     }
   }
 
-  // ========== MÉTODOS CRUD ==========
+  // ✅ WRAPPER PARA API ANTIGUA
+  executeSqlAsync(sql, params = []) {
+    return new Promise((resolve, reject) => {
+      this.db.transaction(tx => {
+        tx.executeSql(
+          sql,
+          params,
+          (_, result) => resolve(result),
+          (_, error) => reject(error)
+        );
+      });
+    });
+  }
 
   async query(sql, params = []) {
     if (this.isWeb) {
@@ -121,8 +139,16 @@ export default class DatabaseService {
     }
 
     try {
-      const result = await this.db.getAllAsync(sql, params);
-      return result;
+      // ✅ COMPATIBLE CON AMBAS APIS
+      if (this.db.getAllAsync) {
+        // Nueva API
+        const result = await this.db.getAllAsync(sql, params);
+        return result;
+      } else {
+        // API antigua
+        const result = await this.executeSqlAsync(sql, params);
+        return result.rows._array || [];
+      }
     } catch (error) {
       console.error('❌ Error en query:', error);
       throw error;
@@ -146,10 +172,17 @@ export default class DatabaseService {
       const placeholders = keys.map(() => '?').join(', ');
 
       const sql = `INSERT INTO ${table} (${keys.join(', ')}) VALUES (${placeholders})`;
-      const result = await this.db.runAsync(sql, values);
-
-      console.log(`✅ Insertado en ${table} con ID: ${result.lastInsertRowId}`);
-      return { id: result.lastInsertRowId, ...payload };
+      
+      // ✅ COMPATIBLE CON AMBAS APIS
+      if (this.db.runAsync) {
+        // Nueva API
+        const result = await this.db.runAsync(sql, values);
+        return { id: result.lastInsertRowId, ...payload };
+      } else {
+        // API antigua
+        const result = await this.executeSqlAsync(sql, values);
+        return { id: result.insertId, ...payload };
+      }
     } catch (error) {
       console.error(`❌ Error al insertar en ${table}:`, error);
       throw error;
@@ -173,9 +206,14 @@ export default class DatabaseService {
       const setClause = keys.map((key) => `${key} = ?`).join(', ');
 
       const sql = `UPDATE ${table} SET ${setClause} WHERE id = ?`;
-      await this.db.runAsync(sql, [...values, id]);
+      
+      // ✅ COMPATIBLE CON AMBAS APIS
+      if (this.db.runAsync) {
+        await this.db.runAsync(sql, [...values, id]);
+      } else {
+        await this.executeSqlAsync(sql, [...values, id]);
+      }
 
-      console.log(`✅ Actualizado en ${table} ID: ${id}`);
       return { id, ...payload };
     } catch (error) {
       console.error(`❌ Error al actualizar ${table}:`, error);
@@ -190,8 +228,14 @@ export default class DatabaseService {
 
     try {
       const sql = `DELETE FROM ${table} WHERE id = ?`;
-      await this.db.runAsync(sql, [id]);
-      console.log(`✅ Eliminado de ${table} ID: ${id}`);
+      
+      // ✅ COMPATIBLE CON AMBAS APIS
+      if (this.db.runAsync) {
+        await this.db.runAsync(sql, [id]);
+      } else {
+        await this.executeSqlAsync(sql, [id]);
+      }
+      
       return { id };
     } catch (error) {
       console.error(`❌ Error al eliminar de ${table}:`, error);
@@ -199,8 +243,7 @@ export default class DatabaseService {
     }
   }
 
-  // ========== MÉTODOS PARA WEB (localStorage) ==========
-
+  // MÉTODOS WEB (sin cambios)
   queryWeb(sql, params = []) {
     const table = this.extractTableName(sql);
     if (!table) return [];
@@ -240,7 +283,6 @@ export default class DatabaseService {
     rows.push(newItem);
     allData[table] = rows;
     this.setLocalStorage(allData);
-    console.log(`✅ [Web] Insertado en ${table}`);
     return newItem;
   }
 
@@ -255,7 +297,6 @@ export default class DatabaseService {
     rows[index] = { ...rows[index], ...data };
     allData[table] = rows;
     this.setLocalStorage(allData);
-    console.log(`✅ [Web] Actualizado en ${table} ID: ${id}`);
     return rows[index];
   }
 
@@ -266,11 +307,8 @@ export default class DatabaseService {
 
     allData[table] = rows.filter((item) => String(item.id) !== String(id));
     this.setLocalStorage(allData);
-    console.log(`✅ [Web] Eliminado de ${table} ID: ${id}`);
     return { id };
   }
-
-  // ========== HELPERS INTERNOS ==========
 
   async filterData(table, data = {}, exclude = []) {
     const columns = await this.getTableColumns(table);
@@ -290,8 +328,15 @@ export default class DatabaseService {
     }
 
     if (!this.schemaCache[table]) {
-      const info = await this.db.getAllAsync(`PRAGMA table_info(${table});`);
-      this.schemaCache[table] = info.map((row) => row.name);
+      // ✅ COMPATIBLE CON AMBAS APIS
+      if (this.db.getAllAsync) {
+        const info = await this.db.getAllAsync(`PRAGMA table_info(${table});`);
+        this.schemaCache[table] = info.map((row) => row.name);
+      } else {
+        const result = await this.executeSqlAsync(`PRAGMA table_info(${table});`);
+        const info = result.rows._array || [];
+        this.schemaCache[table] = info.map((row) => row.name);
+      }
     }
 
     return this.schemaCache[table];

@@ -1,58 +1,93 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Switch, Image, ScrollView, Pressable, Alert, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, StyleSheet, Switch, Image, ScrollView, Pressable, Alert } from "react-native";
 import UsuarioController from "../controllers/UsuarioController";
 
 export default function Ajustes({ navigation, onLogout, usuario }) {
   const [notificacionesActivas, setNotificacionesActivas] = useState(true);
   const [controller] = useState(new UsuarioController());
   
-  const [editando, setEditando] = useState(false);
-  const [nombre, setNombre] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [correo, setCorreo] = useState("");
-
   useEffect(() => {
-    controller.init();
-    if (usuario) {
-      setNombre(usuario.nombre || "");
-      setCorreo(usuario.correo || "");
-      setTelefono(usuario.telefono || "");
-    }
-  }, [usuario]);
+    const initController = async () => {
+      try {
+        await controller.init();
+        console.log('✅ Controlador inicializado en Ajustes');
+      } catch (error) {
+        console.error('❌ Error al inicializar controlador:', error);
+        Alert.alert(
+          "Error de Inicialización",
+          "Hubo un problema al cargar la configuración. Por favor reinicia la aplicación."
+        );
+      }
+    };
+
+    initController();
+
+    // Suscribirse al sistema de observadores
+    const observerCallback = (action, data) => {
+      console.log('📢 Evento en Ajustes:', action);
+      
+      if (action === 'USUARIO_LOGOUT') {
+        console.log('Usuario ha cerrado sesión');
+      }
+    };
+
+    controller.subscribe(observerCallback);
+
+    // Cleanup
+    return () => {
+      controller.unsubscribe(observerCallback);
+    };
+  }, []);
 
   const handleLogout = () => {
     Alert.alert(
       "Cerrar Sesión",
       "¿Estás seguro de que quieres cerrar sesión?",
       [
-        { text: "Cancelar", style: "cancel" },
+        { 
+          text: "Cancelar", 
+          style: "cancel" 
+        },
         {
           text: "Cerrar Sesión",
           style: "destructive",
-          onPress: () => {
-            controller.logout();
-            if (onLogout) onLogout();
+          onPress: async () => {
+            try {
+              // Notificar logout
+              controller.logout();
+              
+              // Callback a App.js
+              if (onLogout) {
+                onLogout();
+              }
+
+              console.log('✅ Sesión cerrada correctamente');
+            } catch (error) {
+              console.error('❌ Error al cerrar sesión:', error);
+              Alert.alert(
+                "Error",
+                "Hubo un problema al cerrar sesión, pero se procederá de todos modos."
+              );
+              
+              // Intentar cerrar sesión de todos modos
+              if (onLogout) {
+                onLogout();
+              }
+            }
           }
         }
       ]
     );
   };
 
-  const guardarCambios = async () => {
-    if (!usuario?.id) return;
+  const handleNotificacionesToggle = (value) => {
+    setNotificacionesActivas(value);
     
-    const resultado = await controller.actualizarPerfil(usuario.id, {
-      nombre,
-      correo,
-      telefono,
-      contrasena: "" // Mantener contraseña actual
-    });
-
-    if (resultado.exito) {
-      Alert.alert("Éxito", "Datos actualizados correctamente");
-      setEditando(false);
+    // Aquí podrías guardar esta preferencia en la base de datos
+    if (value) {
+      console.log('✅ Notificaciones activadas');
     } else {
-      Alert.alert("Error", resultado.mensaje);
+      console.log('❌ Notificaciones desactivadas');
     }
   };
 
@@ -71,6 +106,8 @@ export default function Ajustes({ navigation, onLogout, usuario }) {
 
         <View style={styles.content}>
         
+        
+
           <Text style={styles.sectionLabel}>GENERAL</Text>
 
           <View style={styles.card}>
@@ -90,7 +127,7 @@ export default function Ajustes({ navigation, onLogout, usuario }) {
               </View>
               <Switch
                 value={notificacionesActivas}
-                onValueChange={setNotificacionesActivas}
+                onValueChange={handleNotificacionesToggle}
                 trackColor={{ false: "#e0e0e0", true: "#b3a5ff" }}
                 thumbColor={notificacionesActivas ? "#7b6cff" : "#f4f3f4"}
               />
@@ -187,57 +224,6 @@ const styles = StyleSheet.create({
     color: "#888",
     fontWeight: "500",
   },
-  inputEdit: {
-    fontSize: 14,
-    color: "#333",
-    fontWeight: "500",
-    borderBottomWidth: 1,
-    borderBottomColor: "#7b6cff",
-    paddingVertical: 5,
-  },
-  editButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  cancelButton: {
-    flex: 1,
-    backgroundColor: "#e0e0e0",
-    paddingVertical: 15,
-    borderRadius: 15,
-    marginRight: 10,
-    alignItems: "center",
-  },
-  cancelText: {
-    fontSize: 16,
-    color: "#666",
-    fontWeight: "700",
-  },
-  saveButton: {
-    flex: 1,
-    backgroundColor: "#7b6cff",
-    paddingVertical: 15,
-    borderRadius: 15,
-    alignItems: "center",
-  },
-  saveText: {
-    fontSize: 16,
-    color: "#fff",
-    fontWeight: "700",
-  },
-  editProfileButton: {
-    backgroundColor: "#7b6cff",
-    paddingVertical: 15,
-    borderRadius: 15,
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  editProfileText: {
-    fontSize: 16,
-    color: "#fff",
-    fontWeight: "700",
-  },
   logoutButton: {
     backgroundColor: "#ff7675",
     paddingVertical: 18,
@@ -245,8 +231,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 30,
     width: "100%",
-    
-    
   },
   exitText: {
     fontSize: 16,

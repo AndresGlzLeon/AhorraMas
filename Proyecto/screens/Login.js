@@ -25,6 +25,10 @@ export default function Login({ navigation, onLogin }) {
       return;
     }
     const resultado = await controller.login(email, password);
+    if (resultado.exito) {
+      console.log('✅ Usuario logueado:', resultado.usuario); // DEBUG
+      if (onLogin) onLogin(resultado.usuario);
+    }
     
     if (resultado.exito) {
       if (onLogin) onLogin(resultado.usuario);
